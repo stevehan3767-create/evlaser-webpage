@@ -1,6 +1,7 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import Icon from "./Icon";
+import { patents, certifications } from "@/lib/data";
 
 interface HistoryYear {
   year: string;
@@ -76,9 +77,49 @@ export default function CompanyInfo() {
         <div className="mx-auto max-w-[1240px] px-7">
           <span className="eyebrow">{t("patents.eyebrow")}</span>
           <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{t("patents.title")}</h2>
-          <div className="mt-6 flex gap-3 p-4 bg-blue-soft border border-line-strong max-w-[62ch]">
-            <Icon name="doc" className="w-5 h-5 text-blue flex-none" />
-            <p className="text-[13px] text-ink-soft">{t("patents.note")}</p>
+          <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("patents.summary")}</p>
+
+          <h3 className="mt-10 mb-4 text-[16px] font-bold">
+            {t("patents.patentsHeading")} <span className="font-mono text-ink-faint text-[13px]">({patents.length})</span>
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {patents.map((p, i) => (
+              <a
+                key={i}
+                href={p.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block border border-line-strong bg-surface hover:border-blue transition-colors"
+              >
+                <div className="relative aspect-[248/371] bg-surface-alt">
+                  <Image src={p.image} alt={p.title} fill sizes="200px" className="object-contain" />
+                </div>
+                <p className="p-2 text-[11px] text-ink-soft leading-snug line-clamp-3">{p.title}</p>
+              </a>
+            ))}
+          </div>
+
+          <h3 className="mt-12 mb-4 text-[16px] font-bold">
+            {t("patents.certsHeading")} <span className="font-mono text-ink-faint text-[13px]">({certifications.length})</span>
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {certifications.map((c, i) => (
+              <a
+                key={i}
+                href={c.image}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block border border-line-strong bg-surface hover:border-blue transition-colors"
+              >
+                <div className="relative aspect-[248/371] bg-surface-alt">
+                  <Image src={c.image} alt={c.title} fill sizes="200px" className="object-contain" />
+                </div>
+                <div className="p-2">
+                  <p className="text-[11px] text-ink-soft leading-snug line-clamp-2">{c.title}</p>
+                  {c.subtitle && <p className="text-[10.5px] text-ink-faint leading-snug mt-0.5">{c.subtitle}</p>}
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>

@@ -141,7 +141,8 @@
     "print3d": "3D Printing",
     "medical": "Medical Devices",
     "safety": "Laser Safety",
-    "other": "Other"
+    "other": "Other",
+    "etching": "Laser Etching"
   },
   "sitemap": {
     "eyebrow": "SITE STRUCTURE",
@@ -193,16 +194,18 @@
     "offices": "Offices & Contacts",
     "distributors": "Find a Distributor",
     "table": {
+      "location": "Location",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
       "country": "Country",
       "partner": "Partner",
-      "contact": "Contact",
-      "phone": "Phone"
+      "contact": "Contact"
     },
     "rows": {
-      "hq": "EV Laser HQ",
+      "hq": "Head Office",
       "techCenter": "Laser Technology Center",
-      "salesSupport": "Sales Support Team",
-      "techSupport": "Technical Support Team"
+      "suzhou": "EVLS (Suzhou, China)"
     }
   },
   "news": {
@@ -457,7 +460,9 @@
     "patents": {
       "eyebrow": "PATENTS & CERTIFICATIONS",
       "title": "Patents & Certifications",
-      "note": "Our patents and certifications (e.g. ISO) will be listed here once the actual certificate details are provided."
+      "summary": "EVLASER CO., LTD. holds the highest level of technical expertise, backed by 23 domestically registered patents and 13 certifications. We grow together with our customers on a foundation of quality and trust.",
+      "patentsHeading": "Patents",
+      "certsHeading": "Certifications"
     }
   },
   "footer": {
@@ -473,6 +478,208 @@
       "products": "Products & Tech",
       "resources": "Resource Center",
       "contact": "Contact"
+    }
+  },
+  "techDetails": {
+    "featuresHeading": "Technical Features",
+    "applicationsHeading": "Applications",
+    "parametersHeading": "Key Parameters",
+    "plasticWelding": {
+      "title": "Laser Plastics Welding",
+      "materials": [
+        "Plastic"
+      ],
+      "description": [
+        "The basic principle of laser plastic welding is to overlap an upper-layer base material with optical properties that transmit the laser beam and a lower-layer base material that absorbs the laser beam. When the laser beam is irradiated from above, it passes through the upper layer and reaches the interface with the lower layer, raising the surface temperature of the lower material. The heat generated in this process then transfers back into the upper layer, melting both materials at the interface and joining them together.",
+        "Traditional methods used for joining plastics have typically included adhesive bonding, ultrasonic and vibration friction welding, hot-plate welding, and mechanical fastening with screws.",
+        "Despite each having its own advantages, these methods have created demand for an alternative process due to drawbacks such as poor appearance quality, watertightness issues, burrs and flash, higher production costs, design constraints, workplace environment concerns, and low productivity.",
+        "Laser plastic welding offers several advantages over these conventional joining methods — in particular, it resolves watertightness (leak) defects, appearance quality issues, and burr/flash problems while achieving high joint strength and requiring less installation space. It is also known that, to minimize injection-molding deformation and other fundamental issues and to ensure stable quality in mass production, technical factors should be reviewed thoroughly with expert guidance from the product design stage onward, minimizing trial and error when adopting the new technology."
+      ],
+      "features": [
+        "Non-contact process with no burrs or flash",
+        "Outstanding weld quality that eliminates appearance defects",
+        "High process stability and flexibility",
+        "Minimal mechanical stress through uniform heat input",
+        "Applicable to both 2D and 3D shaped products"
+      ],
+      "applications": [
+        "Automotive precision sensor components",
+        "Automotive actuator components",
+        "Automotive lamps, camera modules and other electronic components"
+      ],
+      "parameters": "Laser beam wavelength and characteristics, laser power, optical properties, material transmittance, material thickness and color, feed/clamping systems and quality control equipment"
+    },
+    "etching": {
+      "title": "Laser Etching",
+      "materials": [
+        "Plastic",
+        "Metal",
+        "Glass",
+        "Other"
+      ],
+      "description": [
+        "Laser etching is a broad term covering a wide range of engraving and shallow marking processes. It can be applied to nearly any material across products such as automotive parts, medical devices, wine barrels, micro-electronic components, and gravestones. Laser etching is generally distinguished from marking in that it changes the surface roughness of a part rather than simply altering its surface color or texture.",
+        "The main purpose of laser etching is to create fine patterns, designs, text, and images on a wide range of materials. Thanks to its precision, speed, and versatility, the technology is widely used across many industries."
+      ],
+      "features": [
+        "Material versatility: applicable to nearly all material types, including plastic, metal, glass and ceramics",
+        "Precision: laser beams enable the creation of highly precise patterns",
+        "Non-contact, wear-free processing"
+      ],
+      "applications": [
+        "Automotive parts, medical devices, micro-electronics",
+        "Manufacturing of precision components such as electronic devices",
+        "A wide range of metal and plastic parts"
+      ],
+      "parameters": "Laser wavelength, power, scan speed, repetition rate, scan pattern, focal position"
+    },
+    "cleaning": {
+      "title": "Laser Cleaning",
+      "materials": [
+        "Plastic",
+        "Metal",
+        "Other"
+      ],
+      "description": [
+        "Laser cleaning is a non-contact method that uses a high-energy laser beam to remove contaminants from a surface.",
+        "The transferred heat melts the material to form a molten pool, after which the treated area is cooled and fused. The technology is gaining attention across industries as an environmentally friendly and precise alternative to conventional chemical and mechanical cleaning methods."
+      ],
+      "features": [
+        "Thermal contaminant removal: rapidly heats the contaminant layer to vaporize it, or dislodges it through gas pressure and shockwaves",
+        "Non-contact, wear-free processing: selectively removes contaminants without damaging the substrate",
+        "Environmentally friendly, with no pollution and no waste generated"
+      ],
+      "applications": [
+        "Aerospace and automotive industries: parts cleaning, paint removal, maintenance",
+        "Metal surface cleaning: removal of rust, oxides, and oil",
+        "Cultural heritage preservation: delicate restoration work",
+        "Manufacturing industry: surface preparation before welding or coating"
+      ],
+      "parameters": "Pulse width, energy density, scan speed, irradiation time, wavelength (typically fiber, 1064 nm)"
+    },
+    "cutting": {
+      "title": "Laser Plastic Cutting",
+      "materials": [
+        "Plastic"
+      ],
+      "description": [
+        "Laser plastic cutting is a technology that uses a high-energy laser beam to precisely cut plastic. As a non-contact cutting process using heat, it minimizes deformation while enabling precise processing. With fast cutting speeds and high productivity, it is widely used across industry. It is applicable to a wide range of plastic materials and is especially useful where complex shapes and precise designs are required."
+      ],
+      "features": [
+        "High-speed processing: much faster than mechanical cutting, improving productivity",
+        "Material versatility: broadly applicable to various plastics such as acrylic, polycarbonate, and polyethylene",
+        "Non-contact processing: minimizes material damage since there is no physical contact"
+      ],
+      "applications": [
+        "Display components, precision parts for medical devices",
+        "Processing of acrylic, film, and plastic parts",
+        "Cutting of plastic products such as toy and lighting components"
+      ],
+      "parameters": "Power, scan speed, focal spot diameter, processing speed, wavelength (e.g. CO₂ 10.6 μm)"
+    },
+    "marking": {
+      "title": "Laser Marking",
+      "materials": [
+        "Plastic",
+        "Metal",
+        "Glass",
+        "Other"
+      ],
+      "description": [
+        "Laser marking is a technology that uses laser light to alter a material's surface to engrave logos, product names, serial numbers, and more. By transforming or carbonizing the surface, it produces clear, highly durable marks. Since it requires no ink or chemicals, it is applicable to a wide range of materials in an environmentally friendly way. It is widely used in industries that require precise, long-lasting marking on diverse materials."
+      ],
+      "features": [
+        "High-precision marking: produces precise patterns or characters at exact positions",
+        "Semi-permanent: highly durable and resistant to wear, suitable for long-term use",
+        "Applicable to diverse materials: metal, plastic, wood, and more",
+        "High-speed processing: fast marking speed maximizes production efficiency"
+      ],
+      "applications": [
+        "Automotive parts processing (serial number marking)",
+        "Identification code marking on electronic components",
+        "Logo printing on medical devices",
+        "Product identification marking for industrial parts and consumer goods"
+      ],
+      "parameters": "Wavelength (fiber/CO₂/UV), irradiation time, beam diameter, scan speed, focal position"
+    },
+    "heatTreatment": {
+      "title": "Laser Heat Treatment",
+      "materials": [
+        "Metal",
+        "Other"
+      ],
+      "description": [
+        "Laser heat treatment is a technology that uses a high-energy laser beam to locally heat a material's surface, increasing hardness and improving wear resistance. Rapid heating and cooling minimize deformation while enabling precise, localized heat treatment. It is used across industries to enhance the physical and chemical properties of materials."
+      ],
+      "features": [
+        "Precision heat treatment: concentrates high energy locally to precisely treat only the targeted micro-area",
+        "High energy density: rapidly heats the surface while enabling control of the microstructure",
+        "Improved material performance: enhances mechanical properties such as hardness, toughness, and fatigue strength, and increases durability"
+      ],
+      "applications": [
+        "Automotive industry, parts processing",
+        "Aerospace industry, improving durability of high-strength steel and engine components",
+        "Metalworking: enhancing wear resistance of cutting tools, bearings, and molds",
+        "Electronics and electrical industry: used for surface treatment and improvement of electronic components"
+      ],
+      "parameters": "Power, feed speed, beam size, irradiation time, cooling rate"
+    },
+    "cladding": {
+      "title": "Laser Cladding",
+      "materials": [
+        "Metal",
+        "Other"
+      ],
+      "description": [
+        "Laser cladding is a method that uses a laser beam to melt metal powder or wire onto the surface of a base material, forming a coating. It forms a uniform coating layer that gives the part stronger properties than the original material, effectively extending its service life. The technology improves wear resistance, corrosion resistance, and heat resistance, and is widely used across industries."
+      ],
+      "features": [
+        "Concentrated heating and rapid cooling: uses concentrated heat to melt the material, then rapid cooling to form a strong metallurgical bond and fine microstructure",
+        "Minimal heat impact: reduces deformation and damage to the workpiece",
+        "High-quality coating: strong adhesion and uniform coating with low distortion and dilution",
+        "High-speed, high-precision coating",
+        "Applicable to complex shapes"
+      ],
+      "applications": [
+        "Automotive industry, parts processing",
+        "Aerospace industry, processing of high-strength components",
+        "Oil and marine equipment, heavy-load machine parts, power generation equipment processing",
+        "High-performance industrial metals, mold coating, repair, and service-life extension"
+      ],
+      "parameters": "Powder feed rate, laser power, track spacing, scan path, cooling rate"
+    },
+    "safety": {
+      "title": "Laser Safety",
+      "intro": [
+        "Laser safety is a responsibility, not merely a regulatory requirement.",
+        "EVLASER drives innovation and growth built on safety by complying with international standards, implementing state-of-the-art safety measures, and raising awareness."
+      ],
+      "principlesHeading": "What Is Laser Safety",
+      "principlesIntro": "Laser safety encompasses the practices, standards, and technologies designed to mitigate the risks associated with laser use.",
+      "principles": [
+        {
+          "title": "Understanding Laser Classifications",
+          "desc": "Different laser types pose varying levels of risk — from harmless Class 1 devices to high-power Class 4 lasers that can cause serious injury if mishandled."
+        },
+        {
+          "title": "Protective Equipment",
+          "desc": "Certified safety glasses, barriers, and interlock devices are used to prevent exposure."
+        },
+        {
+          "title": "Training and Awareness",
+          "desc": "Users are educated on potential hazards and best practices to ensure safe operation."
+        },
+        {
+          "title": "Regulatory Compliance",
+          "desc": "The highest level of protection is maintained by complying with global safety standards."
+        }
+      ],
+      "importanceHeading": "Why Laser Safety Matters",
+      "importance": [
+        "Lasers are extremely useful, but high-power lasers used in industrial and medical settings can pose risks such as eye injury, skin burns, or fire hazards if not handled safely. By taking proactive measures, companies can prevent accidents, reduce liability, and improve productivity.",
+        "EVLASER is committed to complying with safety standards across all of its laser equipment, and aims to provide customers with safe, reliable laser solutions through continuous research and development.",
+        "See EVLASER's laser safety solutions and be assured of the highest safety standards. With the right precautions and technology, lasers are clearly a safe and effective tool that drives industrial growth."
+      ]
     }
   }
 }

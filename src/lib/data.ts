@@ -38,6 +38,7 @@ export const techItems: TechItem[] = [
   { icon: "weld", key: "glassWelding" },
   { icon: "cut", key: "cutting" },
   { icon: "mark", key: "marking" },
+  { icon: "mark", key: "etching" },
   { icon: "clean", key: "cleaning" },
   { icon: "precision", key: "precisionMachining" },
   { icon: "drill", key: "drilling" },
@@ -47,6 +48,19 @@ export const techItems: TechItem[] = [
   { icon: "medical", key: "medical" },
   { icon: "safety", key: "safety" },
   { icon: "etc", key: "other" },
+];
+
+// Tech items with real, user-provided detail content (source: evlaser.co.kr
+// "사업소개 > 주요공법" pages). See messages `techDetails` namespace.
+// "safety" uses a different content shape and is rendered separately.
+export const techDetailKeys = [
+  "plasticWelding",
+  "etching",
+  "cleaning",
+  "cutting",
+  "marking",
+  "heatTreatment",
+  "cladding",
 ];
 
 export interface NavItem {
@@ -136,9 +150,26 @@ export const sitemap: SitemapBranch[] = [
   },
 ];
 
+// Real addresses (source: evlaser.co.kr "오시는 길" page, provided by the user).
 export const officeRows = [
-  { country: "Korea (HQ)", partnerKey: "hq", contactKey: "salesSupport", phone: "+82 31 452 9860" },
-  { country: "Korea (Laser Tech Center)", partnerKey: "techCenter", contactKey: "techSupport", phone: "+82 31 452 9860" },
+  {
+    key: "hq",
+    address: "경기도 군포시 고산로 148번길 17 군포IT밸리 B동 313호 (15850)",
+    phone: "+82 31 452 9860",
+    email: "info@evlaser.co.kr",
+  },
+  {
+    key: "techCenter",
+    address: "경기도 군포시 농심로2 삼보 스카이비즈 706-709호 (15845)",
+    phone: "+82 31 452 9860",
+    email: "info@evlaser.co.kr",
+  },
+  {
+    key: "suzhou",
+    address: "1F, Building 1, Xinyi Vaogu Wisdom Industrial Park, 415 Changyang Street, Suzhou Industrial Park, Suzhou City, Jiangsu Province, China (215000)",
+    phone: "+86 512 6515 8026",
+    email: "info@evlaser.cn",
+  },
 ];
 
 export const distributorRows = [
@@ -166,6 +197,53 @@ export const ceoCards = [
   { id: "ethics", icon: "shield" as IconName },
   { id: "praise", icon: "star" as IconName },
   { id: "complaint", icon: "alert" as IconName },
+];
+
+// Real patent titles as registered with the Korean Intellectual Property
+// Office (source: evlaser.co.kr "특허&인증서" page, provided by the user).
+export const patents = [
+  { image: "/images/patents/patent-01.jpg", title: "레이저빔 투과율 측정장치" },
+  { image: "/images/patents/patent-02.jpg", title: "다중 레이저빔을 이용한 원통형플라스틱 배관 경방향 접근 방식 동시조사 레이저 용접장치" },
+  { image: "/images/patents/patent-03.jpg", title: "레이저빔 반사채널 및 다관절로봇을 이용한 레이저플라스틱 용접장치" },
+  { image: "/images/patents/patent-04.jpg", title: "레이저빔 반사채널 및 스캐너를 이용한 레이저플라스틱 용접장치" },
+  { image: "/images/patents/patent-05.jpg", title: "레이저빔의 반사를 이용한 플라스틱 용접시스템" },
+  { image: "/images/patents/patent-06.jpg", title: "타원궤적 추종형 레이저 융착장치" },
+  { image: "/images/patents/patent-07.jpg", title: "클래딩장치" },
+  { image: "/images/patents/patent-08.jpg", title: "지그 착탈식 레이저 융착장치" },
+  { image: "/images/patents/patent-09.jpg", title: "레이저금속코팅장치" },
+  { image: "/images/patents/patent-10.jpg", title: "대용량 배터리 케이스 레이저 융착장치" },
+  { image: "/images/patents/patent-11.jpg", title: "레이저 융착용 리모콘 클램핑장치" },
+  { image: "/images/patents/patent-12.jpg", title: "금속표면 경도측정장치를 채용한 레이저금속 표면 열처리 시스템" },
+  { image: "/images/patents/patent-13.jpg", title: "압축기용 머플러 레이저 융착장치" },
+  { image: "/images/patents/patent-14.jpg", title: "자동차용 연료필터 레이저 융착장치" },
+  { image: "/images/patents/patent-15.jpg", title: "레이저를 이용한 진공챔버에서의 금속표면 열처리 장치" },
+  { image: "/images/patents/patent-16.jpg", title: "레이저빔 투과율 측정장치" },
+  { image: "/images/patents/patent-17.jpg", title: "자동차램프 레이저 융착방법/융착장치" },
+  { image: "/images/patents/patent-18.jpg", title: "크랭크샤프트 레이저 열처리 장치" },
+  { image: "/images/patents/patent-19.jpg", title: "레이저 금속 코팅장치용 노즐" },
+  { image: "/images/patents/patent-20.jpg", title: "플라스틱 레이저 용접장치" },
+  { image: "/images/patents/patent-21.jpg", title: "레이저 필름접장치" },
+  { image: "/images/patents/patent-22.jpg", title: "레이저 플라스틱 용접시스템" },
+  { image: "/images/patents/patent-23.jpg", title: "플라스틱 레이저용접의 클램핑 방법" },
+];
+
+// Real certifications (source: evlaser.co.kr "특허&인증서" page). Titles keep
+// the official Korean document name with an English gloss for international
+// standards, since these are registered document titles, not marketing copy.
+export const certifications = [
+  { image: "/images/certifications/cert-01.jpg", title: "ISO 9001:2015 / KS Q ISO 9001:2015", subtitle: "품질경영시스템 인증 (Quality Management System)" },
+  { image: "/images/certifications/cert-02.jpg", title: "ISO 14001:2015 / KS I ISO 14001:2015", subtitle: "환경경영시스템 인증 (Environmental Management System)" },
+  { image: "/images/certifications/cert-03.jpg", title: "CE 인증 (EC Declaration of Conformity)", subtitle: "ELCR LASER / ELCR-LC" },
+  { image: "/images/certifications/cert-04.jpg", title: "CE 인증 (EC Declaration of Conformity)" },
+  { image: "/images/certifications/cert-05.jpg", title: "CE 인증 (Declaration of Conformity)", subtitle: "ELCR LASER / ELCR-LC" },
+  { image: "/images/certifications/cert-06.jpg", title: "공장등록증명(신청)서", subtitle: "Factory Registration Certificate" },
+  { image: "/images/certifications/cert-07.jpg", title: "기업부설연구소 인정서", subtitle: "In-house R&D Institute Certification" },
+  { image: "/images/certifications/cert-08.jpg", title: "경영혁신형 중소기업(Main-Biz) 확인서" },
+  { image: "/images/certifications/cert-09.jpg", title: "뿌리기술 전문기업 지정증" },
+  { image: "/images/certifications/cert-10.jpg", title: "CE 인증 (EC Declaration of Conformity)" },
+  { image: "/images/certifications/cert-11.jpg", title: "소재·부품전문기업확인서" },
+  { image: "/images/certifications/cert-12.jpg", title: "기술혁신형 중소기업(Inno-Biz) 확인서" },
+  { image: "/images/certifications/cert-13.jpg", title: "벤처기업확인서" },
 ];
 
 export const showcaseSlides = [
