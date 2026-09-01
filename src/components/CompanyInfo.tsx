@@ -2,8 +2,15 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 
+interface HistoryYear {
+  year: string;
+  items: string[];
+}
+
 export default function CompanyInfo() {
   const t = useTranslations("company");
+  const greetingParagraphs = t.raw("greeting.paragraphs") as string[];
+  const historyItems = t.raw("history.items") as HistoryYear[];
 
   return (
     <>
@@ -13,7 +20,21 @@ export default function CompanyInfo() {
           <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
             {t("title")}
           </h1>
-          <p className="mt-5 max-w-[62ch] text-ink-soft text-[16px] leading-relaxed">{t("intro")}</p>
+
+          <div className="mt-10 max-w-[68ch]">
+            <span className="eyebrow">{t("greeting.eyebrow")}</span>
+            <h2 className="mt-2.5 text-[22px] sm:text-[28px] font-[family-name:var(--font-display)] tracking-tight">
+              {t("greeting.title")}
+            </h2>
+            <div className="mt-5 flex flex-col gap-4">
+              {greetingParagraphs.map((p, i) => (
+                <p key={i} className="text-ink-soft text-[15px] leading-relaxed">
+                  {p}
+                </p>
+              ))}
+            </div>
+            <p className="mt-6 font-bold text-ink text-[14px]">{t("greeting.signature")}</p>
+          </div>
         </div>
       </section>
 
@@ -21,16 +42,22 @@ export default function CompanyInfo() {
         <div className="mx-auto max-w-[1240px] px-7">
           <span className="eyebrow">{t("history.eyebrow")}</span>
           <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{t("history.title")}</h2>
+          <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("history.summary")}</p>
           <div className="mt-8 border-t border-line-strong">
-            <div className="flex gap-6 py-4 border-b border-line">
-              <span className="font-mono font-bold text-blue w-[64px] flex-none">2002</span>
-              <span className="text-ink-soft text-[13.8px]">{t("history.founded")}</span>
-            </div>
-            <div className="flex gap-6 py-4 border-b border-line">
-              <span className="font-mono font-bold text-blue w-[64px] flex-none">2026</span>
-              <span className="text-ink-soft text-[13.8px]">{t("history.placeholder")}</span>
-            </div>
+            {historyItems.map((h) => (
+              <div key={h.year} className="flex gap-6 py-4 border-b border-line">
+                <span className="font-mono font-bold text-blue w-[64px] flex-none">{h.year}</span>
+                <ul className="flex flex-col gap-1">
+                  {h.items.map((item, i) => (
+                    <li key={i} className="text-ink-soft text-[13.8px]">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
+          <p className="mt-6 text-ink-faint text-[12.5px]">{t("history.moreNote")}</p>
         </div>
       </section>
 

@@ -1,13 +1,63 @@
 {
   "nav": {
-    "company": { "label": "Company", "items": { "overview": "Overview", "history": "History", "business": "Business Areas", "patents": "Patents & Certs", "directions": "Directions" } },
-    "products": { "label": "Products & Tech", "items": { "byTech": "By Technology", "byIndustry": "By Industry", "byMaterial": "By Material" } },
-    "resources": { "label": "Resource Center", "items": { "docs": "Technical Papers", "videos": "Video Library", "cases": "Case Studies" } },
-    "news": { "label": "News", "items": { "company": "Company News", "exhibition": "Exhibitions", "industry": "Industry Trends" } },
-    "careers": { "label": "Careers", "items": { "openings": "Open Positions", "culture": "Our People" } },
-    "global": { "label": "Global Network", "items": { "offices": "Offices & Contacts", "distributors": "Find a Distributor" } },
-    "support": { "label": "Contact", "items": { "contact": "Contact (Q&A)", "faq": "FAQ" } },
-    "ceo": { "label": "CEO Direct Channel" }
+    "company": {
+      "label": "Company",
+      "items": {
+        "overview": "Overview",
+        "history": "History",
+        "business": "Business Areas",
+        "patents": "Patents & Certs",
+        "directions": "Directions"
+      }
+    },
+    "products": {
+      "label": "Products & Tech",
+      "items": {
+        "byTech": "By Technology",
+        "byIndustry": "By Industry",
+        "byMaterial": "By Material"
+      }
+    },
+    "resources": {
+      "label": "Resource Center",
+      "items": {
+        "docs": "Technical Papers",
+        "videos": "Video Library",
+        "cases": "Case Studies"
+      }
+    },
+    "news": {
+      "label": "News",
+      "items": {
+        "company": "Company News",
+        "exhibition": "Exhibitions",
+        "industry": "Industry Trends"
+      }
+    },
+    "careers": {
+      "label": "Careers",
+      "items": {
+        "openings": "Open Positions",
+        "culture": "Our People"
+      }
+    },
+    "global": {
+      "label": "Global Network",
+      "items": {
+        "offices": "Offices & Contacts",
+        "distributors": "Find a Distributor"
+      }
+    },
+    "support": {
+      "label": "Contact",
+      "items": {
+        "contact": "Contact (Q&A)",
+        "faq": "FAQ"
+      }
+    },
+    "ceo": {
+      "label": "CEO Direct Channel"
+    }
   },
   "topbar": {
     "ceo": "CEO Direct Channel",
@@ -15,9 +65,16 @@
     "careers": "Careers",
     "global": "Global Network"
   },
-  "search": { "label": "Search", "placeholder": "Search products, tech, resources" },
-  "drawer": { "title": "Menu" },
-  "logo": { "since": "SINCE 2002" },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search products, tech, resources"
+  },
+  "drawer": {
+    "title": "Menu"
+  },
+  "logo": {
+    "since": "SINCE 2002"
+  },
   "hero": {
     "eyebrow": "SINCE 2002 · SPECIALIZED IN LASER TECHNOLOGY",
     "title": "Precision engineering <em>the future of industry</em>",
@@ -30,11 +87,26 @@
     "stat3": "Languages supported"
   },
   "showcase": {
-    "s1": { "tag": "BATTERY WELDING", "title": "Laser welding line for battery packs" },
-    "s2": { "tag": "PRECISION CUTTING", "title": "Precision metal-part laser cutting" },
-    "s3": { "tag": "SEMICONDUCTOR MARKING", "title": "Laser marking for semiconductor parts" },
-    "s4": { "tag": "SURFACE CLADDING", "title": "Laser cladding surface coating" },
-    "s5": { "tag": "ADDITIVE MANUFACTURING", "title": "Metal 3D printing equipment" }
+    "s1": {
+      "tag": "BATTERY WELDING",
+      "title": "Laser welding line for battery packs"
+    },
+    "s2": {
+      "tag": "PRECISION CUTTING",
+      "title": "Precision metal-part laser cutting"
+    },
+    "s3": {
+      "tag": "SEMICONDUCTOR MARKING",
+      "title": "Laser marking for semiconductor parts"
+    },
+    "s4": {
+      "tag": "SURFACE CLADDING",
+      "title": "Laser cladding surface coating"
+    },
+    "s5": {
+      "tag": "ADDITIVE MANUFACTURING",
+      "title": "Metal 3D printing equipment"
+    }
   },
   "industries": {
     "eyebrow": "INDUSTRIES WE SERVE",
@@ -88,15 +160,27 @@
     }
   },
   "admin": {
-    "items": { "contentMgmt": "Content Management", "memberMgmt": "Inquiries & Members" }
+    "items": {
+      "contentMgmt": "Content Management",
+      "memberMgmt": "Inquiries & Members"
+    }
   },
   "resources": {
     "eyebrow": "RESOURCE CENTER",
     "title": "Resource Center",
     "categories": {
-      "doc": { "title": "Technical Papers", "desc": "Download whitepapers, spec sheets and application reports." },
-      "video": { "title": "Video Library", "desc": "Watch real equipment footage and process demonstrations." },
-      "case": { "title": "Case Studies", "desc": "Industry deployment stories and performance data." }
+      "doc": {
+        "title": "Technical Papers",
+        "desc": "Download whitepapers, spec sheets and application reports."
+      },
+      "video": {
+        "title": "Video Library",
+        "desc": "Watch real equipment footage and process demonstrations."
+      },
+      "case": {
+        "title": "Case Studies",
+        "desc": "Industry deployment stories and performance data."
+      }
     },
     "emptyNote": "Items will appear here once added from the admin panel.",
     "autoBadge": "Auto-collected industry updates twice weekly · Published after staff review",
@@ -108,8 +192,18 @@
     "desc": "Local support close to you through our worldwide offices and distributors.",
     "offices": "Offices & Contacts",
     "distributors": "Find a Distributor",
-    "table": { "country": "Country", "partner": "Partner", "contact": "Contact", "phone": "Phone" },
-    "rows": { "hq": "EV Laser HQ", "techCenter": "Laser Technology Center", "salesSupport": "Sales Support Team", "techSupport": "Technical Support Team" }
+    "table": {
+      "country": "Country",
+      "partner": "Partner",
+      "contact": "Contact",
+      "phone": "Phone"
+    },
+    "rows": {
+      "hq": "EV Laser HQ",
+      "techCenter": "Laser Technology Center",
+      "salesSupport": "Sales Support Team",
+      "techSupport": "Technical Support Team"
+    }
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",
@@ -124,16 +218,35 @@
     "viewAll": "View All Openings",
     "apply": "Apply Now",
     "jobs": {
-      "laserEngineer": { "title": "Laser Applications Engineer", "type": "Full-time · Experienced", "loc": "Gunpo HQ", "due": "Rolling basis" },
-      "overseasSales": { "title": "Overseas Sales / Global Marketing", "type": "Full-time · Any level", "loc": "Gunpo HQ", "due": "Rolling basis" }
+      "laserEngineer": {
+        "title": "Laser Applications Engineer",
+        "type": "Full-time · Experienced",
+        "loc": "Gunpo HQ",
+        "due": "Rolling basis"
+      },
+      "overseasSales": {
+        "title": "Overseas Sales / Global Marketing",
+        "type": "Full-time · Any level",
+        "loc": "Gunpo HQ",
+        "due": "Rolling basis"
+      }
     },
     "culture": {
       "eyebrow": "OUR PEOPLE",
       "title": "Our People",
       "values": {
-        "expertise": { "title": "Expertise", "desc": "Deep specialists devoted to laser technology alone" },
-        "integrity": { "title": "Integrity", "desc": "A principled attitude trusted by customers and colleagues" },
-        "challenge": { "title": "Challenge", "desc": "Fearless in taking on new technologies and industries" }
+        "expertise": {
+          "title": "Expertise",
+          "desc": "Deep specialists devoted to laser technology alone"
+        },
+        "integrity": {
+          "title": "Integrity",
+          "desc": "A principled attitude trusted by customers and colleagues"
+        },
+        "challenge": {
+          "title": "Challenge",
+          "desc": "Fearless in taking on new technologies and industries"
+        }
       }
     }
   },
@@ -143,9 +256,21 @@
     "desc": "The CEO personally listens to and acts on feedback from customers and employees.",
     "confid": "This channel is operated directly by the CEO. Reporters' identities and content are kept strictly confidential, with protection against any retaliation. Submissions are forwarded instantly to the CEO's personal email (sbhan3763@naver.com).",
     "cards": {
-      "ethics": { "title": "Ethics Reporting Center", "desc": "Report misconduct, bribery, or workplace harassment securely, anonymously or by name.", "cta": "Report an Issue" },
-      "praise": { "title": "Employee Commendation", "desc": "Recommend an employee who went above and beyond — the CEO personally recognizes and rewards them.", "cta": "Give Praise" },
-      "complaint": { "title": "CEO Direct Customer Feedback", "desc": "Unresolved issues from regular support are handled personally and quickly by the CEO.", "cta": "Submit Feedback" }
+      "ethics": {
+        "title": "Ethics Reporting Center",
+        "desc": "Report misconduct, bribery, or workplace harassment securely, anonymously or by name.",
+        "cta": "Report an Issue"
+      },
+      "praise": {
+        "title": "Employee Commendation",
+        "desc": "Recommend an employee who went above and beyond — the CEO personally recognizes and rewards them.",
+        "cta": "Give Praise"
+      },
+      "complaint": {
+        "title": "CEO Direct Customer Feedback",
+        "desc": "Unresolved issues from regular support are handled personally and quickly by the CEO.",
+        "cta": "Submit Feedback"
+      }
     }
   },
   "support": {
@@ -153,16 +278,34 @@
     "title": "Contact Us",
     "desc": "Send us a message about products, technology, or partnerships — our team responds quickly.",
     "channelNote": {
-      "ethics": { "label": "Ethics Report", "note": "Handled directly by the CEO; your identity and content are kept strictly confidential." },
-      "praise": { "label": "Employee Commendation", "note": "Your recommendation is forwarded directly to the CEO." },
-      "complaint": { "label": "CEO Direct Customer Feedback", "note": "The CEO will personally review and resolve this quickly." },
+      "ethics": {
+        "label": "Ethics Report",
+        "note": "Handled directly by the CEO; your identity and content are kept strictly confidential."
+      },
+      "praise": {
+        "label": "Employee Commendation",
+        "note": "Your recommendation is forwarded directly to the CEO."
+      },
+      "complaint": {
+        "label": "CEO Direct Customer Feedback",
+        "note": "The CEO will personally review and resolve this quickly."
+      },
       "prefix": "will be submitted through this channel."
     },
     "mailNote": "Submissions here are forwarded to our team's mailbox. If email delivery isn't configured on this deployment, submissions are still saved but no email is actually sent.",
     "faq": {
-      "quote": { "q": "How do I request a quote?", "a": "Share your industry and requirements in the form and our team will follow up." },
-      "install": { "q": "Do you support overseas installation?", "a": "Yes — our global network of distributors handles local installation and maintenance." },
-      "access": { "q": "Do I need an account to view technical materials?", "a": "Public resources are open to all; some detailed materials require staff verification." }
+      "quote": {
+        "q": "How do I request a quote?",
+        "a": "Share your industry and requirements in the form and our team will follow up."
+      },
+      "install": {
+        "q": "Do you support overseas installation?",
+        "a": "Yes — our global network of distributors handles local installation and maintenance."
+      },
+      "access": {
+        "q": "Do I need an account to view technical materials?",
+        "a": "Public resources are open to all; some detailed materials require staff verification."
+      }
     },
     "form": {
       "name": "Name",
@@ -181,12 +324,129 @@
   "company": {
     "eyebrow": "COMPANY",
     "title": "Company",
-    "intro": "Founded in 2002, EV Laser is a global laser solutions company that has focused solely on laser technology, powering automotive, semiconductor, biomedical and aerospace manufacturing with precision laser solutions — guided by our slogan, \"Better Laser Technology makes Better World.\"",
+    "greeting": {
+      "eyebrow": "GREETING",
+      "title": "Greeting",
+      "paragraphs": [
+        "Welcome to EVLASER CO., LTD.",
+        "EVLASER CO., LTD. was founded in April 2002 under the name EuroVision Co., Ltd., as a venture company developing industrial laser application technologies. We have grown together with countless partners in Korea and around the world — Europe, South America, China, Southeast Asia and beyond — by developing broad and innovative laser-based technologies applied across nearly every industry, including automotive, steel, electronics, semiconductor, shipbuilding and machinery. In 2018, we changed our name to EVLASER CO., LTD. / EVLaser Co., Ltd. to prepare for a greater leap toward becoming a truly global company.",
+        "Our in-house R&D institute and engineering staff at EVLASER CO., LTD. / EVLaser Co., Ltd. — made up of professionals with rich experience and the highest passion — together with our Laser Technology Center, equipped with more than 30 laser processing systems, and the strong partnerships we have built over many years with laser specialists in the United States, Europe, Japan, China and other countries, will play a major role in helping EVLASER successfully expand overseas and grow together as a global company.",
+        "We are recognized for our expertise and technical capability across a wide range of fields — from macro applications used in the automotive industry, such as laser welding, laser cutting, laser marking, laser heat treatment, laser cladding, laser micromachining and laser soldering, to the ultra-precision micro applications required in the electronics and semiconductor industries, and even laser safety consulting to protect the safety of laser users.",
+        "Rather than settling for our current environment, every employee of EVLASER CO., LTD. holds firmly to the larger goal of \"making a better world with better laser technology,\" and we will work with one united mind toward becoming a global company, preparing for the next 10 and 100 years.",
+        "Rather than striving merely to become the \"best company\" in outward appearance, we will work to build a \"better world\" together through innovative laser technology, and to become a \"better company\" that grows and develops together with our employees and partners alike.",
+        "Thank you."
+      ],
+      "signature": "All Employees of EVLASER CO., LTD."
+    },
     "history": {
       "eyebrow": "HISTORY",
       "title": "History",
-      "founded": "EVLASER CO., LTD. founded",
-      "placeholder": "(To be replaced with real milestones — expansions, certifications, new production lines by year)"
+      "summary": "EVLASER CO., LTD. specializes in the development of laser processes and the development and supply of laser systems. Since our founding in 2002, we have grown Win-Win partnerships with roughly 350 customers in Korea and abroad by developing and delivering technology aligned with market needs and trends.",
+      "items": [
+        {
+          "year": "2002",
+          "items": [
+            "Founded as EuroVision Co., Ltd."
+          ]
+        },
+        {
+          "year": "2008",
+          "items": [
+            "Established in-house R&D institute",
+            "Certified as an Inno-Biz enterprise"
+          ]
+        },
+        {
+          "year": "2009",
+          "items": [
+            "Certified as a venture company"
+          ]
+        },
+        {
+          "year": "2010",
+          "items": [
+            "Selected as a Promising SME by Gyeonggi Province"
+          ]
+        },
+        {
+          "year": "2012",
+          "items": [
+            "Relocated to an expanded headquarters"
+          ]
+        },
+        {
+          "year": "2014",
+          "items": [
+            "Renamed to EuroVision Laser Co., Ltd.",
+            "Received Venture Company Citation (Small and Medium Business Administration)"
+          ]
+        },
+        {
+          "year": "2015",
+          "items": [
+            "Certified as a Materials & Components Specialist Company (Ministry of Trade, Industry and Energy)"
+          ]
+        },
+        {
+          "year": "2016",
+          "items": [
+            "Established Jinan, China subsidiary",
+            "Received Prime Minister's Citation",
+            "Received Excellent Capital Goods Development Citation (Ministry of Trade, Industry and Energy)",
+            "Certified as a Root Technology Specialist Company (Small and Medium Business Administration)"
+          ]
+        },
+        {
+          "year": "2017",
+          "items": [
+            "Established ELTC (Laser Technology Center)"
+          ]
+        },
+        {
+          "year": "2018",
+          "items": [
+            "Renamed to EVLASER CO., LTD. / EVLaser Co., Ltd."
+          ]
+        },
+        {
+          "year": "2019",
+          "items": [
+            "Established a laser plastic welding research lab at a university in Shanghai, China"
+          ]
+        },
+        {
+          "year": "2020",
+          "items": [
+            "Secured 3D scanner laser plastic welding technology"
+          ]
+        },
+        {
+          "year": "2021",
+          "items": [
+            "Relocated ELTC (Laser Technology Center) to an expanded new plant"
+          ]
+        },
+        {
+          "year": "2022",
+          "items": [
+            "Established a plant in Suzhou, China",
+            "Recognized as a leading talent in the Suzhou industrial district"
+          ]
+        },
+        {
+          "year": "2023",
+          "items": [
+            "Developed hybrid laser plastic welding technology, SSW (Super Scan Welding)"
+          ]
+        },
+        {
+          "year": "2024",
+          "items": [
+            "Developed laser glass welding technology (Quartz Welding)"
+          ]
+        }
+      ],
+      "moreNote": "Further history will continue to be updated as it becomes available."
     },
     "business": {
       "eyebrow": "BUSINESS AREAS",
@@ -208,6 +468,11 @@
     "addressLine4": "T. +82 31 452 9860",
     "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
     "admin": "Admin Login",
-    "columns": { "company": "Company", "products": "Products & Tech", "resources": "Resource Center", "contact": "Contact" }
+    "columns": {
+      "company": "Company",
+      "products": "Products & Tech",
+      "resources": "Resource Center",
+      "contact": "Contact"
+    }
   }
 }

@@ -1,13 +1,63 @@
 {
   "nav": {
-    "company": { "label": "회사소개", "items": { "overview": "인사말·개요", "history": "연혁", "business": "사업분야", "patents": "특허·인증", "directions": "오시는 길" } },
-    "products": { "label": "제품·기술", "items": { "byTech": "기술종류별", "byIndustry": "산업분야별", "byMaterial": "재료별" } },
-    "resources": { "label": "자료실", "items": { "docs": "기술자료", "videos": "동영상자료실", "cases": "적용사례" } },
-    "news": { "label": "뉴스·소식", "items": { "company": "회사소식", "exhibition": "전시회소식", "industry": "산업동향" } },
-    "careers": { "label": "채용", "items": { "openings": "채용공고", "culture": "인재상" } },
-    "global": { "label": "글로벌 네트워크", "items": { "offices": "지사·연락처", "distributors": "대리점 찾기" } },
-    "support": { "label": "문의하기", "items": { "contact": "문의하기(Q&A)", "faq": "자주 묻는 질문" } },
-    "ceo": { "label": "대표이사 직속 소통센터" }
+    "company": {
+      "label": "회사소개",
+      "items": {
+        "overview": "인사말·개요",
+        "history": "연혁",
+        "business": "사업분야",
+        "patents": "특허·인증",
+        "directions": "오시는 길"
+      }
+    },
+    "products": {
+      "label": "제품·기술",
+      "items": {
+        "byTech": "기술종류별",
+        "byIndustry": "산업분야별",
+        "byMaterial": "재료별"
+      }
+    },
+    "resources": {
+      "label": "자료실",
+      "items": {
+        "docs": "기술자료",
+        "videos": "동영상자료실",
+        "cases": "적용사례"
+      }
+    },
+    "news": {
+      "label": "뉴스·소식",
+      "items": {
+        "company": "회사소식",
+        "exhibition": "전시회소식",
+        "industry": "산업동향"
+      }
+    },
+    "careers": {
+      "label": "채용",
+      "items": {
+        "openings": "채용공고",
+        "culture": "인재상"
+      }
+    },
+    "global": {
+      "label": "글로벌 네트워크",
+      "items": {
+        "offices": "지사·연락처",
+        "distributors": "대리점 찾기"
+      }
+    },
+    "support": {
+      "label": "문의하기",
+      "items": {
+        "contact": "문의하기(Q&A)",
+        "faq": "자주 묻는 질문"
+      }
+    },
+    "ceo": {
+      "label": "대표이사 직속 소통센터"
+    }
   },
   "topbar": {
     "ceo": "대표이사 직속 소통센터",
@@ -15,9 +65,16 @@
     "careers": "채용",
     "global": "글로벌 네트워크"
   },
-  "search": { "label": "검색", "placeholder": "제품, 기술, 자료 검색" },
-  "drawer": { "title": "메뉴" },
-  "logo": { "since": "SINCE 2002" },
+  "search": {
+    "label": "검색",
+    "placeholder": "제품, 기술, 자료 검색"
+  },
+  "drawer": {
+    "title": "메뉴"
+  },
+  "logo": {
+    "since": "SINCE 2002"
+  },
   "hero": {
     "eyebrow": "SINCE 2002 · 레이저기술 전문기업",
     "title": "정밀함이 <em>미래 산업</em>을 만듭니다",
@@ -30,11 +87,26 @@
     "stat3": "글로벌 서비스 언어"
   },
   "showcase": {
-    "s1": { "tag": "BATTERY WELDING", "title": "배터리팩 레이저 용접 라인" },
-    "s2": { "tag": "PRECISION CUTTING", "title": "정밀 금속부품 레이저 절단" },
-    "s3": { "tag": "SEMICONDUCTOR MARKING", "title": "반도체 부품 레이저 마킹" },
-    "s4": { "tag": "SURFACE CLADDING", "title": "레이저 클래딩 표면 코팅" },
-    "s5": { "tag": "ADDITIVE MANUFACTURING", "title": "금속 3D프린팅 설비" }
+    "s1": {
+      "tag": "BATTERY WELDING",
+      "title": "배터리팩 레이저 용접 라인"
+    },
+    "s2": {
+      "tag": "PRECISION CUTTING",
+      "title": "정밀 금속부품 레이저 절단"
+    },
+    "s3": {
+      "tag": "SEMICONDUCTOR MARKING",
+      "title": "반도체 부품 레이저 마킹"
+    },
+    "s4": {
+      "tag": "SURFACE CLADDING",
+      "title": "레이저 클래딩 표면 코팅"
+    },
+    "s5": {
+      "tag": "ADDITIVE MANUFACTURING",
+      "title": "금속 3D프린팅 설비"
+    }
   },
   "industries": {
     "eyebrow": "INDUSTRIES WE SERVE",
@@ -88,15 +160,27 @@
     }
   },
   "admin": {
-    "items": { "contentMgmt": "자료·콘텐츠 관리", "memberMgmt": "문의·회원 관리" }
+    "items": {
+      "contentMgmt": "자료·콘텐츠 관리",
+      "memberMgmt": "문의·회원 관리"
+    }
   },
   "resources": {
     "eyebrow": "RESOURCE CENTER",
     "title": "자료실",
     "categories": {
-      "doc": { "title": "기술자료", "desc": "백서, 스펙시트, 응용 리포트를 다운로드할 수 있습니다." },
-      "video": { "title": "동영상자료실", "desc": "실제 장비 가동 영상과 공정 데모를 확인하세요." },
-      "case": { "title": "적용사례", "desc": "산업별 도입 사례와 성과 데이터를 소개합니다." }
+      "doc": {
+        "title": "기술자료",
+        "desc": "백서, 스펙시트, 응용 리포트를 다운로드할 수 있습니다."
+      },
+      "video": {
+        "title": "동영상자료실",
+        "desc": "실제 장비 가동 영상과 공정 데모를 확인하세요."
+      },
+      "case": {
+        "title": "적용사례",
+        "desc": "산업별 도입 사례와 성과 데이터를 소개합니다."
+      }
     },
     "emptyNote": "관리자 모드에서 자료를 등록하면 이곳에 표시됩니다.",
     "autoBadge": "주 2회 산업동향 자동 수집 · 담당자 검토·승인 후 게시",
@@ -108,8 +192,18 @@
     "desc": "전 세계 지사 및 대리점을 통해 가까운 곳에서 지원을 제공합니다.",
     "offices": "지사·연락처",
     "distributors": "대리점 찾기",
-    "table": { "country": "국가", "partner": "파트너사", "contact": "담당자", "phone": "연락처" },
-    "rows": { "hq": "EV Laser 본사", "techCenter": "레이저기술센터", "salesSupport": "영업지원팀", "techSupport": "기술지원팀" }
+    "table": {
+      "country": "국가",
+      "partner": "파트너사",
+      "contact": "담당자",
+      "phone": "연락처"
+    },
+    "rows": {
+      "hq": "EV Laser 본사",
+      "techCenter": "레이저기술센터",
+      "salesSupport": "영업지원팀",
+      "techSupport": "기술지원팀"
+    }
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",
@@ -124,16 +218,35 @@
     "viewAll": "채용공고 전체보기",
     "apply": "지원하기",
     "jobs": {
-      "laserEngineer": { "title": "레이저 응용기술 엔지니어", "type": "정규직·경력", "loc": "군포 본사", "due": "상시채용" },
-      "overseasSales": { "title": "해외영업(글로벌마케팅) 담당자", "type": "정규직·신입/경력", "loc": "군포 본사", "due": "상시채용" }
+      "laserEngineer": {
+        "title": "레이저 응용기술 엔지니어",
+        "type": "정규직·경력",
+        "loc": "군포 본사",
+        "due": "상시채용"
+      },
+      "overseasSales": {
+        "title": "해외영업(글로벌마케팅) 담당자",
+        "type": "정규직·신입/경력",
+        "loc": "군포 본사",
+        "due": "상시채용"
+      }
     },
     "culture": {
       "eyebrow": "OUR PEOPLE",
       "title": "인재상",
       "values": {
-        "expertise": { "title": "전문성", "desc": "레이저 기술 한 우물을 파는 깊이 있는 전문가" },
-        "integrity": { "title": "정직함", "desc": "고객과 동료에게 신뢰받는 원칙 있는 태도" },
-        "challenge": { "title": "도전정신", "desc": "새로운 기술과 산업에 두려움 없이 도전하는 자세" }
+        "expertise": {
+          "title": "전문성",
+          "desc": "레이저 기술 한 우물을 파는 깊이 있는 전문가"
+        },
+        "integrity": {
+          "title": "정직함",
+          "desc": "고객과 동료에게 신뢰받는 원칙 있는 태도"
+        },
+        "challenge": {
+          "title": "도전정신",
+          "desc": "새로운 기술과 산업에 두려움 없이 도전하는 자세"
+        }
       }
     }
   },
@@ -143,9 +256,21 @@
     "desc": "고객님과 임직원의 목소리에 대표이사가 직접 귀를 기울이고 개선하겠습니다.",
     "confid": "본 채널은 대표이사 직속으로 운영되며, 제보자의 신원과 내용은 철저히 비밀이 보장되고 어떠한 불이익도 없는 보호조치가 적용됩니다. 접수된 내용은 대표이사 개인 메일(sbhan3763@naver.com)로 즉시 전달됩니다.",
     "cards": {
-      "ethics": { "title": "윤리경영 신고센터", "desc": "기업 내 부정·비리, 금품 수수, 직장 내 괴롭힘 등을 철저한 보안 속에 익명 또는 실명으로 제보해 주세요.", "cta": "신고하기" },
-      "praise": { "title": "임직원 칭찬방", "desc": "고객님께 감동을 드린 임직원을 추천해 주세요. 대표이사가 직접 격려하고 포상합니다.", "cta": "칭찬하기" },
-      "complaint": { "title": "CEO 직속 고객불만", "desc": "일반 상담으로 해결되지 않은 불편사항을 대표이사가 직접 챙겨 신속히 해결해 드립니다.", "cta": "접수하기" }
+      "ethics": {
+        "title": "윤리경영 신고센터",
+        "desc": "기업 내 부정·비리, 금품 수수, 직장 내 괴롭힘 등을 철저한 보안 속에 익명 또는 실명으로 제보해 주세요.",
+        "cta": "신고하기"
+      },
+      "praise": {
+        "title": "임직원 칭찬방",
+        "desc": "고객님께 감동을 드린 임직원을 추천해 주세요. 대표이사가 직접 격려하고 포상합니다.",
+        "cta": "칭찬하기"
+      },
+      "complaint": {
+        "title": "CEO 직속 고객불만",
+        "desc": "일반 상담으로 해결되지 않은 불편사항을 대표이사가 직접 챙겨 신속히 해결해 드립니다.",
+        "cta": "접수하기"
+      }
     }
   },
   "support": {
@@ -153,16 +278,34 @@
     "title": "문의하기",
     "desc": "제품, 기술, 협력 제안 등 무엇이든 남겨주시면 담당자가 신속히 답변드립니다.",
     "channelNote": {
-      "ethics": { "label": "윤리경영 신고", "note": "대표이사 직속으로 접수되며, 신원과 내용은 철저히 비밀이 보장됩니다." },
-      "praise": { "label": "임직원 칭찬", "note": "추천해 주신 내용은 대표이사에게 직접 전달됩니다." },
-      "complaint": { "label": "CEO 직속 고객불만", "note": "대표이사가 직접 확인 후 신속히 처리해 드립니다." },
+      "ethics": {
+        "label": "윤리경영 신고",
+        "note": "대표이사 직속으로 접수되며, 신원과 내용은 철저히 비밀이 보장됩니다."
+      },
+      "praise": {
+        "label": "임직원 칭찬",
+        "note": "추천해 주신 내용은 대표이사에게 직접 전달됩니다."
+      },
+      "complaint": {
+        "label": "CEO 직속 고객불만",
+        "note": "대표이사가 직접 확인 후 신속히 처리해 드립니다."
+      },
       "prefix": "채널로 접수됩니다."
     },
     "mailNote": "이 화면에 접수된 내용은 담당팀 대표메일로 전달됩니다. 이메일 발송 설정이 되어 있지 않은 환경에서는 접수 내역만 저장되고 실제 메일은 발송되지 않습니다.",
     "faq": {
-      "quote": { "q": "견적은 어떻게 요청하나요?", "a": "문의 양식에 산업분야와 요구사항을 남겨주시면 담당팀에서 안내드립니다." },
-      "install": { "q": "해외 설치·지원이 가능한가요?", "a": "글로벌 네트워크를 통해 현지 대리점이 설치 및 유지보수를 지원합니다." },
-      "access": { "q": "기술자료 열람에 별도 가입이 필요한가요?", "a": "공개 자료는 로그인 없이 열람 가능하며, 일부 상세자료는 담당자 확인 후 제공됩니다." }
+      "quote": {
+        "q": "견적은 어떻게 요청하나요?",
+        "a": "문의 양식에 산업분야와 요구사항을 남겨주시면 담당팀에서 안내드립니다."
+      },
+      "install": {
+        "q": "해외 설치·지원이 가능한가요?",
+        "a": "글로벌 네트워크를 통해 현지 대리점이 설치 및 유지보수를 지원합니다."
+      },
+      "access": {
+        "q": "기술자료 열람에 별도 가입이 필요한가요?",
+        "a": "공개 자료는 로그인 없이 열람 가능하며, 일부 상세자료는 담당자 확인 후 제공됩니다."
+      }
     },
     "form": {
       "name": "이름",
@@ -181,12 +324,129 @@
   "company": {
     "eyebrow": "COMPANY",
     "title": "회사소개",
-    "intro": "EV Laser는 2002년 설립 이래 한 우물을 파온 레이저기술 전문기업입니다. 자동차·반도체·바이오의료·항공 등 첨단 제조 산업을 위한 정밀 레이저 솔루션을 제공하며, \"더 좋은 레이저기술로 더 좋은 세상을 만듭니다\"라는 슬로건 아래 기술 혁신을 이어가고 있습니다.",
+    "greeting": {
+      "eyebrow": "GREETING",
+      "title": "인사말",
+      "paragraphs": [
+        "(주)이브이레이저에 오신것을 환영합니다.",
+        "㈜이브이레이저는, 2002년 4월 ㈜유로비전이라는 사명으로 산업용 레이저 응용 기술을 개발하는 벤처 기업으로 설립되어 자동차, 철강, 전자, 반도체, 조선, 기계산업 등 거의 모든 산업분야에 응용되는 레이저를 이용한 폭넓고 혁신적인 기술들을 개발하여 국내는 물론 유럽, 남미, 중국, 동남아시아 등 전 세계의 수많은 협력사들과 교류하면서 함께 성장해왔으며, 2018년 ㈜이브이레이저 / EVLaser CO., LTD.로 사명을 변경하여 Global Company로의 더 큰 도약을 준비하고 있습니다.",
+        "풍부한 경험과 최고의 열정을 겸비한 전문 인력으로 구성된 ㈜이브이레이저 / EVLaser CO., LTD. 기업부설연구소와 기술진들, 30여 대가 넘는 레이저가공용 시스템이 구축된 Laser Technology Center 그리고 미국, 유럽, 일본, 중국 등 해외 각국의 레이저 관련 분야 전문 기업들과 수년간 맺어온 튼튼한 파트너십은 ㈜이브이레이저가 성공적인 해외 진출을 통하여 Global Company로 함께 도약하고 성장하는데 큰 역할을 하게 될 것입니다.",
+        "저희는 자동차 산업분야에 적용되는 Laser Welding, Laser Cutting, Laser Marking, Laser Heat Treatment, Laser Cladding, Laser Micromachining 그리고 Laser Soldering 등 Macro 응용 기술은 물론 전자, 반도체 산업에서 요구되는 초정밀 Micro 응용 기술과 Laser 사용자의 안전을 책임지는 Laser Safety Consulting에 이르기까지 많은 분야에서 그 전문성과 기술력을 인정받고 있습니다.",
+        "㈜이브이레이저의 전 임직원은 현재의 환경에 머무르고 만족하기 보다는 \"더 좋은 레이저 기술로 더 좋은 세상을 만들어간다\"라는 큰 목표를 가슴에 품고 10년 후, 100년 후를 준비하면서 Global Company로의 도약을 위해 한결같은 마음으로 열심히 하겠습니다.",
+        "외형적으로 \"최고의 회사\"가 되려 하기보다는, 혁신적인 레이저 기술로 \"더 좋은 세상\"을 함께 만들어가고 임직원은 물론 파트너사들과 함께 성장, 발전하는 \"더 좋은 회사\"가 되기 위하여 노력하겠습니다.",
+        "감사합니다."
+      ],
+      "signature": "㈜이브이레이저 임직원 일동"
+    },
     "history": {
       "eyebrow": "HISTORY",
       "title": "연혁",
-      "founded": "㈜이브이레이저 설립",
-      "placeholder": "(실제 연혁 정보로 교체 예정 — 주요 연도별 사업 확장, 인증 취득, 신규 라인 구축 등)"
+      "summary": "㈜이브이레이저는 레이저 공법의 개발 및 시스템 개발·공급 전문 업체로, 2002년 창립 이래 시장의 수요와 트렌드에 맞춘 기술 개발 및 제공으로 국내외 약 350개 고객사와 Win-Win의 파트너십을 키워가고 있습니다.",
+      "items": [
+        {
+          "year": "2002",
+          "items": [
+            "㈜유로비전(EuroVision) 창립"
+          ]
+        },
+        {
+          "year": "2008",
+          "items": [
+            "기업부설연구소 설립",
+            "이노비즈기업 인증"
+          ]
+        },
+        {
+          "year": "2009",
+          "items": [
+            "벤처기업 인증"
+          ]
+        },
+        {
+          "year": "2010",
+          "items": [
+            "경기도 유망 중소기업 선정"
+          ]
+        },
+        {
+          "year": "2012",
+          "items": [
+            "사옥 확장 이전"
+          ]
+        },
+        {
+          "year": "2014",
+          "items": [
+            "㈜유로비전레이저로 사명 변경",
+            "벤처기업표창(중소기업청)"
+          ]
+        },
+        {
+          "year": "2015",
+          "items": [
+            "소재부품 전문기업 인증(산업통상자원부)"
+          ]
+        },
+        {
+          "year": "2016",
+          "items": [
+            "중국 제남(濟南) 법인 설립",
+            "국무총리 표창",
+            "우수자본재 개발 표창(산업통상자원부)",
+            "뿌리기술 전문기업 인증(중소기업청)"
+          ]
+        },
+        {
+          "year": "2017",
+          "items": [
+            "ELTC(레이저기술센터) 설립"
+          ]
+        },
+        {
+          "year": "2018",
+          "items": [
+            "㈜이브이레이저 / EVLaser CO., LTD.로 사명 변경"
+          ]
+        },
+        {
+          "year": "2019",
+          "items": [
+            "중국 상해대학 내 레이저 플라스틱 용접 연구소 설립"
+          ]
+        },
+        {
+          "year": "2020",
+          "items": [
+            "3D Scanner Laser Plastic Welding 기술 확보"
+          ]
+        },
+        {
+          "year": "2021",
+          "items": [
+            "ELTC(레이저기술센터) 신공장 확장 이전"
+          ]
+        },
+        {
+          "year": "2022",
+          "items": [
+            "쑤저우(苏州) 공장 설립",
+            "쑤저우 산업지구 선도 인재 인정"
+          ]
+        },
+        {
+          "year": "2023",
+          "items": [
+            "하이브리드 방식 레이저 플라스틱 용접 기술 SSW(Super Scan Welding) 개발"
+          ]
+        },
+        {
+          "year": "2024",
+          "items": [
+            "레이저 유리 용접 기술(Quartz Welding) 개발"
+          ]
+        }
+      ],
+      "moreNote": "이후 연혁은 확인되는 대로 계속 업데이트됩니다."
     },
     "business": {
       "eyebrow": "BUSINESS AREAS",
@@ -208,6 +468,11 @@
     "addressLine4": "T. 031-452-9860",
     "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
     "admin": "관리자 로그인",
-    "columns": { "company": "회사소개", "products": "제품·기술", "resources": "자료실", "contact": "문의하기" }
+    "columns": {
+      "company": "회사소개",
+      "products": "제품·기술",
+      "resources": "자료실",
+      "contact": "문의하기"
+    }
   }
 }

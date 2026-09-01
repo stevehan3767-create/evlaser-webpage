@@ -1,13 +1,63 @@
 {
   "nav": {
-    "company": { "label": "公司介绍", "items": { "overview": "公司概况", "history": "发展历程", "business": "业务领域", "patents": "专利与认证", "directions": "交通指南" } },
-    "products": { "label": "产品与技术", "items": { "byTech": "按技术类型", "byIndustry": "按行业分类", "byMaterial": "按材料" } },
-    "resources": { "label": "资料中心", "items": { "docs": "技术资料", "videos": "视频资料库", "cases": "应用案例" } },
-    "news": { "label": "新闻动态", "items": { "company": "公司新闻", "exhibition": "展会资讯", "industry": "行业动态" } },
-    "careers": { "label": "招聘", "items": { "openings": "招聘岗位", "culture": "人才理念" } },
-    "global": { "label": "全球网络", "items": { "offices": "分支机构与联系方式", "distributors": "查找代理商" } },
-    "support": { "label": "联系我们", "items": { "contact": "咨询(Q&A)", "faq": "常见问题" } },
-    "ceo": { "label": "总裁直属沟通中心" }
+    "company": {
+      "label": "公司介绍",
+      "items": {
+        "overview": "公司概况",
+        "history": "发展历程",
+        "business": "业务领域",
+        "patents": "专利与认证",
+        "directions": "交通指南"
+      }
+    },
+    "products": {
+      "label": "产品与技术",
+      "items": {
+        "byTech": "按技术类型",
+        "byIndustry": "按行业分类",
+        "byMaterial": "按材料"
+      }
+    },
+    "resources": {
+      "label": "资料中心",
+      "items": {
+        "docs": "技术资料",
+        "videos": "视频资料库",
+        "cases": "应用案例"
+      }
+    },
+    "news": {
+      "label": "新闻动态",
+      "items": {
+        "company": "公司新闻",
+        "exhibition": "展会资讯",
+        "industry": "行业动态"
+      }
+    },
+    "careers": {
+      "label": "招聘",
+      "items": {
+        "openings": "招聘岗位",
+        "culture": "人才理念"
+      }
+    },
+    "global": {
+      "label": "全球网络",
+      "items": {
+        "offices": "分支机构与联系方式",
+        "distributors": "查找代理商"
+      }
+    },
+    "support": {
+      "label": "联系我们",
+      "items": {
+        "contact": "咨询(Q&A)",
+        "faq": "常见问题"
+      }
+    },
+    "ceo": {
+      "label": "总裁直属沟通中心"
+    }
   },
   "topbar": {
     "ceo": "总裁直属沟通中心",
@@ -15,9 +65,16 @@
     "careers": "招聘",
     "global": "全球网络"
   },
-  "search": { "label": "搜索", "placeholder": "搜索产品、技术、资料" },
-  "drawer": { "title": "菜单" },
-  "logo": { "since": "SINCE 2002" },
+  "search": {
+    "label": "搜索",
+    "placeholder": "搜索产品、技术、资料"
+  },
+  "drawer": {
+    "title": "菜单"
+  },
+  "logo": {
+    "since": "SINCE 2002"
+  },
   "hero": {
     "eyebrow": "SINCE 2002 · 专注激光技术企业",
     "title": "以精密缔造<em>未来产业</em>",
@@ -30,11 +87,26 @@
     "stat3": "全球服务语言"
   },
   "showcase": {
-    "s1": { "tag": "电池焊接", "title": "电池组激光焊接产线" },
-    "s2": { "tag": "精密切割", "title": "精密金属零件激光切割" },
-    "s3": { "tag": "半导体打标", "title": "半导体零件激光打标" },
-    "s4": { "tag": "表面涂层", "title": "激光熔覆表面涂层" },
-    "s5": { "tag": "增材制造", "title": "金属3D打印设备" }
+    "s1": {
+      "tag": "电池焊接",
+      "title": "电池组激光焊接产线"
+    },
+    "s2": {
+      "tag": "精密切割",
+      "title": "精密金属零件激光切割"
+    },
+    "s3": {
+      "tag": "半导体打标",
+      "title": "半导体零件激光打标"
+    },
+    "s4": {
+      "tag": "表面涂层",
+      "title": "激光熔覆表面涂层"
+    },
+    "s5": {
+      "tag": "增材制造",
+      "title": "金属3D打印设备"
+    }
   },
   "industries": {
     "eyebrow": "INDUSTRIES WE SERVE",
@@ -88,15 +160,27 @@
     }
   },
   "admin": {
-    "items": { "contentMgmt": "资料内容管理", "memberMgmt": "咨询与会员管理" }
+    "items": {
+      "contentMgmt": "资料内容管理",
+      "memberMgmt": "咨询与会员管理"
+    }
   },
   "resources": {
     "eyebrow": "RESOURCE CENTER",
     "title": "资料中心",
     "categories": {
-      "doc": { "title": "技术资料", "desc": "可下载白皮书、规格书与应用报告。" },
-      "video": { "title": "视频资料库", "desc": "查看真实设备运行影像与工艺演示。" },
-      "case": { "title": "应用案例", "desc": "介绍各行业的导入案例与成果数据。" }
+      "doc": {
+        "title": "技术资料",
+        "desc": "可下载白皮书、规格书与应用报告。"
+      },
+      "video": {
+        "title": "视频资料库",
+        "desc": "查看真实设备运行影像与工艺演示。"
+      },
+      "case": {
+        "title": "应用案例",
+        "desc": "介绍各行业的导入案例与成果数据。"
+      }
     },
     "emptyNote": "管理员在后台添加资料后将显示于此。",
     "autoBadge": "每周两次自动采集行业动态 · 经负责人审核后发布",
@@ -108,8 +192,18 @@
     "desc": "通过遍布全球的分支机构与代理商，就近提供支持。",
     "offices": "分支机构与联系方式",
     "distributors": "查找代理商",
-    "table": { "country": "国家", "partner": "合作伙伴", "contact": "联系人", "phone": "联系电话" },
-    "rows": { "hq": "EV Laser 总部", "techCenter": "激光技术中心", "salesSupport": "销售支持团队", "techSupport": "技术支持团队" }
+    "table": {
+      "country": "国家",
+      "partner": "合作伙伴",
+      "contact": "联系人",
+      "phone": "联系电话"
+    },
+    "rows": {
+      "hq": "EV Laser 总部",
+      "techCenter": "激光技术中心",
+      "salesSupport": "销售支持团队",
+      "techSupport": "技术支持团队"
+    }
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",
@@ -124,16 +218,35 @@
     "viewAll": "查看全部职位",
     "apply": "立即申请",
     "jobs": {
-      "laserEngineer": { "title": "激光应用技术工程师", "type": "全职·有经验", "loc": "军浦总部", "due": "常年招聘" },
-      "overseasSales": { "title": "海外销售(全球营销)专员", "type": "全职·经验不限", "loc": "军浦总部", "due": "常年招聘" }
+      "laserEngineer": {
+        "title": "激光应用技术工程师",
+        "type": "全职·有经验",
+        "loc": "军浦总部",
+        "due": "常年招聘"
+      },
+      "overseasSales": {
+        "title": "海外销售(全球营销)专员",
+        "type": "全职·经验不限",
+        "loc": "军浦总部",
+        "due": "常年招聘"
+      }
     },
     "culture": {
       "eyebrow": "OUR PEOPLE",
       "title": "人才理念",
       "values": {
-        "expertise": { "title": "专业性", "desc": "专注激光技术、深耕不辍的专家" },
-        "integrity": { "title": "正直", "desc": "赢得客户与同事信赖的原则性态度" },
-        "challenge": { "title": "挑战精神", "desc": "对新技术与新产业无所畏惧的挑战态度" }
+        "expertise": {
+          "title": "专业性",
+          "desc": "专注激光技术、深耕不辍的专家"
+        },
+        "integrity": {
+          "title": "正直",
+          "desc": "赢得客户与同事信赖的原则性态度"
+        },
+        "challenge": {
+          "title": "挑战精神",
+          "desc": "对新技术与新产业无所畏惧的挑战态度"
+        }
       }
     }
   },
@@ -143,9 +256,21 @@
     "desc": "总裁将亲自倾听客户与员工的声音，并推动改善。",
     "confid": "本渠道由总裁直接管理，举报人身份及内容将被严格保密，并采取措施确保举报人不受任何不利影响。提交内容将即时转发至总裁个人邮箱(sbhan3763@naver.com)。",
     "cards": {
-      "ethics": { "title": "伦理经营举报中心", "desc": "如遇企业内部违规、贿赂、职场霸凌等，请在严格保密的情况下匿名或实名举报。", "cta": "立即举报" },
-      "praise": { "title": "员工表扬专区", "desc": "请推荐让您感动的员工，总裁将亲自给予鼓励与奖励。", "cta": "给予表扬" },
-      "complaint": { "title": "总裁直属客户投诉", "desc": "一般客服未能解决的问题，将由总裁亲自负责并迅速处理。", "cta": "提交投诉" }
+      "ethics": {
+        "title": "伦理经营举报中心",
+        "desc": "如遇企业内部违规、贿赂、职场霸凌等，请在严格保密的情况下匿名或实名举报。",
+        "cta": "立即举报"
+      },
+      "praise": {
+        "title": "员工表扬专区",
+        "desc": "请推荐让您感动的员工，总裁将亲自给予鼓励与奖励。",
+        "cta": "给予表扬"
+      },
+      "complaint": {
+        "title": "总裁直属客户投诉",
+        "desc": "一般客服未能解决的问题，将由总裁亲自负责并迅速处理。",
+        "cta": "提交投诉"
+      }
     }
   },
   "support": {
@@ -153,16 +278,34 @@
     "title": "联系我们",
     "desc": "无论是产品、技术还是合作提案，欢迎留言，我们会尽快回复。",
     "channelNote": {
-      "ethics": { "label": "伦理经营举报", "note": "由总裁直接受理，身份与内容将被严格保密。" },
-      "praise": { "label": "员工表扬", "note": "您推荐的内容将直接转达给总裁。" },
-      "complaint": { "label": "总裁直属客户投诉", "note": "总裁将亲自确认并迅速处理。" },
+      "ethics": {
+        "label": "伦理经营举报",
+        "note": "由总裁直接受理，身份与内容将被严格保密。"
+      },
+      "praise": {
+        "label": "员工表扬",
+        "note": "您推荐的内容将直接转达给总裁。"
+      },
+      "complaint": {
+        "label": "总裁直属客户投诉",
+        "note": "总裁将亲自确认并迅速处理。"
+      },
       "prefix": "渠道提交。"
     },
     "mailNote": "此处提交的内容将转发至负责团队邮箱。若当前环境未配置邮件发送，提交内容仍会被保存，但不会实际发送邮件。",
     "faq": {
-      "quote": { "q": "如何获取报价？", "a": "请在表单中填写所属行业与需求，负责团队将尽快为您解答。" },
-      "install": { "q": "是否支持海外安装？", "a": "我们的全球代理网络可提供当地安装与维护支持。" },
-      "access": { "q": "查看技术资料是否需要注册？", "a": "公开资料无需登录即可查看，部分详细资料需经负责人确认后提供。" }
+      "quote": {
+        "q": "如何获取报价？",
+        "a": "请在表单中填写所属行业与需求，负责团队将尽快为您解答。"
+      },
+      "install": {
+        "q": "是否支持海外安装？",
+        "a": "我们的全球代理网络可提供当地安装与维护支持。"
+      },
+      "access": {
+        "q": "查看技术资料是否需要注册？",
+        "a": "公开资料无需登录即可查看，部分详细资料需经负责人确认后提供。"
+      }
     },
     "form": {
       "name": "姓名",
@@ -181,12 +324,129 @@
   "company": {
     "eyebrow": "COMPANY",
     "title": "公司介绍",
-    "intro": "EV Laser 成立于2002年，是一家专注于激光技术的全球激光解决方案企业，以精密激光技术支持汽车、半导体、生物医疗与航空航天等尖端制造产业，并秉持「更好的激光技术，成就更好的世界」的理念持续推动技术创新。",
+    "greeting": {
+      "eyebrow": "GREETING",
+      "title": "致辞",
+      "paragraphs": [
+        "欢迎访问(株)EVLASER。",
+        "(株)EVLASER于2002年4月以「(株)EuroVision」之名创立，是一家致力于开发工业用激光应用技术的风险企业。我们凭借应用于汽车、钢铁、电子、半导体、造船、机械等几乎所有产业领域的广泛而创新的激光技术，与国内外——欧洲、南美、中国、东南亚等全世界众多合作伙伴携手交流、共同成长，并于2018年将公司名称变更为「(株)EVLASER / EVLaser Co., Ltd.」，为迈向Global Company的更大飞跃做好准备。",
+        "由拥有丰富经验与最高热忱的专业人才组成的(株)EVLASER附属研究所及技术团队、建有30多台激光加工系统的Laser Technology Center，以及与美国、欧洲、日本、中国等海外各国激光相关领域专业企业多年来建立的稳固合作伙伴关系，都将在(株)EVLASER成功拓展海外市场、共同迈向Global Company的过程中发挥重要作用。",
+        "从应用于汽车产业的激光焊接（Laser Welding）、激光切割（Laser Cutting）、激光打标（Laser Marking）、激光热处理（Laser Heat Treatment）、激光熔覆（Laser Cladding）、激光微加工（Laser Micromachining）及激光钎焊（Laser Soldering）等Macro应用技术，到电子、半导体产业所需的超精密Micro应用技术，乃至保障激光使用者安全的激光安全咨询（Laser Safety Consulting），我们在众多领域的专业性与技术实力均获得广泛认可。",
+        "(株)EVLASER全体员工不满足于现状，胸怀「以更好的激光技术，创造更好的世界」这一宏大目标，为迎接未来10年、100年，将始终如一地为迈向Global Company而努力。",
+        "我们不追求表面上成为「最好的公司」，而是致力于通过创新的激光技术共同创造「更好的世界」，并成为与员工及合作伙伴共同成长、共同发展的「更好的公司」。",
+        "谢谢。"
+      ],
+      "signature": "(株)EVLASER全体员工敬上"
+    },
     "history": {
       "eyebrow": "HISTORY",
       "title": "发展历程",
-      "founded": "EVLASER株式会社成立",
-      "placeholder": "(即将替换为实际发展历程 —— 各年度业务扩展、认证取得、新产线建设等)"
+      "summary": "(株)EVLASER是专注于激光工艺开发及激光系统开发与供应的专业企业。自2002年创立以来，秉持顺应市场需求与趋势的技术开发理念，与国内外约350家客户共同培育Win-Win的合作伙伴关系。",
+      "items": [
+        {
+          "year": "2002",
+          "items": [
+            "以「(株)EuroVision」之名创立"
+          ]
+        },
+        {
+          "year": "2008",
+          "items": [
+            "设立企业附属研究所",
+            "获得Inno-Biz企业认证"
+          ]
+        },
+        {
+          "year": "2009",
+          "items": [
+            "获得风险企业认证"
+          ]
+        },
+        {
+          "year": "2010",
+          "items": [
+            "入选京畿道潜力中小企业"
+          ]
+        },
+        {
+          "year": "2012",
+          "items": [
+            "扩建并迁址新办公楼"
+          ]
+        },
+        {
+          "year": "2014",
+          "items": [
+            "更名为「(株)EuroVision Laser」",
+            "获得风险企业表彰（中小企业厅）"
+          ]
+        },
+        {
+          "year": "2015",
+          "items": [
+            "获得材料零部件专业企业认证（产业通商资源部）"
+          ]
+        },
+        {
+          "year": "2016",
+          "items": [
+            "设立中国济南法人",
+            "获得国务总理表彰",
+            "获得优秀资本财开发表彰（产业通商资源部）",
+            "获得根技术专业企业认证（中小企业厅）"
+          ]
+        },
+        {
+          "year": "2017",
+          "items": [
+            "设立ELTC（激光技术中心）"
+          ]
+        },
+        {
+          "year": "2018",
+          "items": [
+            "更名为「(株)EVLASER / EVLaser Co., Ltd.」"
+          ]
+        },
+        {
+          "year": "2019",
+          "items": [
+            "在中国上海大学内设立激光塑料焊接研究所"
+          ]
+        },
+        {
+          "year": "2020",
+          "items": [
+            "掌握3D Scanner激光塑料焊接技术"
+          ]
+        },
+        {
+          "year": "2021",
+          "items": [
+            "ELTC（激光技术中心）扩建迁至新厂房"
+          ]
+        },
+        {
+          "year": "2022",
+          "items": [
+            "设立苏州工厂",
+            "获评苏州产业园区领军人才"
+          ]
+        },
+        {
+          "year": "2023",
+          "items": [
+            "开发混合式激光塑料焊接技术 SSW（Super Scan Welding）"
+          ]
+        },
+        {
+          "year": "2024",
+          "items": [
+            "开发激光玻璃焊接技术（Quartz Welding）"
+          ]
+        }
+      ],
+      "moreNote": "后续发展历程将在确认后持续更新。"
     },
     "business": {
       "eyebrow": "BUSINESS AREAS",
@@ -208,6 +468,11 @@
     "addressLine4": "电话 +82 31 452 9860",
     "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
     "admin": "管理员登录",
-    "columns": { "company": "公司介绍", "products": "产品与技术", "resources": "资料中心", "contact": "联系我们" }
+    "columns": {
+      "company": "公司介绍",
+      "products": "产品与技术",
+      "resources": "资料中心",
+      "contact": "联系我们"
+    }
   }
 }
