@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Icon from "./Icon";
 import { jobs } from "@/lib/data";
 
@@ -12,14 +13,14 @@ export default function Careers() {
         <div className="flex flex-wrap justify-between items-end gap-6 mb-11">
           <div>
             <span className="eyebrow">JOIN EV LASER</span>
-            <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+            <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
               상시채용
-            </h2>
+            </h1>
             <p className="text-ink-soft mt-2.5">레이저 기술의 미래를 함께 만들어갈 인재를 기다립니다.</p>
           </div>
-          <a href="#support" className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
+          <Link href="/support" className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
             채용공고 전체보기
-          </a>
+          </Link>
         </div>
         <div className="grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
           {jobs.map((j) => (
@@ -33,11 +34,30 @@ export default function Careers() {
                   </span>
                 ))}
               </div>
-              <a href="#support" className="mt-2 text-[12.5px] font-bold text-blue inline-flex items-center gap-[5px]">
+              <Link href="/support" className="mt-2 text-[12.5px] font-bold text-blue inline-flex items-center gap-[5px]">
                 지원하기
-              </a>
+              </Link>
             </div>
           ))}
+        </div>
+
+        <div id="culture" className="mt-16 pt-16 border-t border-line scroll-mt-28">
+          <span className="eyebrow">OUR PEOPLE</span>
+          <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+            인재상
+          </h2>
+          <div className="grid gap-[18px] mt-8" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            {[
+              { title: "전문성", desc: "레이저 기술 한 우물을 파는 깊이 있는 전문가" },
+              { title: "정직함", desc: "고객과 동료에게 신뢰받는 원칙 있는 태도" },
+              { title: "도전정신", desc: "새로운 기술과 산업에 두려움 없이 도전하는 자세" },
+            ].map((v) => (
+              <div key={v.title} className="border border-line p-5">
+                <h3 className="font-bold text-[15px]">{v.title}</h3>
+                <p className="text-ink-soft text-[13.3px] mt-1.5">{v.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

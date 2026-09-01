@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Icon from "./Icon";
 import { ceoCards } from "@/lib/data";
 
@@ -7,9 +8,9 @@ export default function CeoChannel() {
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-9">
           <span className="eyebrow !text-[#8fb3ea]">CEO DIRECT CHANNEL</span>
-          <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance text-white">
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance text-white">
             대표이사 직속 소통센터
-          </h2>
+          </h1>
           <p className="text-[#aec2de] max-w-[58ch] mt-2.5">
             고객님과 임직원의 목소리에 대표이사가 직접 귀를 기울이고 개선하겠습니다.
           </p>
@@ -23,13 +24,17 @@ export default function CeoChannel() {
         </div>
         <div className="grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {ceoCards.map((c) => (
-            <div key={c.title} className="bg-white/4 border border-white/16 border-t-[3px] border-t-red p-[26px] flex flex-col gap-3">
+            <div
+              key={c.title}
+              id={c.id}
+              className="bg-white/4 border border-white/16 border-t-[3px] border-t-red p-[26px] flex flex-col gap-3 scroll-mt-28"
+            >
               <Icon name={c.icon} className="w-[30px] h-[30px] text-red" />
               <h3 className="text-[16.5px] text-white">{c.title}</h3>
               <p className="text-[13px] text-[#b7c4d8]">{c.desc}</p>
-              <a href="#support" className="mt-auto text-[12.5px] font-bold text-white inline-flex items-center gap-[5px]">
+              <Link href="/support" className="mt-auto text-[12.5px] font-bold text-white inline-flex items-center gap-[5px]">
                 {c.cta}
-              </a>
+              </Link>
             </div>
           ))}
         </div>

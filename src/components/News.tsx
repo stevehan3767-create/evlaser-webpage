@@ -6,9 +6,9 @@ export default function News() {
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-11">
           <span className="eyebrow">NEWS & UPDATES</span>
-          <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
             뉴스·소식
-          </h2>
+          </h1>
         </div>
         <div className="border-t border-line">
           {newsItems.map((n) => (

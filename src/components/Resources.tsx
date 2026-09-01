@@ -7,9 +7,9 @@ export default function Resources() {
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-11">
           <span className="eyebrow">RESOURCE CENTER</span>
-          <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
             자료실
-          </h2>
+          </h1>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[22px]">
           {resourceCards.map((c) => (

@@ -12,14 +12,14 @@ export default function Support() {
       <div className="mx-auto max-w-[1240px] px-7 grid grid-cols-1 md:grid-cols-2 gap-14">
         <div>
           <span className="eyebrow">GET IN TOUCH</span>
-          <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
             문의하기
-          </h2>
+          </h1>
           <p className="text-ink-soft mt-3">
             제품, 기술, 협력 제안 등 무엇이든 남겨주시면 담당자가 신속히 답변드립니다.
           </p>
 
-          <div className="border-t border-line mt-8">
+          <div id="faq" className="border-t border-line mt-8 scroll-mt-28">
             {faqs.map((f, i) => (
               <div key={f.q} className="border-b border-line py-[18px]">
                 <p className="font-bold text-[14px] flex gap-2.5">

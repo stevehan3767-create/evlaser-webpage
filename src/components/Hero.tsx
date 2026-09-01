@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Icon from "./Icon";
 import { showcaseSlides } from "@/lib/data";
@@ -59,18 +60,16 @@ export default function Hero() {
             자동차·반도체·바이오의료·항공까지 — EV Laser의 정밀 레이저 기술이 차세대 제조 현장을 지탱합니다.
           </p>
           <div className="flex gap-3 mt-8 flex-wrap">
-            <a
-              href="#tech"
+            <Link              href="/products"
               className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025] hover:border-[#c40025]"
             >
               제품·기술 보기
-            </a>
-            <a
-              href="#support"
+            </Link>
+            <Link              href="/support"
               className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-transparent text-ink font-bold text-[13.5px] border border-line-strong hover:border-blue hover:text-blue"
             >
               상담 문의하기
-            </a>
+            </Link>
           </div>
         </div>
 

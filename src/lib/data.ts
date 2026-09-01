@@ -50,66 +50,80 @@ export const techItems: TechItem[] = [
 ];
 
 export const companyNav = [
-  { label: "인사말·개요", href: "#company" },
-  { label: "연혁", href: "#company" },
-  { label: "사업분야", href: "#company" },
-  { label: "특허·인증", href: "#company" },
-  { label: "오시는 길", href: "#global" },
+  { label: "인사말·개요", href: "/company" },
+  { label: "연혁", href: "/company#history" },
+  { label: "사업분야", href: "/company#business" },
+  { label: "특허·인증", href: "/company#patents" },
+  { label: "오시는 길", href: "/global#offices" },
 ];
 
 export const productsNav = [
-  { label: "기술종류별", href: "#tech" },
-  { label: "산업분야별", href: "#industries" },
-  { label: "재료별", href: "#tech" },
+  { label: "기술종류별", href: "/products#tech" },
+  { label: "산업분야별", href: "/products#industries" },
+  { label: "재료별", href: "/products#tech" },
 ];
 
 export const resourcesNav = [
-  { label: "기술자료", href: "#resources" },
-  { label: "동영상자료실", href: "#resources" },
-  { label: "적용사례", href: "#resources" },
+  { label: "기술자료", href: "/resources" },
+  { label: "동영상자료실", href: "/resources" },
+  { label: "적용사례", href: "/resources" },
 ];
 
 export const newsNav = [
-  { label: "회사소식", href: "#news" },
-  { label: "전시회소식", href: "#news" },
-  { label: "산업동향", href: "#news" },
+  { label: "회사소식", href: "/news" },
+  { label: "전시회소식", href: "/news" },
+  { label: "산업동향", href: "/news" },
 ];
 
 export const careersNav = [
-  { label: "채용공고", href: "#careers" },
-  { label: "인재상", href: "#careers" },
+  { label: "채용공고", href: "/careers" },
+  { label: "인재상", href: "/careers#culture" },
 ];
 
 export const globalNav = [
-  { label: "지사·연락처", href: "#global" },
-  { label: "대리점 찾기", href: "#global" },
+  { label: "지사·연락처", href: "/global#offices" },
+  { label: "대리점 찾기", href: "/global#distributors" },
 ];
 
 export const supportNav = [
-  { label: "문의하기(Q&A)", href: "#support" },
-  { label: "자주 묻는 질문", href: "#support" },
+  { label: "문의하기(Q&A)", href: "/support" },
+  { label: "자주 묻는 질문", href: "/support#faq" },
 ];
 
 export interface SitemapBranch {
   icon: IconName;
   title: string;
-  items: string[];
+  titleHref: string;
+  items: { label: string; href: string }[];
   accent?: boolean;
 }
 
 export const sitemap: SitemapBranch[] = [
-  { icon: "build", title: "회사소개", items: companyNav.map((n) => n.label) },
-  { icon: "cut", title: "제품·기술", items: productsNav.map((n) => n.label) },
-  { icon: "doc", title: "자료실", items: resourcesNav.map((n) => n.label) },
-  { icon: "bell", title: "뉴스·소식", items: newsNav.map((n) => n.label) },
-  { icon: "people", title: "채용", items: careersNav.map((n) => n.label) },
-  { icon: "globe", title: "글로벌 네트워크", items: globalNav.map((n) => n.label) },
-  { icon: "flag", title: "문의하기", items: supportNav.map((n) => n.label) },
-  { icon: "lock", title: "관리자 모드", items: ["자료·콘텐츠 관리", "문의·회원 관리"] },
+  { icon: "build", title: "회사소개", titleHref: "/company", items: companyNav },
+  { icon: "cut", title: "제품·기술", titleHref: "/products", items: productsNav },
+  { icon: "doc", title: "자료실", titleHref: "/resources", items: resourcesNav },
+  { icon: "bell", title: "뉴스·소식", titleHref: "/news", items: newsNav },
+  { icon: "people", title: "채용", titleHref: "/careers", items: careersNav },
+  { icon: "globe", title: "글로벌 네트워크", titleHref: "/global", items: globalNav },
+  { icon: "flag", title: "문의하기", titleHref: "/support", items: supportNav },
+  {
+    icon: "lock",
+    title: "관리자 모드",
+    titleHref: "#",
+    items: [
+      { label: "자료·콘텐츠 관리", href: "#" },
+      { label: "문의·회원 관리", href: "#" },
+    ],
+  },
   {
     icon: "alert",
     title: "대표이사 직속 소통센터",
-    items: ["윤리경영 신고센터", "임직원 칭찬방", "CEO 직속 고객불만"],
+    titleHref: "/ceo-channel",
+    items: [
+      { label: "윤리경영 신고센터", href: "/ceo-channel#ethics" },
+      { label: "임직원 칭찬방", href: "/ceo-channel#praise" },
+      { label: "CEO 직속 고객불만", href: "/ceo-channel#complaint" },
+    ],
     accent: true,
   },
 ];
@@ -146,18 +160,21 @@ export const jobs = [
 
 export const ceoCards = [
   {
+    id: "ethics",
     icon: "shield" as IconName,
     title: "윤리경영 신고센터",
     desc: "기업 내 부정·비리, 금품 수수, 직장 내 괴롭힘 등을 철저한 보안 속에 익명 또는 실명으로 제보해 주세요.",
     cta: "신고하기",
   },
   {
+    id: "praise",
     icon: "star" as IconName,
     title: "임직원 칭찬방",
     desc: "고객님께 감동을 드린 임직원을 추천해 주세요. 대표이사가 직접 격려하고 포상합니다.",
     cta: "칭찬하기",
   },
   {
+    id: "complaint",
     icon: "alert" as IconName,
     title: "CEO 직속 고객불만",
     desc: "일반 상담으로 해결되지 않은 불편사항을 대표이사가 직접 챙겨 신속히 해결해 드립니다.",

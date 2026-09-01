@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Icon from "./Icon";
 import { sitemap } from "@/lib/data";
 
@@ -16,22 +17,25 @@ export default function Sitemap() {
         </div>
         <div className="grid gap-[26px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
           {sitemap.map((branch) => (
-            <div
-              key={branch.title}
-              className={`bg-surface border ${branch.accent ? "border-red" : "border-line"}`}
-            >
-              <div
-                className={`flex items-center gap-2.5 px-4 py-3.5 border-b border-line ${
+            <div key={branch.title} className={`bg-surface border ${branch.accent ? "border-red" : "border-line"}`}>
+              <Link
+                href={branch.titleHref}
+                className={`flex items-center gap-2.5 px-4 py-3.5 border-b border-line hover:opacity-80 ${
                   branch.accent ? "bg-red-soft" : "bg-surface-alt"
                 }`}
               >
                 <Icon name={branch.icon} className={`w-[18px] h-[18px] flex-none ${branch.accent ? "text-red" : "text-blue"}`} />
                 <span className="font-bold text-[13.5px]">{branch.title}</span>
-              </div>
+              </Link>
               <ul className="py-1.5">
                 {branch.items.map((item) => (
-                  <li key={item} className="relative pl-[30px] pr-4 py-2 text-[12.8px] text-ink-soft hover:text-blue">
-                    {item}
+                  <li key={item.label}>
+                    <Link
+                      href={item.href}
+                      className="relative block pl-[30px] pr-4 py-2 text-[12.8px] text-ink-soft hover:text-blue"
+                    >
+                      {item.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

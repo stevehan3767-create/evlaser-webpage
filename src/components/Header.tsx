@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Logo from "./Logo";
-import Icon from "./Icon";
 import {
   companyNav,
   productsNav,
@@ -13,12 +13,12 @@ import {
 } from "@/lib/data";
 
 const mainNav = [
-  { label: "회사소개", items: companyNav },
-  { label: "제품·기술", items: productsNav },
-  { label: "자료실", items: resourcesNav },
-  { label: "뉴스·소식", items: newsNav },
-  { label: "채용", items: careersNav },
-  { label: "글로벌 네트워크", items: globalNav },
+  { label: "회사소개", href: "/company", items: companyNav },
+  { label: "제품·기술", href: "/products", items: productsNav },
+  { label: "자료실", href: "/resources", items: resourcesNav },
+  { label: "뉴스·소식", href: "/news", items: newsNav },
+  { label: "채용", href: "/careers", items: careersNav },
+  { label: "글로벌 네트워크", href: "/global", items: globalNav },
 ];
 
 export default function Header() {
@@ -30,18 +30,18 @@ export default function Header() {
       <div className="bg-[#02070E] text-[#c9d6e8] text-[12.5px] border-b border-white/10">
         <div className="mx-auto max-w-[1240px] px-7 flex items-center justify-between h-[38px] gap-4">
           <div className="flex gap-[18px]">
-            <a href="#ceo-channel" className="font-bold text-[#ff7a90]">
+            <Link href="/ceo-channel" className="font-bold text-[#ff7a90]">
               대표이사 직속 소통센터
-            </a>
-            <a href="#support" className="opacity-[.85] hover:opacity-100 hover:text-white">
+            </Link>
+            <Link href="/support" className="opacity-[.85] hover:opacity-100 hover:text-white">
               고객지원
-            </a>
-            <a href="#careers" className="opacity-[.85] hover:opacity-100 hover:text-white">
+            </Link>
+            <Link href="/careers" className="opacity-[.85] hover:opacity-100 hover:text-white">
               채용
-            </a>
-            <a href="#global" className="opacity-[.85] hover:opacity-100 hover:text-white">
+            </Link>
+            <Link href="/global" className="opacity-[.85] hover:opacity-100 hover:text-white">
               글로벌 네트워크
-            </a>
+            </Link>
           </div>
           <div className="hidden sm:flex gap-0.5 bg-white/5 p-[3px] rounded-sm">
             {["한국어", "EN", "中文", "日本語"].map((l, i) => (
@@ -59,39 +59,42 @@ export default function Header() {
 
       <header className="sticky top-0 z-50 bg-surface border-b border-line">
         <div className="mx-auto max-w-[1240px] px-7 flex items-center gap-8 h-[76px]">
-          <a href="#top" aria-label="EV Laser home" className="flex items-center flex-none text-ink">
+          <Link href="/" aria-label="EV Laser home" className="flex items-center flex-none text-ink">
             <Logo className="w-[150px] sm:w-[168px]" />
             <span className="hidden md:inline-block font-mono text-[11px] font-bold tracking-wider text-red pl-3.5 ml-3.5 border-l border-line-strong whitespace-nowrap">
               SINCE 2002
             </span>
-          </a>
+          </Link>
 
           <nav aria-label="Primary" className="hidden [@media(min-width:1180px)]:flex items-stretch flex-1 min-w-0">
             {mainNav.map((item) => (
               <div key={item.label} className="relative group">
-                <button className="flex items-center gap-1 h-[76px] px-2.5 font-semibold text-[13.6px] text-ink whitespace-nowrap border-b-[2.5px] border-transparent group-hover:text-blue group-hover:border-red">
+                <Link
+                  href={item.href}
+                  className="flex items-center gap-1 h-[76px] px-2.5 font-semibold text-[13.6px] text-ink whitespace-nowrap border-b-[2.5px] border-transparent group-hover:text-blue group-hover:border-red"
+                >
                   {item.label}
                   <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 transition-transform group-hover:rotate-180">
                     <polyline points="5 8 12 16 19 8" fill="none" stroke="currentColor" strokeWidth="2.2" />
                   </svg>
-                </button>
+                </Link>
                 <div className="absolute top-full left-1/2 -translate-x-1/2 min-w-[220px] bg-surface border border-line shadow-lg p-2.5 hidden group-hover:block">
                   {item.items.map((sub) => (
-                    <a
+                    <Link
                       key={sub.label}
                       href={sub.href}
                       className="flex items-center gap-2 px-3 py-2.5 text-[13.5px] text-ink-soft whitespace-nowrap border-l-2 border-transparent hover:bg-surface-alt hover:text-blue hover:border-red"
                     >
                       {sub.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
             ))}
             <div className="relative">
-              <a href="#ceo-channel" className="flex items-center h-[76px] px-2.5 font-semibold text-[13.6px] text-red whitespace-nowrap">
+              <Link href="/ceo-channel" className="flex items-center h-[76px] px-2.5 font-semibold text-[13.6px] text-red whitespace-nowrap">
                 대표이사 직속 소통센터
-              </a>
+              </Link>
             </div>
           </nav>
 
@@ -101,7 +104,6 @@ export default function Header() {
               onClick={() => setSearchOpen((v) => !v)}
               className="hidden [@media(min-width:1180px)]:flex w-[38px] h-[38px] items-center justify-center text-ink-soft hover:text-blue"
             >
-              <Icon name="pin" className="hidden" />
               <svg viewBox="0 0 24 24" className="w-[19px] h-[19px]" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="10.5" cy="10.5" r="6.5" />
                 <line x1="15.5" y1="15.5" x2="20.5" y2="20.5" />
@@ -151,29 +153,31 @@ export default function Header() {
             {mainNav.map((item) => (
               <details key={item.label} className="border-b border-line">
                 <summary className="p-4 px-[18px] font-bold text-[14.5px] list-none flex justify-between cursor-pointer">
-                  {item.label}
+                  <Link href={item.href} onClick={() => setDrawerOpen(false)}>
+                    {item.label}
+                  </Link>
                 </summary>
                 <div>
                   {item.items.map((sub) => (
-                    <a
+                    <Link
                       key={sub.label}
                       href={sub.href}
                       onClick={() => setDrawerOpen(false)}
                       className="block py-2.5 pl-7 pr-[18px] text-[13.3px] text-ink-soft"
                     >
                       {sub.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </details>
             ))}
-            <a
-              href="#ceo-channel"
+            <Link
+              href="/ceo-channel"
               onClick={() => setDrawerOpen(false)}
               className="block p-4 px-[18px] font-bold text-[14.5px] text-red border-b border-line"
             >
               대표이사 직속 소통센터
-            </a>
+            </Link>
           </nav>
         </div>
       )}
