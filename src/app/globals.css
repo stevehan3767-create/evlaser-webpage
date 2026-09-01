@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #10151c;
+  --ink-soft: #4b5866;
+  --ink-faint: #8592a1;
+  --surface: #ffffff;
+  --surface-alt: #f3f6fa;
+  --line: #dce3ec;
+  --line-strong: #c2cdda;
+  --blue: #0b4da2;
+  --blue-soft: #e9f0fb;
+  --blue-deep: #062c63;
+  --blue-deep-2: #04193d;
+  --red: #e4002b;
+  --red-soft: #fce7ea;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-blue: var(--blue);
+  --color-blue-soft: var(--blue-soft);
+  --color-blue-deep: var(--blue-deep);
+  --color-blue-deep-2: var(--blue-deep-2);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+
+  --font-display: var(--font-archivo), var(--font-noto-kr), sans-serif;
+  --font-body: var(--font-noto-kr), -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --font-brand: var(--font-poppins), sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  background: var(--red);
+  flex: none;
+}
