@@ -339,6 +339,18 @@
           "If false information is found in your application, the job offer may be withdrawn even after hiring is confirmed.",
           "Closing dates may vary by position - please check carefully."
         ]
+      },
+      "laserEngineer": {
+        "title": "Laser Applications Engineer",
+        "type": "Full-time - Experienced",
+        "loc": "Gunpo HQ",
+        "due": "Rolling basis"
+      },
+      "overseasSales": {
+        "title": "Overseas Sales / Global Marketing",
+        "type": "Full-time - Any level",
+        "loc": "Gunpo HQ",
+        "due": "Rolling basis"
       }
     },
     "culture": {

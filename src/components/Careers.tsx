@@ -40,6 +40,13 @@ interface JobDetail {
   notes: string[];
 }
 
+interface SimpleJob {
+  title: string;
+  type: string;
+  loc: string;
+  due: string;
+}
+
 function List({ items }: { items: string[] }) {
   return (
     <ul className="flex flex-col gap-1.5">
@@ -52,32 +59,28 @@ function List({ items }: { items: string[] }) {
   );
 }
 
-export default function Careers() {
+function SimpleJobCard({ job }: { job: SimpleJob }) {
   const t = useTranslations("careers");
-  const j = t.raw(`jobs.${jobs[0]?.key}`) as JobDetail | undefined;
-
   return (
-    <section id="careers" className="py-16 sm:py-22 border-b border-line">
-      <div className="mx-auto max-w-[1240px] px-7">
-        <div className="inline-flex items-center gap-2 px-3.5 py-[7px] bg-red text-white font-bold text-[12px] tracking-wide mb-3.5">
-          <span className="w-[7px] h-[7px] rounded-full bg-white animate-pulse" />
-          {t("badge")}
-        </div>
-        <div className="flex flex-wrap justify-between items-end gap-6 mb-11">
-          <div>
-            <span className="eyebrow">{t("eyebrow")}</span>
-            <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-              {t("title")}
-            </h1>
-            <p className="text-ink-soft mt-2.5">{t("desc")}</p>
-          </div>
-          <Link href="/support" className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
-            {t("viewAll")}
-          </Link>
-        </div>
+    <div className="border border-line-strong border-l-4 border-l-red bg-surface p-[22px] flex flex-col gap-2.5">
+      <Icon name="briefcase" className="w-6 h-6 text-red" />
+      <h3 className="text-[16px]">{job.title}</h3>
+      <div className="flex flex-wrap gap-2">
+        <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{job.type}</span>
+        <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{job.loc}</span>
+        <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{job.due}</span>
+      </div>
+      <Link href="/support" className="mt-2 text-[12.5px] font-bold text-blue inline-flex items-center gap-[5px]">
+        {t("apply")}
+      </Link>
+    </div>
+  );
+}
 
-        {j && (
-          <details className="group border border-line-strong border-l-4 border-l-red bg-surface open:bg-surface-alt">
+function DetailedJobCard({ j }: { j: JobDetail }) {
+  const t = useTranslations("careers");
+  return (
+    <details className="group border border-line-strong border-l-4 border-l-red bg-surface open:bg-surface-alt">
             <summary className="p-[22px] flex flex-col gap-2.5 cursor-pointer list-none marker:content-none">
               <div className="flex items-start justify-between gap-3">
                 <Icon name="briefcase" className="w-6 h-6 text-red flex-none" />
@@ -178,7 +181,41 @@ export default function Careers() {
               </Link>
             </div>
           </details>
-        )}
+  );
+}
+
+export default function Careers() {
+  const t = useTranslations("careers");
+
+  return (
+    <section id="careers" className="py-16 sm:py-22 border-b border-line">
+      <div className="mx-auto max-w-[1240px] px-7">
+        <div className="inline-flex items-center gap-2 px-3.5 py-[7px] bg-red text-white font-bold text-[12px] tracking-wide mb-3.5">
+          <span className="w-[7px] h-[7px] rounded-full bg-white animate-pulse" />
+          {t("badge")}
+        </div>
+        <div className="flex flex-wrap justify-between items-end gap-6 mb-11">
+          <div>
+            <span className="eyebrow">{t("eyebrow")}</span>
+            <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+              {t("title")}
+            </h1>
+            <p className="text-ink-soft mt-2.5">{t("desc")}</p>
+          </div>
+          <Link href="/support" className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
+            {t("viewAll")}
+          </Link>
+        </div>
+
+        <div className="flex flex-col gap-[18px]">
+          {jobs.map((job) =>
+            job.detailed ? (
+              <DetailedJobCard key={job.key} j={t.raw(`jobs.${job.key}`) as JobDetail} />
+            ) : (
+              <SimpleJobCard key={job.key} job={t.raw(`jobs.${job.key}`) as SimpleJob} />
+            )
+          )}
+        </div>
 
         <div id="culture" className="mt-16 pt-16 border-t border-line scroll-mt-28">
           <span className="eyebrow">{t("culture.eyebrow")}</span>
