@@ -1,0 +1,213 @@
+{
+  "nav": {
+    "company": { "label": "회사소개", "items": { "overview": "인사말·개요", "history": "연혁", "business": "사업분야", "patents": "특허·인증", "directions": "오시는 길" } },
+    "products": { "label": "제품·기술", "items": { "byTech": "기술종류별", "byIndustry": "산업분야별", "byMaterial": "재료별" } },
+    "resources": { "label": "자료실", "items": { "docs": "기술자료", "videos": "동영상자료실", "cases": "적용사례" } },
+    "news": { "label": "뉴스·소식", "items": { "company": "회사소식", "exhibition": "전시회소식", "industry": "산업동향" } },
+    "careers": { "label": "채용", "items": { "openings": "채용공고", "culture": "인재상" } },
+    "global": { "label": "글로벌 네트워크", "items": { "offices": "지사·연락처", "distributors": "대리점 찾기" } },
+    "support": { "label": "문의하기", "items": { "contact": "문의하기(Q&A)", "faq": "자주 묻는 질문" } },
+    "ceo": { "label": "대표이사 직속 소통센터" }
+  },
+  "topbar": {
+    "ceo": "대표이사 직속 소통센터",
+    "support": "고객지원",
+    "careers": "채용",
+    "global": "글로벌 네트워크"
+  },
+  "search": { "label": "검색", "placeholder": "제품, 기술, 자료 검색" },
+  "drawer": { "title": "메뉴" },
+  "logo": { "since": "SINCE 2002" },
+  "hero": {
+    "eyebrow": "SINCE 2002 · 레이저기술 전문기업",
+    "title": "정밀함이 <em>미래 산업</em>을 만듭니다",
+    "body": "자동차·반도체·바이오의료·항공까지 — EV Laser의 정밀 레이저 기술이 차세대 제조 현장을 지탱합니다.",
+    "cta1": "제품·기술 보기",
+    "cta2": "상담 문의하기",
+    "stat0": "설립 연도",
+    "stat1": "년간 레이저 기술 경험",
+    "stat2": "세부 산업 분야",
+    "stat3": "글로벌 서비스 언어"
+  },
+  "showcase": {
+    "s1": { "tag": "BATTERY WELDING", "title": "배터리팩 레이저 용접 라인" },
+    "s2": { "tag": "PRECISION CUTTING", "title": "정밀 금속부품 레이저 절단" },
+    "s3": { "tag": "SEMICONDUCTOR MARKING", "title": "반도체 부품 레이저 마킹" },
+    "s4": { "tag": "SURFACE CLADDING", "title": "레이저 클래딩 표면 코팅" },
+    "s5": { "tag": "ADDITIVE MANUFACTURING", "title": "금속 3D프린팅 설비" }
+  },
+  "industries": {
+    "eyebrow": "INDUSTRIES WE SERVE",
+    "title": "이런 산업 현장에서 EV Laser를 만납니다",
+    "automotive": "자동차",
+    "battery": "밧데리",
+    "semiconductor": "반도체",
+    "bioHealth": "바이오의료헬스",
+    "homeAppliance": "생활·가전",
+    "shipbuilding": "조선",
+    "aerospace": "항공",
+    "machinery": "기계",
+    "steel": "철강",
+    "display": "디스플레이",
+    "defense": "방위산업",
+    "precisionMachining": "정밀가공",
+    "other": "기타"
+  },
+  "tech": {
+    "eyebrow": "CORE TECHNOLOGY",
+    "title": "기술종류별로 보는 레이저 솔루션",
+    "plasticWelding": "플라스틱 용접",
+    "metalWelding": "금속·알루미늄·동 용접",
+    "glassWelding": "유리 용접",
+    "cutting": "레이저 절단",
+    "marking": "레이저마킹(조각·인쇄)",
+    "cleaning": "레이저 클리닝(세정)",
+    "precisionMachining": "레이저정밀(미세)가공",
+    "drilling": "레이저드릴링",
+    "heatTreatment": "레이저열처리(가열)",
+    "cladding": "레이저클래딩(코팅)",
+    "print3d": "3D프린팅",
+    "medical": "의료기기",
+    "safety": "레이저안전",
+    "other": "기타"
+  },
+  "sitemap": {
+    "eyebrow": "SITE STRUCTURE",
+    "title": "한눈에 보는 EV Laser",
+    "desc": "방문자가 원하는 정보를 가장 빠르게 찾을 수 있도록 설계된 사이트 구조입니다.",
+    "branches": {
+      "company": "회사소개",
+      "products": "제품·기술",
+      "resources": "자료실",
+      "news": "뉴스·소식",
+      "careers": "채용",
+      "global": "글로벌 네트워크",
+      "support": "문의하기",
+      "admin": "관리자 모드",
+      "ceo": "대표이사 직속 소통센터"
+    }
+  },
+  "admin": {
+    "items": { "contentMgmt": "자료·콘텐츠 관리", "memberMgmt": "문의·회원 관리" }
+  },
+  "resources": {
+    "eyebrow": "RESOURCE CENTER",
+    "title": "자료실",
+    "categories": {
+      "doc": { "title": "기술자료", "desc": "백서, 스펙시트, 응용 리포트를 다운로드할 수 있습니다." },
+      "video": { "title": "동영상자료실", "desc": "실제 장비 가동 영상과 공정 데모를 확인하세요." },
+      "case": { "title": "적용사례", "desc": "산업별 도입 사례와 성과 데이터를 소개합니다." }
+    },
+    "emptyNote": "관리자 모드에서 자료를 등록하면 이곳에 표시됩니다.",
+    "autoBadge": "주 2회 산업동향 자동 수집 · 담당자 검토·승인 후 게시",
+    "linkCta": "바로가기"
+  },
+  "global": {
+    "eyebrow": "WORLDWIDE PRESENCE",
+    "title": "글로벌 네트워크",
+    "desc": "전 세계 지사 및 대리점을 통해 가까운 곳에서 지원을 제공합니다.",
+    "offices": "지사·연락처",
+    "distributors": "대리점 찾기",
+    "table": { "country": "국가", "partner": "파트너사", "contact": "담당자", "phone": "연락처" },
+    "rows": { "hq": "EV Laser 본사", "techCenter": "레이저기술센터", "salesSupport": "영업지원팀", "techSupport": "기술지원팀" }
+  },
+  "news": {
+    "eyebrow": "NEWS & UPDATES",
+    "title": "뉴스·소식",
+    "empty": "아직 등록된 소식이 없습니다."
+  },
+  "careers": {
+    "badge": "채용중 · 상시 지원 가능",
+    "eyebrow": "JOIN EV LASER",
+    "title": "상시채용",
+    "desc": "레이저 기술의 미래를 함께 만들어갈 인재를 기다립니다.",
+    "viewAll": "채용공고 전체보기",
+    "apply": "지원하기",
+    "jobs": {
+      "laserEngineer": { "title": "레이저 응용기술 엔지니어", "type": "정규직·경력", "loc": "군포 본사", "due": "상시채용" },
+      "overseasSales": { "title": "해외영업(글로벌마케팅) 담당자", "type": "정규직·신입/경력", "loc": "군포 본사", "due": "상시채용" }
+    },
+    "culture": {
+      "eyebrow": "OUR PEOPLE",
+      "title": "인재상",
+      "values": {
+        "expertise": { "title": "전문성", "desc": "레이저 기술 한 우물을 파는 깊이 있는 전문가" },
+        "integrity": { "title": "정직함", "desc": "고객과 동료에게 신뢰받는 원칙 있는 태도" },
+        "challenge": { "title": "도전정신", "desc": "새로운 기술과 산업에 두려움 없이 도전하는 자세" }
+      }
+    }
+  },
+  "ceo": {
+    "eyebrow": "CEO DIRECT CHANNEL",
+    "title": "대표이사 직속 소통센터",
+    "desc": "고객님과 임직원의 목소리에 대표이사가 직접 귀를 기울이고 개선하겠습니다.",
+    "confid": "본 채널은 대표이사 직속으로 운영되며, 제보자의 신원과 내용은 철저히 비밀이 보장되고 어떠한 불이익도 없는 보호조치가 적용됩니다. 접수된 내용은 대표이사 개인 메일(sbhan3763@naver.com)로 즉시 전달됩니다.",
+    "cards": {
+      "ethics": { "title": "윤리경영 신고센터", "desc": "기업 내 부정·비리, 금품 수수, 직장 내 괴롭힘 등을 철저한 보안 속에 익명 또는 실명으로 제보해 주세요.", "cta": "신고하기" },
+      "praise": { "title": "임직원 칭찬방", "desc": "고객님께 감동을 드린 임직원을 추천해 주세요. 대표이사가 직접 격려하고 포상합니다.", "cta": "칭찬하기" },
+      "complaint": { "title": "CEO 직속 고객불만", "desc": "일반 상담으로 해결되지 않은 불편사항을 대표이사가 직접 챙겨 신속히 해결해 드립니다.", "cta": "접수하기" }
+    }
+  },
+  "support": {
+    "eyebrow": "GET IN TOUCH",
+    "title": "문의하기",
+    "desc": "제품, 기술, 협력 제안 등 무엇이든 남겨주시면 담당자가 신속히 답변드립니다.",
+    "channelNote": {
+      "ethics": { "label": "윤리경영 신고", "note": "대표이사 직속으로 접수되며, 신원과 내용은 철저히 비밀이 보장됩니다." },
+      "praise": { "label": "임직원 칭찬", "note": "추천해 주신 내용은 대표이사에게 직접 전달됩니다." },
+      "complaint": { "label": "CEO 직속 고객불만", "note": "대표이사가 직접 확인 후 신속히 처리해 드립니다." },
+      "prefix": "채널로 접수됩니다."
+    },
+    "mailNote": "이 화면에 접수된 내용은 담당팀 대표메일로 전달됩니다. 이메일 발송 설정이 되어 있지 않은 환경에서는 접수 내역만 저장되고 실제 메일은 발송되지 않습니다.",
+    "faq": {
+      "quote": { "q": "견적은 어떻게 요청하나요?", "a": "문의 양식에 산업분야와 요구사항을 남겨주시면 담당팀에서 안내드립니다." },
+      "install": { "q": "해외 설치·지원이 가능한가요?", "a": "글로벌 네트워크를 통해 현지 대리점이 설치 및 유지보수를 지원합니다." },
+      "access": { "q": "기술자료 열람에 별도 가입이 필요한가요?", "a": "공개 자료는 로그인 없이 열람 가능하며, 일부 상세자료는 담당자 확인 후 제공됩니다." }
+    },
+    "form": {
+      "name": "이름",
+      "company": "회사명",
+      "email": "이메일",
+      "phone": "연락처",
+      "industry": "관심 산업분야",
+      "message": "문의 내용",
+      "submit": "문의 보내기",
+      "sending": "전송 중...",
+      "success": "문의가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.",
+      "errorGeneric": "문의 접수 중 오류가 발생했습니다.",
+      "errorNetwork": "네트워크 오류로 접수하지 못했습니다. 잠시 후 다시 시도해 주세요."
+    }
+  },
+  "company": {
+    "eyebrow": "COMPANY",
+    "title": "회사소개",
+    "intro": "EV Laser는 2002년 설립 이래 한 우물을 파온 레이저기술 전문기업입니다. 자동차·반도체·바이오의료·항공 등 첨단 제조 산업을 위한 정밀 레이저 솔루션을 제공하며, \"더 좋은 레이저기술로 더 좋은 세상을 만듭니다\"라는 슬로건 아래 기술 혁신을 이어가고 있습니다.",
+    "history": {
+      "eyebrow": "HISTORY",
+      "title": "연혁",
+      "founded": "㈜이브이레이저 설립",
+      "placeholder": "(실제 연혁 정보로 교체 예정 — 주요 연도별 사업 확장, 인증 취득, 신규 라인 구축 등)"
+    },
+    "business": {
+      "eyebrow": "BUSINESS AREAS",
+      "title": "사업분야",
+      "desc": "자세한 사업분야·기술종류·적용산업은 제품·기술 페이지에서 확인하실 수 있습니다.",
+      "cta": "제품·기술 보기"
+    },
+    "patents": {
+      "eyebrow": "PATENTS & CERTIFICATIONS",
+      "title": "특허·인증",
+      "note": "보유 특허 및 인증(ISO 등) 목록은 실제 인증서 정보로 교체 후 게시 예정입니다. 목록과 인증서 이미지를 전달해 주시면 반영하겠습니다."
+    }
+  },
+  "footer": {
+    "about": "EV Laser는 2002년 설립 이래 한 우물을 파온 레이저기술 전문기업으로, 정밀 레이저 기술로 자동차, 반도체, 바이오의료, 항공 등 첨단 제조 산업을 지원하는 글로벌 레이저 솔루션 기업입니다.",
+    "addressLine1": "(주)이브이레이저 · 대표이사 한상배",
+    "addressLine2": "본사: 경기도 군포시 고산로148번길 17, 군포IT밸리 B동 313호(15850)",
+    "addressLine3": "레이저기술센터: 경기도 군포시 농심로2, 삼보스카이비즈 706호(15845)",
+    "addressLine4": "T. 031-452-9860",
+    "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
+    "admin": "관리자 로그인",
+    "columns": { "company": "회사소개", "products": "제품·기술", "resources": "자료실", "contact": "문의하기" }
+  }
+}

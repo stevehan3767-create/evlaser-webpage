@@ -1,7 +1,9 @@
+import { useTranslations } from "next-intl";
 import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, seedIfEmpty } from "@/lib/repo";
 
 export default function News() {
+  const t = useTranslations("news");
   seedIfEmpty(seedNewsItems);
   const items = newsRepo.list(true);
 
@@ -9,14 +11,14 @@ export default function News() {
     <section id="news" className="py-16 sm:py-22 border-b border-line bg-surface-alt">
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-11">
-          <span className="eyebrow">NEWS & UPDATES</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-            뉴스·소식
+            {t("title")}
           </h1>
         </div>
         <div className="border-t border-line">
           {items.length === 0 ? (
-            <p className="py-8 text-ink-soft text-[13.5px]">아직 등록된 소식이 없습니다.</p>
+            <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
           ) : (
             items.map((n) => (
               <div

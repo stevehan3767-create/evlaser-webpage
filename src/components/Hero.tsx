@@ -1,11 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 import { showcaseSlides } from "@/lib/data";
 
 export default function Hero() {
+  const t = useTranslations("hero");
+  const tShowcase = useTranslations("showcase");
   const [slide, setSlide] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,23 +55,23 @@ export default function Hero() {
 
       <div className="relative mx-auto max-w-[1240px] px-7 grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-12 items-center py-6 pb-14">
         <div>
-          <span className="eyebrow">SINCE 2002 · 레이저기술 전문기업</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h1 className="mt-[18px] text-[32px] sm:text-[44px] lg:text-[52px] font-extrabold leading-tight tracking-tight text-balance font-[family-name:var(--font-display)]">
-            정밀함이 <em className="not-italic text-red">미래 산업</em>을 만듭니다
+            {t.rich("title", { em: (chunks) => <em className="not-italic text-red">{chunks}</em> })}
           </h1>
-          <p className="mt-5 max-w-[52ch] text-ink-soft text-[16.5px]">
-            자동차·반도체·바이오의료·항공까지 — EV Laser의 정밀 레이저 기술이 차세대 제조 현장을 지탱합니다.
-          </p>
+          <p className="mt-5 max-w-[52ch] text-ink-soft text-[16.5px]">{t("body")}</p>
           <div className="flex gap-3 mt-8 flex-wrap">
-            <Link              href="/products"
+            <Link
+              href="/products"
               className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025] hover:border-[#c40025]"
             >
-              제품·기술 보기
+              {t("cta1")}
             </Link>
-            <Link              href="/support"
+            <Link
+              href="/support"
               className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-transparent text-ink font-bold text-[13.5px] border border-line-strong hover:border-blue hover:text-blue"
             >
-              상담 문의하기
+              {t("cta2")}
             </Link>
           </div>
         </div>
@@ -77,7 +80,7 @@ export default function Hero() {
           <div className="relative aspect-[4/3] overflow-hidden" onMouseEnter={stop} onMouseLeave={start}>
             {showcaseSlides.map((s, i) => (
               <div
-                key={s.title}
+                key={s.key}
                 className="absolute inset-0 flex flex-col justify-end p-[22px] text-white transition-opacity"
                 style={{
                   opacity: i === slide ? 1 : 0,
@@ -86,15 +89,15 @@ export default function Hero() {
                 }}
               >
                 <Icon name={s.icon} className="w-[46px] h-[46px] opacity-90 mb-auto" strokeWidth={1.4} />
-                <span className="font-mono text-[10.5px] tracking-wider opacity-[.85]">{s.tag}</span>
-                <h3 className="text-[19px] text-white mt-1">{s.title}</h3>
+                <span className="font-mono text-[10.5px] tracking-wider opacity-[.85]">{tShowcase(`${s.key}.tag`)}</span>
+                <h3 className="text-[19px] text-white mt-1">{tShowcase(`${s.key}.title`)}</h3>
               </div>
             ))}
           </div>
           <div className="flex gap-[7px] p-3.5 justify-center border-t border-line">
             {showcaseSlides.map((s, i) => (
               <button
-                key={s.title}
+                key={s.key}
                 aria-label={`slide ${i + 1}`}
                 onClick={() => {
                   setSlide(i);
@@ -109,14 +112,14 @@ export default function Hero() {
 
       <div className="mx-auto max-w-[1240px] px-7 grid grid-cols-2 sm:grid-cols-4 border-t border-line">
         {[
-          ["2002", "설립 연도"],
-          ["24+", "년간 레이저 기술 경험"],
-          ["13", "세부 산업 분야"],
-          ["4", "글로벌 서비스 언어"],
-        ].map(([num, label], i) => (
-          <div key={label} className={`py-[22px] px-[18px] ${i !== 0 ? "border-l border-line" : ""}`}>
+          ["2002", "stat0"],
+          ["24+", "stat1"],
+          ["13", "stat2"],
+          ["4", "stat3"],
+        ].map(([num, key], i) => (
+          <div key={key} className={`py-[22px] px-[18px] ${i !== 0 ? "border-l border-line" : ""}`}>
             <b className="block font-mono text-[26px] sm:text-[28px] text-blue-deep">{num}</b>
-            <span className="text-[11.5px] text-ink-faint tracking-wide">{label}</span>
+            <span className="text-[11.5px] text-ink-faint tracking-wide">{t(key)}</span>
           </div>
         ))}
       </div>

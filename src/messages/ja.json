@@ -1,0 +1,213 @@
+{
+  "nav": {
+    "company": { "label": "会社案内", "items": { "overview": "概要", "history": "沿革", "business": "事業分野", "patents": "特許・認証", "directions": "アクセス" } },
+    "products": { "label": "製品・技術", "items": { "byTech": "技術別", "byIndustry": "産業分野別", "byMaterial": "材料別" } },
+    "resources": { "label": "資料室", "items": { "docs": "技術資料", "videos": "動画資料室", "cases": "導入事例" } },
+    "news": { "label": "ニュース", "items": { "company": "会社ニュース", "exhibition": "展示会情報", "industry": "業界動向" } },
+    "careers": { "label": "採用情報", "items": { "openings": "求人情報", "culture": "求める人材" } },
+    "global": { "label": "グローバルネットワーク", "items": { "offices": "拠点・連絡先", "distributors": "販売代理店を探す" } },
+    "support": { "label": "お問い合わせ", "items": { "contact": "お問い合わせ(Q&A)", "faq": "よくある質問" } },
+    "ceo": { "label": "社長直属コミュニケーションセンター" }
+  },
+  "topbar": {
+    "ceo": "社長直属コミュニケーションセンター",
+    "support": "サポート",
+    "careers": "採用情報",
+    "global": "グローバルネットワーク"
+  },
+  "search": { "label": "検索", "placeholder": "製品・技術・資料を検索" },
+  "drawer": { "title": "メニュー" },
+  "logo": { "since": "SINCE 2002" },
+  "hero": {
+    "eyebrow": "SINCE 2002 · レーザー技術専門企業",
+    "title": "精密さが<em>未来産業</em>をつくる",
+    "body": "自動車、半導体からバイオメディカル、航空まで — EV Laserの精密レーザー技術が次世代の製造現場を支えます。",
+    "cta1": "製品・技術を見る",
+    "cta2": "お問い合わせ",
+    "stat0": "設立年",
+    "stat1": "年のレーザー技術実績",
+    "stat2": "詳細対応産業",
+    "stat3": "対応言語数"
+  },
+  "showcase": {
+    "s1": { "tag": "バッテリー溶接", "title": "バッテリーパック用レーザー溶接ライン" },
+    "s2": { "tag": "精密切断", "title": "精密金属部品のレーザー切断" },
+    "s3": { "tag": "半導体マーキング", "title": "半導体部品へのレーザーマーキング" },
+    "s4": { "tag": "表面コーティング", "title": "レーザークラッディング表面コーティング" },
+    "s5": { "tag": "積層造形", "title": "金属3Dプリンティング設備" }
+  },
+  "industries": {
+    "eyebrow": "INDUSTRIES WE SERVE",
+    "title": "EV Laserが活躍する産業現場",
+    "automotive": "自動車",
+    "battery": "バッテリー",
+    "semiconductor": "半導体",
+    "bioHealth": "バイオメディカル・ヘルス",
+    "homeAppliance": "生活・家電",
+    "shipbuilding": "造船",
+    "aerospace": "航空",
+    "machinery": "機械",
+    "steel": "鉄鋼",
+    "display": "ディスプレイ",
+    "defense": "防衛産業",
+    "precisionMachining": "精密加工",
+    "other": "その他"
+  },
+  "tech": {
+    "eyebrow": "CORE TECHNOLOGY",
+    "title": "技術種類別レーザーソリューション",
+    "plasticWelding": "プラスチック溶接",
+    "metalWelding": "金属・アルミ・銅溶接",
+    "glassWelding": "ガラス溶接",
+    "cutting": "レーザー切断",
+    "marking": "レーザーマーキング(彫刻・印刷)",
+    "cleaning": "レーザークリーニング",
+    "precisionMachining": "レーザー精密(微細)加工",
+    "drilling": "レーザードリリング",
+    "heatTreatment": "レーザー熱処理(加熱)",
+    "cladding": "レーザークラッディング(コーティング)",
+    "print3d": "3Dプリンティング",
+    "medical": "医療機器",
+    "safety": "レーザー安全",
+    "other": "その他"
+  },
+  "sitemap": {
+    "eyebrow": "SITE STRUCTURE",
+    "title": "EV Laserをひと目で",
+    "desc": "訪問者が求める情報に最短でたどり着けるよう設計されたサイト構造です。",
+    "branches": {
+      "company": "会社案内",
+      "products": "製品・技術",
+      "resources": "資料室",
+      "news": "ニュース",
+      "careers": "採用情報",
+      "global": "グローバルネットワーク",
+      "support": "お問い合わせ",
+      "admin": "管理者モード",
+      "ceo": "社長直属コミュニケーションセンター"
+    }
+  },
+  "admin": {
+    "items": { "contentMgmt": "資料・コンテンツ管理", "memberMgmt": "問い合わせ・会員管理" }
+  },
+  "resources": {
+    "eyebrow": "RESOURCE CENTER",
+    "title": "資料室",
+    "categories": {
+      "doc": { "title": "技術資料", "desc": "ホワイトペーパー、仕様書、導入レポートをダウンロードできます。" },
+      "video": { "title": "動画資料室", "desc": "実機稼働映像やプロセスデモをご覧いただけます。" },
+      "case": { "title": "導入事例", "desc": "業界別の導入事例と成果データをご紹介します。" }
+    },
+    "emptyNote": "管理者モードで資料を登録するとこちらに表示されます。",
+    "autoBadge": "週2回、業界動向を自動収集 · 担当者の確認後に公開",
+    "linkCta": "詳しく見る"
+  },
+  "global": {
+    "eyebrow": "WORLDWIDE PRESENCE",
+    "title": "グローバルネットワーク",
+    "desc": "世界各地の拠点・代理店を通じて、身近な場所でサポートを提供します。",
+    "offices": "拠点・連絡先",
+    "distributors": "販売代理店を探す",
+    "table": { "country": "国", "partner": "パートナー", "contact": "担当者", "phone": "連絡先" },
+    "rows": { "hq": "EV Laser 本社", "techCenter": "レーザー技術センター", "salesSupport": "営業支援チーム", "techSupport": "技術支援チーム" }
+  },
+  "news": {
+    "eyebrow": "NEWS & UPDATES",
+    "title": "ニュース",
+    "empty": "まだ掲載されたニュースはありません。"
+  },
+  "careers": {
+    "badge": "採用中 · 随時応募可能",
+    "eyebrow": "JOIN EV LASER",
+    "title": "通年採用実施中",
+    "desc": "レーザー技術の未来を共に創る仲間を求めています。",
+    "viewAll": "求人情報をすべて見る",
+    "apply": "応募する",
+    "jobs": {
+      "laserEngineer": { "title": "レーザー応用技術エンジニア", "type": "正社員・経験者", "loc": "軍浦本社", "due": "随時採用" },
+      "overseasSales": { "title": "海外営業(グローバルマーケティング)担当", "type": "正社員・未経験可", "loc": "軍浦本社", "due": "随時採用" }
+    },
+    "culture": {
+      "eyebrow": "OUR PEOPLE",
+      "title": "求める人材",
+      "values": {
+        "expertise": { "title": "専門性", "desc": "レーザー技術一筋を極める深い専門家" },
+        "integrity": { "title": "誠実さ", "desc": "顧客と同僚から信頼される、原則を貫く姿勢" },
+        "challenge": { "title": "挑戦精神", "desc": "新しい技術と産業に臆せず挑む姿勢" }
+      }
+    }
+  },
+  "ceo": {
+    "eyebrow": "CEO DIRECT CHANNEL",
+    "title": "社長直属コミュニケーションセンター",
+    "desc": "お客様と社員の声に社長自らが耳を傾け、改善に取り組みます。",
+    "confid": "本チャネルは社長直属で運営され、通報者の身元と内容は厳重に秘密が保持され、不利益のない保護措置が適用されます。受け付けた内容は社長個人のメール(sbhan3763@naver.com)へ即時転送されます。",
+    "cards": {
+      "ethics": { "title": "倫理経営通報センター", "desc": "社内の不正・贈収賄・職場内いじめなどを、厳重なセキュリティのもと匿名または実名で通報してください。", "cta": "通報する" },
+      "praise": { "title": "社員表彰コーナー", "desc": "感動を与えてくれた社員を推薦してください。社長が直接激励し、表彰します。", "cta": "表彰推薦する" },
+      "complaint": { "title": "社長直属お客様苦情窓口", "desc": "通常の相談窓口で解決しなかった不便な点を、社長が直接責任を持って迅速に解決します。", "cta": "申し立てる" }
+    }
+  },
+  "support": {
+    "eyebrow": "GET IN TOUCH",
+    "title": "お問い合わせ",
+    "desc": "製品、技術、業務提携など、どんなことでもお気軽にご連絡ください。担当者が迅速に対応いたします。",
+    "channelNote": {
+      "ethics": { "label": "倫理経営通報", "note": "社長直属で受け付け、身元と内容は厳重に秘密が保持されます。" },
+      "praise": { "label": "社員表彰", "note": "ご推薦の内容は社長へ直接伝えられます。" },
+      "complaint": { "label": "社長直属お客様苦情", "note": "社長が直接確認のうえ、迅速に対応いたします。" },
+      "prefix": "チャネルで受け付けます。"
+    },
+    "mailNote": "こちらの内容は担当チームのメールへ転送されるよう設計されています。メール送信が設定されていない環境では、内容は保存されますが実際のメール送信は行われません。",
+    "faq": {
+      "quote": { "q": "見積もりはどのように依頼できますか？", "a": "フォームに業界とご要望をご記入いただければ、担当チームよりご案内いたします。" },
+      "install": { "q": "海外での設置・サポートは可能ですか？", "a": "グローバルネットワークを通じ、現地代理店が設置・保守をサポートします。" },
+      "access": { "q": "技術資料の閲覧に会員登録は必要ですか？", "a": "公開資料はログイン不要で閲覧でき、一部の詳細資料は担当者確認後にご提供します。" }
+    },
+    "form": {
+      "name": "お名前",
+      "company": "会社名",
+      "email": "メールアドレス",
+      "phone": "電話番号",
+      "industry": "関心のある産業分野",
+      "message": "お問い合わせ内容",
+      "submit": "送信する",
+      "sending": "送信中...",
+      "success": "お問い合わせを受け付けました。担当者よりご連絡いたします。",
+      "errorGeneric": "送信中にエラーが発生しました。",
+      "errorNetwork": "ネットワークエラーのため送信できませんでした。しばらくしてから再度お試しください。"
+    }
+  },
+  "company": {
+    "eyebrow": "COMPANY",
+    "title": "会社案内",
+    "intro": "EV Laserは2002年の設立以来、レーザー技術一筋に歩んできた専門企業です。自動車・半導体・バイオメディカル・航空など最先端の製造産業向けに精密レーザーソリューションを提供し、「より良いレーザー技術で、より良い世界をつくる」というスローガンのもと技術革新を続けています。",
+    "history": {
+      "eyebrow": "HISTORY",
+      "title": "沿革",
+      "founded": "EVLASER株式会社 設立",
+      "placeholder": "(実際の沿革情報に差し替え予定 — 年度別の事業拡大、認証取得、新ラインの構築など)"
+    },
+    "business": {
+      "eyebrow": "BUSINESS AREAS",
+      "title": "事業分野",
+      "desc": "詳しい事業分野・技術種類・対応産業は製品・技術ページでご確認いただけます。",
+      "cta": "製品・技術を見る"
+    },
+    "patents": {
+      "eyebrow": "PATENTS & CERTIFICATIONS",
+      "title": "特許・認証",
+      "note": "保有する特許および認証(ISO等)の一覧は、実際の認証情報の提供後に更新・掲載予定です。"
+    }
+  },
+  "footer": {
+    "about": "EV Laserは2002年の設立以来、レーザー技術一筋に歩んできた専門企業として、精密レーザー技術で自動車・半導体・バイオメディカル・航空など最先端の製造産業を支えるグローバルレーザーソリューション企業です。",
+    "addressLine1": "EVLASER株式会社 · 代表取締役 ハン・サンベ(Steve Han)",
+    "addressLine2": "本社：京畿道軍浦市高山路148番길17、群浦ITバレーB棟313号(15850)",
+    "addressLine3": "レーザー技術センター：京畿道軍浦市農心路2、サンボスカイビズ706号(15845)",
+    "addressLine4": "TEL +82 31 452 9860",
+    "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
+    "admin": "管理者ログイン",
+    "columns": { "company": "会社案内", "products": "製品・技術", "resources": "資料室", "contact": "お問い合わせ" }
+  }
+}

@@ -2,48 +2,35 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Icon from "./Icon";
-import { faqs } from "@/lib/data";
 
-const CHANNEL_INFO: Record<string, { label: string; note: string }> = {
-  ethics: {
-    label: "윤리경영 신고",
-    note: "대표이사 직속으로 접수되며, 신원과 내용은 철저히 비밀이 보장됩니다.",
-  },
-  praise: {
-    label: "임직원 칭찬",
-    note: "추천해 주신 내용은 대표이사에게 직접 전달됩니다.",
-  },
-  complaint: {
-    label: "CEO 직속 고객불만",
-    note: "대표이사가 직접 확인 후 신속히 처리해 드립니다.",
-  },
-};
+const CHANNEL_KEYS = ["ethics", "praise", "complaint"] as const;
+const FAQ_KEYS = ["quote", "install", "access"] as const;
 
 function ContactForm() {
+  const t = useTranslations("support");
+  const tIndustries = useTranslations("industries");
   const params = useSearchParams();
-  const channel = params.get("channel") ?? "general";
-  const channelInfo = CHANNEL_INFO[channel];
+  const channelParam = params.get("channel") ?? "general";
+  const channel = (CHANNEL_KEYS as readonly string[]).includes(channelParam) ? channelParam : "general";
 
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   return (
     <div>
-      {channelInfo && (
+      {channel !== "general" && (
         <div className="flex gap-3 p-4 bg-red-soft border border-red mb-4">
           <Icon name="alert" className="w-5 h-5 text-red flex-none" />
           <p className="text-[12.8px] text-ink">
-            <b>{channelInfo.label}</b> 채널로 접수됩니다. {channelInfo.note}
+            <b>{t(`channelNote.${channel}.label`)}</b> {t("channelNote.prefix")} {t(`channelNote.${channel}.note`)}
           </p>
         </div>
       )}
       <div className="flex gap-3 p-4 bg-blue-soft border border-line-strong mb-[26px]">
         <Icon name="bell" className="w-5 h-5 text-blue flex-none" />
-        <p className="text-[12.8px] text-ink-soft">
-          이 화면에 접수된 내용은 담당팀 대표메일로 전달됩니다. 이메일 발송 설정이 되어 있지 않은 환경에서는 접수
-          내역만 저장되고 실제 메일은 발송되지 않습니다.
-        </p>
+        <p className="text-[12.8px] text-ink-soft">{t("mailNote")}</p>
       </div>
       <form
         onSubmit={async (e) => {
@@ -68,38 +55,38 @@ function ContactForm() {
             });
             const json = await res.json();
             if (!res.ok) {
-              setErrorMsg(json.error ?? "문의 접수 중 오류가 발생했습니다.");
+              setErrorMsg(json.error ?? t("form.errorGeneric"));
               setStatus("error");
               return;
             }
             setStatus("sent");
             form.reset();
           } catch {
-            setErrorMsg("네트워크 오류로 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+            setErrorMsg(t("form.errorNetwork"));
             setStatus("error");
           }
         }}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <Field label="이름" name="name" required />
-          <Field label="회사명" name="company" />
+          <Field label={t("form.name")} name="name" required />
+          <Field label={t("form.company")} name="company" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <Field label="이메일" name="email" type="email" required />
-          <Field label="연락처" name="phone" type="tel" />
+          <Field label={t("form.email")} name="email" type="email" required />
+          <Field label={t("form.phone")} name="phone" type="tel" />
         </div>
         <div className="flex flex-col gap-1.5 mb-4">
-          <label className="text-[12.5px] font-bold text-ink-soft">관심 산업분야</label>
+          <label className="text-[12.5px] font-bold text-ink-soft">{t("form.industry")}</label>
           <select name="industry" className="border border-line-strong px-3 py-[11px] bg-surface text-[13.8px] rounded-sm">
-            <option>자동차</option>
-            <option>반도체</option>
-            <option>바이오의료헬스</option>
-            <option>항공</option>
-            <option>기타</option>
+            <option>{tIndustries("automotive")}</option>
+            <option>{tIndustries("semiconductor")}</option>
+            <option>{tIndustries("bioHealth")}</option>
+            <option>{tIndustries("aerospace")}</option>
+            <option>{tIndustries("other")}</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5 mb-4">
-          <label className="text-[12.5px] font-bold text-ink-soft">문의 내용</label>
+          <label className="text-[12.5px] font-bold text-ink-soft">{t("form.message")}</label>
           <textarea name="message" rows={4} required className="border border-line-strong px-3 py-[11px] bg-surface text-[13.8px] rounded-sm" />
         </div>
         <button
@@ -107,42 +94,38 @@ function ContactForm() {
           disabled={status === "sending"}
           className="w-full justify-center inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025] disabled:opacity-60"
         >
-          {status === "sending" ? "전송 중..." : "문의 보내기"}
+          {status === "sending" ? t("form.sending") : t("form.submit")}
         </button>
         {status === "sent" && (
-          <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">
-            문의가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.
-          </p>
+          <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{t("form.success")}</p>
         )}
-        {status === "error" && (
-          <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{errorMsg}</p>
-        )}
+        {status === "error" && <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{errorMsg}</p>}
       </form>
     </div>
   );
 }
 
 export default function Support() {
+  const t = useTranslations("support");
+
   return (
     <section id="support" className="py-16 sm:py-22">
       <div className="mx-auto max-w-[1240px] px-7 grid grid-cols-1 md:grid-cols-2 gap-14">
         <div>
-          <span className="eyebrow">GET IN TOUCH</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-            문의하기
+            {t("title")}
           </h1>
-          <p className="text-ink-soft mt-3">
-            제품, 기술, 협력 제안 등 무엇이든 남겨주시면 담당자가 신속히 답변드립니다.
-          </p>
+          <p className="text-ink-soft mt-3">{t("desc")}</p>
 
           <div id="faq" className="border-t border-line mt-8 scroll-mt-28">
-            {faqs.map((f, i) => (
-              <div key={f.q} className="border-b border-line py-[18px]">
+            {FAQ_KEYS.map((key, i) => (
+              <div key={key} className="border-b border-line py-[18px]">
                 <p className="font-bold text-[14px] flex gap-2.5">
                   <span className="font-mono text-red">{`Q${i + 1}`}</span>
-                  {f.q}
+                  {t(`faq.${key}.q`)}
                 </p>
-                <p className="mt-2 text-ink-soft text-[13.3px] pl-6">{f.a}</p>
+                <p className="mt-2 text-ink-soft text-[13.3px] pl-6">{t(`faq.${key}.a`)}</p>
               </div>
             ))}
           </div>

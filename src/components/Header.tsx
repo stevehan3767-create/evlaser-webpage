@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 import Logo from "./Logo";
 import {
   companyNav,
@@ -12,18 +14,27 @@ import {
   globalNav,
 } from "@/lib/data";
 
-const mainNav = [
-  { label: "회사소개", href: "/company", items: companyNav },
-  { label: "제품·기술", href: "/products", items: productsNav },
-  { label: "자료실", href: "/resources", items: resourcesNav },
-  { label: "뉴스·소식", href: "/news", items: newsNav },
-  { label: "채용", href: "/careers", items: careersNav },
-  { label: "글로벌 네트워크", href: "/global", items: globalNav },
-];
+const NAV_SECTIONS = [
+  { section: "company", items: companyNav, href: "/company" },
+  { section: "products", items: productsNav, href: "/products" },
+  { section: "resources", items: resourcesNav, href: "/resources" },
+  { section: "news", items: newsNav, href: "/news" },
+  { section: "careers", items: careersNav, href: "/careers" },
+  { section: "global", items: globalNav, href: "/global" },
+] as const;
+
+const LANG_LABELS: Record<string, string> = { ko: "한국어", en: "EN", zh: "中文", ja: "日本語" };
 
 export default function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const t = useTranslations("nav");
+  const tTop = useTranslations("topbar");
+  const tSearch = useTranslations("search");
+  const tDrawer = useTranslations("drawer");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <>
@@ -31,26 +42,27 @@ export default function Header() {
         <div className="mx-auto max-w-[1240px] px-7 flex items-center justify-between h-[38px] gap-4">
           <div className="flex gap-[18px]">
             <Link href="/ceo-channel" className="font-bold text-[#ff7a90]">
-              대표이사 직속 소통센터
+              {tTop("ceo")}
             </Link>
             <Link href="/support" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              고객지원
+              {tTop("support")}
             </Link>
             <Link href="/careers" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              채용
+              {tTop("careers")}
             </Link>
             <Link href="/global" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              글로벌 네트워크
+              {tTop("global")}
             </Link>
           </div>
           <div className="hidden sm:flex gap-0.5 bg-white/5 p-[3px] rounded-sm">
-            {["한국어", "EN", "中文", "日本語"].map((l, i) => (
+            {routing.locales.map((l) => (
               <button
                 key={l}
-                aria-pressed={i === 0}
+                aria-pressed={l === locale}
+                onClick={() => router.replace(pathname, { locale: l })}
                 className="px-2.5 py-[3px] text-[11.5px] font-semibold rounded-sm text-[#b7c4d8] aria-pressed:bg-red aria-pressed:text-white hover:text-white"
               >
-                {l}
+                {LANG_LABELS[l]}
               </button>
             ))}
           </div>
@@ -67,25 +79,25 @@ export default function Header() {
           </Link>
 
           <nav aria-label="Primary" className="hidden [@media(min-width:1180px)]:flex items-stretch flex-1 min-w-0">
-            {mainNav.map((item) => (
-              <div key={item.label} className="relative group">
+            {NAV_SECTIONS.map(({ section, items, href }) => (
+              <div key={section} className="relative group">
                 <Link
-                  href={item.href}
+                  href={href}
                   className="flex items-center gap-1 h-[76px] px-2.5 font-semibold text-[13.6px] text-ink whitespace-nowrap border-b-[2.5px] border-transparent group-hover:text-blue group-hover:border-red"
                 >
-                  {item.label}
+                  {t(`${section}.label`)}
                   <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 transition-transform group-hover:rotate-180">
                     <polyline points="5 8 12 16 19 8" fill="none" stroke="currentColor" strokeWidth="2.2" />
                   </svg>
                 </Link>
                 <div className="absolute top-full left-1/2 -translate-x-1/2 min-w-[220px] bg-surface border border-line shadow-lg p-2.5 hidden group-hover:block">
-                  {item.items.map((sub) => (
+                  {items.map((sub) => (
                     <Link
-                      key={sub.label}
+                      key={sub.key}
                       href={sub.href}
                       className="flex items-center gap-2 px-3 py-2.5 text-[13.5px] text-ink-soft whitespace-nowrap border-l-2 border-transparent hover:bg-surface-alt hover:text-blue hover:border-red"
                     >
-                      {sub.label}
+                      {t(`${section}.items.${sub.key}`)}
                     </Link>
                   ))}
                 </div>
@@ -93,7 +105,7 @@ export default function Header() {
             ))}
             <div className="relative">
               <Link href="/ceo-channel" className="flex items-center h-[76px] px-2.5 font-semibold text-[13.6px] text-red whitespace-nowrap">
-                대표이사 직속 소통센터
+                {t("ceo.label")}
               </Link>
             </div>
           </nav>
@@ -114,7 +126,7 @@ export default function Header() {
                 <input
                   autoFocus
                   type="search"
-                  placeholder="제품, 기술, 자료 검색"
+                  placeholder={tSearch("placeholder")}
                   className="w-[240px] px-3 py-2 border border-line-strong bg-surface-alt text-[13px] text-ink rounded-sm"
                 />
               </form>
@@ -142,7 +154,7 @@ export default function Header() {
             className="fixed top-0 right-0 bottom-0 w-[86vw] max-w-[320px] bg-surface border-l border-line overflow-y-auto"
           >
             <div className="flex justify-between items-center p-[18px] border-b border-line">
-              <strong>메뉴</strong>
+              <strong>{tDrawer("title")}</strong>
               <button aria-label="Close" onClick={() => setDrawerOpen(false)} className="w-[30px] h-[30px]">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <line x1="5" y1="5" x2="19" y2="19" />
@@ -150,22 +162,22 @@ export default function Header() {
                 </svg>
               </button>
             </div>
-            {mainNav.map((item) => (
-              <details key={item.label} className="border-b border-line">
+            {NAV_SECTIONS.map(({ section, items, href }) => (
+              <details key={section} className="border-b border-line">
                 <summary className="p-4 px-[18px] font-bold text-[14.5px] list-none flex justify-between cursor-pointer">
-                  <Link href={item.href} onClick={() => setDrawerOpen(false)}>
-                    {item.label}
+                  <Link href={href} onClick={() => setDrawerOpen(false)}>
+                    {t(`${section}.label`)}
                   </Link>
                 </summary>
                 <div>
-                  {item.items.map((sub) => (
+                  {items.map((sub) => (
                     <Link
-                      key={sub.label}
+                      key={sub.key}
                       href={sub.href}
                       onClick={() => setDrawerOpen(false)}
                       className="block py-2.5 pl-7 pr-[18px] text-[13.3px] text-ink-soft"
                     >
-                      {sub.label}
+                      {t(`${section}.items.${sub.key}`)}
                     </Link>
                   ))}
                 </div>
@@ -176,7 +188,7 @@ export default function Header() {
               onClick={() => setDrawerOpen(false)}
               className="block p-4 px-[18px] font-bold text-[14.5px] text-red border-b border-line"
             >
-              대표이사 직속 소통센터
+              {t("ceo.label")}
             </Link>
           </nav>
         </div>

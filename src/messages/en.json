@@ -1,0 +1,213 @@
+{
+  "nav": {
+    "company": { "label": "Company", "items": { "overview": "Overview", "history": "History", "business": "Business Areas", "patents": "Patents & Certs", "directions": "Directions" } },
+    "products": { "label": "Products & Tech", "items": { "byTech": "By Technology", "byIndustry": "By Industry", "byMaterial": "By Material" } },
+    "resources": { "label": "Resource Center", "items": { "docs": "Technical Papers", "videos": "Video Library", "cases": "Case Studies" } },
+    "news": { "label": "News", "items": { "company": "Company News", "exhibition": "Exhibitions", "industry": "Industry Trends" } },
+    "careers": { "label": "Careers", "items": { "openings": "Open Positions", "culture": "Our People" } },
+    "global": { "label": "Global Network", "items": { "offices": "Offices & Contacts", "distributors": "Find a Distributor" } },
+    "support": { "label": "Contact", "items": { "contact": "Contact (Q&A)", "faq": "FAQ" } },
+    "ceo": { "label": "CEO Direct Channel" }
+  },
+  "topbar": {
+    "ceo": "CEO Direct Channel",
+    "support": "Support",
+    "careers": "Careers",
+    "global": "Global Network"
+  },
+  "search": { "label": "Search", "placeholder": "Search products, tech, resources" },
+  "drawer": { "title": "Menu" },
+  "logo": { "since": "SINCE 2002" },
+  "hero": {
+    "eyebrow": "SINCE 2002 · SPECIALIZED IN LASER TECHNOLOGY",
+    "title": "Precision engineering <em>the future of industry</em>",
+    "body": "From automotive and semiconductors to biomedical and aerospace — EV Laser's precision laser technology powers next-generation manufacturing.",
+    "cta1": "Explore Technology",
+    "cta2": "Talk to Us",
+    "stat0": "Founded",
+    "stat1": "Years of laser expertise",
+    "stat2": "Specialized industries",
+    "stat3": "Languages supported"
+  },
+  "showcase": {
+    "s1": { "tag": "BATTERY WELDING", "title": "Laser welding line for battery packs" },
+    "s2": { "tag": "PRECISION CUTTING", "title": "Precision metal-part laser cutting" },
+    "s3": { "tag": "SEMICONDUCTOR MARKING", "title": "Laser marking for semiconductor parts" },
+    "s4": { "tag": "SURFACE CLADDING", "title": "Laser cladding surface coating" },
+    "s5": { "tag": "ADDITIVE MANUFACTURING", "title": "Metal 3D printing equipment" }
+  },
+  "industries": {
+    "eyebrow": "INDUSTRIES WE SERVE",
+    "title": "Where EV Laser shows up on the factory floor",
+    "automotive": "Automotive",
+    "battery": "Battery",
+    "semiconductor": "Semiconductor",
+    "bioHealth": "Biomedical & Health",
+    "homeAppliance": "Home Appliance",
+    "shipbuilding": "Shipbuilding",
+    "aerospace": "Aerospace",
+    "machinery": "Machinery",
+    "steel": "Steel",
+    "display": "Display",
+    "defense": "Defense",
+    "precisionMachining": "Precision Machining",
+    "other": "Other"
+  },
+  "tech": {
+    "eyebrow": "CORE TECHNOLOGY",
+    "title": "Laser solutions by technology type",
+    "plasticWelding": "Plastic Welding",
+    "metalWelding": "Metal / Aluminum / Copper Welding",
+    "glassWelding": "Glass Welding",
+    "cutting": "Laser Cutting",
+    "marking": "Laser Marking (Engraving/Printing)",
+    "cleaning": "Laser Cleaning",
+    "precisionMachining": "Precision (Micro) Machining",
+    "drilling": "Laser Drilling",
+    "heatTreatment": "Heat Treatment",
+    "cladding": "Laser Cladding (Coating)",
+    "print3d": "3D Printing",
+    "medical": "Medical Devices",
+    "safety": "Laser Safety",
+    "other": "Other"
+  },
+  "sitemap": {
+    "eyebrow": "SITE STRUCTURE",
+    "title": "EV Laser at a glance",
+    "desc": "A site structure designed so visitors find what they need as fast as possible.",
+    "branches": {
+      "company": "Company",
+      "products": "Products & Tech",
+      "resources": "Resource Center",
+      "news": "News",
+      "careers": "Careers",
+      "global": "Global Network",
+      "support": "Contact",
+      "admin": "Admin Mode",
+      "ceo": "CEO Direct Channel"
+    }
+  },
+  "admin": {
+    "items": { "contentMgmt": "Content Management", "memberMgmt": "Inquiries & Members" }
+  },
+  "resources": {
+    "eyebrow": "RESOURCE CENTER",
+    "title": "Resource Center",
+    "categories": {
+      "doc": { "title": "Technical Papers", "desc": "Download whitepapers, spec sheets and application reports." },
+      "video": { "title": "Video Library", "desc": "Watch real equipment footage and process demonstrations." },
+      "case": { "title": "Case Studies", "desc": "Industry deployment stories and performance data." }
+    },
+    "emptyNote": "Items will appear here once added from the admin panel.",
+    "autoBadge": "Auto-collected industry updates twice weekly · Published after staff review",
+    "linkCta": "View"
+  },
+  "global": {
+    "eyebrow": "WORLDWIDE PRESENCE",
+    "title": "Global Network",
+    "desc": "Local support close to you through our worldwide offices and distributors.",
+    "offices": "Offices & Contacts",
+    "distributors": "Find a Distributor",
+    "table": { "country": "Country", "partner": "Partner", "contact": "Contact", "phone": "Phone" },
+    "rows": { "hq": "EV Laser HQ", "techCenter": "Laser Technology Center", "salesSupport": "Sales Support Team", "techSupport": "Technical Support Team" }
+  },
+  "news": {
+    "eyebrow": "NEWS & UPDATES",
+    "title": "News",
+    "empty": "No news posted yet."
+  },
+  "careers": {
+    "badge": "Now Hiring · Apply Anytime",
+    "eyebrow": "JOIN EV LASER",
+    "title": "We're always hiring",
+    "desc": "Help us build the future of laser technology.",
+    "viewAll": "View All Openings",
+    "apply": "Apply Now",
+    "jobs": {
+      "laserEngineer": { "title": "Laser Applications Engineer", "type": "Full-time · Experienced", "loc": "Gunpo HQ", "due": "Rolling basis" },
+      "overseasSales": { "title": "Overseas Sales / Global Marketing", "type": "Full-time · Any level", "loc": "Gunpo HQ", "due": "Rolling basis" }
+    },
+    "culture": {
+      "eyebrow": "OUR PEOPLE",
+      "title": "Our People",
+      "values": {
+        "expertise": { "title": "Expertise", "desc": "Deep specialists devoted to laser technology alone" },
+        "integrity": { "title": "Integrity", "desc": "A principled attitude trusted by customers and colleagues" },
+        "challenge": { "title": "Challenge", "desc": "Fearless in taking on new technologies and industries" }
+      }
+    }
+  },
+  "ceo": {
+    "eyebrow": "CEO DIRECT CHANNEL",
+    "title": "CEO Direct Communication Center",
+    "desc": "The CEO personally listens to and acts on feedback from customers and employees.",
+    "confid": "This channel is operated directly by the CEO. Reporters' identities and content are kept strictly confidential, with protection against any retaliation. Submissions are forwarded instantly to the CEO's personal email (sbhan3763@naver.com).",
+    "cards": {
+      "ethics": { "title": "Ethics Reporting Center", "desc": "Report misconduct, bribery, or workplace harassment securely, anonymously or by name.", "cta": "Report an Issue" },
+      "praise": { "title": "Employee Commendation", "desc": "Recommend an employee who went above and beyond — the CEO personally recognizes and rewards them.", "cta": "Give Praise" },
+      "complaint": { "title": "CEO Direct Customer Feedback", "desc": "Unresolved issues from regular support are handled personally and quickly by the CEO.", "cta": "Submit Feedback" }
+    }
+  },
+  "support": {
+    "eyebrow": "GET IN TOUCH",
+    "title": "Contact Us",
+    "desc": "Send us a message about products, technology, or partnerships — our team responds quickly.",
+    "channelNote": {
+      "ethics": { "label": "Ethics Report", "note": "Handled directly by the CEO; your identity and content are kept strictly confidential." },
+      "praise": { "label": "Employee Commendation", "note": "Your recommendation is forwarded directly to the CEO." },
+      "complaint": { "label": "CEO Direct Customer Feedback", "note": "The CEO will personally review and resolve this quickly." },
+      "prefix": "will be submitted through this channel."
+    },
+    "mailNote": "Submissions here are forwarded to our team's mailbox. If email delivery isn't configured on this deployment, submissions are still saved but no email is actually sent.",
+    "faq": {
+      "quote": { "q": "How do I request a quote?", "a": "Share your industry and requirements in the form and our team will follow up." },
+      "install": { "q": "Do you support overseas installation?", "a": "Yes — our global network of distributors handles local installation and maintenance." },
+      "access": { "q": "Do I need an account to view technical materials?", "a": "Public resources are open to all; some detailed materials require staff verification." }
+    },
+    "form": {
+      "name": "Name",
+      "company": "Company",
+      "email": "Email",
+      "phone": "Phone",
+      "industry": "Industry of Interest",
+      "message": "Message",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Your message has been received. Our team will be in touch shortly.",
+      "errorGeneric": "Something went wrong while submitting your message.",
+      "errorNetwork": "A network error prevented submission. Please try again shortly."
+    }
+  },
+  "company": {
+    "eyebrow": "COMPANY",
+    "title": "Company",
+    "intro": "Founded in 2002, EV Laser is a global laser solutions company that has focused solely on laser technology, powering automotive, semiconductor, biomedical and aerospace manufacturing with precision laser solutions — guided by our slogan, \"Better Laser Technology makes Better World.\"",
+    "history": {
+      "eyebrow": "HISTORY",
+      "title": "History",
+      "founded": "EVLASER CO., LTD. founded",
+      "placeholder": "(To be replaced with real milestones — expansions, certifications, new production lines by year)"
+    },
+    "business": {
+      "eyebrow": "BUSINESS AREAS",
+      "title": "Business Areas",
+      "desc": "See the Products & Technology page for our full range of business areas, technologies, and served industries.",
+      "cta": "View Products & Technology"
+    },
+    "patents": {
+      "eyebrow": "PATENTS & CERTIFICATIONS",
+      "title": "Patents & Certifications",
+      "note": "Our patents and certifications (e.g. ISO) will be listed here once the actual certificate details are provided."
+    }
+  },
+  "footer": {
+    "about": "Founded in 2002, EV Laser is a global laser solutions company that has focused solely on laser technology, powering automotive, semiconductor, biomedical and aerospace manufacturing with precision laser technology.",
+    "addressLine1": "EVLASER CO., LTD. · CEO Steve Han",
+    "addressLine2": "Head Office: #313, GUNPO IT VALLEY, 17, Gosan-ro 148beon-gil, Gunpo-si, Gyeonggi-do, Korea (15850)",
+    "addressLine3": "Laser Technology Center: #706~709, SAMBO SKY-BIZ, 2, Nongsim-ro, Gunpo-si, Gyeonggi-do, Korea (15845)",
+    "addressLine4": "T. +82 31 452 9860",
+    "copyright": "© 2026 EV Laser Co., Ltd. All rights reserved.",
+    "admin": "Admin Login",
+    "columns": { "company": "Company", "products": "Products & Tech", "resources": "Resource Center", "contact": "Contact" }
+  }
+}
