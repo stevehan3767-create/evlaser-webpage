@@ -32,7 +32,7 @@ export default function CeoChannel() {
               <Icon name={c.icon} className="w-[30px] h-[30px] text-red" />
               <h3 className="text-[16.5px] text-white">{c.title}</h3>
               <p className="text-[13px] text-[#b7c4d8]">{c.desc}</p>
-              <Link href="/support" className="mt-auto text-[12.5px] font-bold text-white inline-flex items-center gap-[5px]">
+              <Link href={`/support?channel=${c.id}`} className="mt-auto text-[12.5px] font-bold text-white inline-flex items-center gap-[5px]">
                 {c.cta}
               </Link>
             </div>

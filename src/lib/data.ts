@@ -128,12 +128,6 @@ export const sitemap: SitemapBranch[] = [
   },
 ];
 
-export const resourceCards = [
-  { icon: "doc" as IconName, title: "기술자료", desc: "백서, 스펙시트, 응용 리포트를 다운로드할 수 있습니다." },
-  { icon: "play" as IconName, title: "동영상자료실", desc: "실제 장비 가동 영상과 공정 데모를 확인하세요." },
-  { icon: "case" as IconName, title: "적용사례", desc: "산업별 도입 사례와 성과 데이터를 소개합니다." },
-];
-
 export const officeRows = [
   { country: "Korea (HQ)", partner: "EV Laser 본사", contact: "영업지원팀", phone: "+82 31 452 9860" },
   { country: "Korea (Laser Tech Center)", partner: "레이저기술센터", contact: "기술지원팀", phone: "+82 31 452 9860" },

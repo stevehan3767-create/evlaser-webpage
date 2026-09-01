@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Poppins, Archivo, Noto_Sans_KR, IBM_Plex_Mono } from "next/font/google";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -40,11 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       className={`${poppins.variable} ${archivo.variable} ${notoKR.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

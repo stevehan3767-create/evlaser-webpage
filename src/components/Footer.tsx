@@ -43,10 +43,10 @@ export default function Footer() {
       </div>
       <div className="mx-auto max-w-[1240px] px-7 flex justify-between items-center gap-4 py-[22px] text-[12px] flex-wrap">
         <span>© 2026 EV Laser Co., Ltd. All rights reserved.</span>
-        <a href="#" className="flex items-center gap-1.5 opacity-70 hover:opacity-100">
+        <Link href="/admin" className="flex items-center gap-1.5 opacity-70 hover:opacity-100">
           <Icon name="lock" className="w-[13px] h-[13px]" />
           관리자 로그인
-        </a>
+        </Link>
       </div>
     </footer>
   );
