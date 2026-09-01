@@ -221,17 +221,124 @@
     "viewAll": "View All Openings",
     "apply": "Apply Now",
     "jobs": {
-      "laserEngineer": {
-        "title": "Laser Applications Engineer",
-        "type": "Full-time · Experienced",
-        "loc": "Gunpo HQ",
-        "due": "Rolling basis"
-      },
-      "overseasSales": {
-        "title": "Overseas Sales / Global Marketing",
-        "type": "Full-time · Any level",
-        "loc": "Gunpo HQ",
-        "due": "Rolling basis"
+      "techSales": {
+        "title": "Laser Equipment Technical Sales",
+        "type": "Full-time (3-month probation)",
+        "loc": "Gyeonggi-do: Gunpo, Suwon, Ansan, Anyang, Uiwang",
+        "due": "Closes 2026.09.11",
+        "field": "Laser processing equipment sales, laser metal welding equipment sales, overseas turnkey projects",
+        "department": "Technical Sales Group (Principal/Senior/Staff Researcher grade)",
+        "responsibilities": [
+          "Identify new domestic and overseas customers and propose tailored laser solutions",
+          "Negotiate specifications based on customer requirement analysis",
+          "Prepare quotations for laser systems/automation equipment, close contracts, and coordinate delivery and shipping schedules",
+          "Enhance brand awareness through domestic and overseas exhibitions and marketing activities"
+        ],
+        "requirements": [
+          "3+ years of relevant experience",
+          "Bachelor's degree or higher (4-year) in Mechanical Engineering, Equipment, or Mechatronics",
+          "Business-level English proficiency",
+          "Experience in technical sales for automation equipment or laser systems",
+          "Strong technical understanding of laser optical modules, welding systems, or FA automation equipment",
+          "Able to review drawings and interpret technical specifications, with strong customer presentation skills"
+        ],
+        "preferred": [
+          "Experience selling laser welding equipment or modules",
+          "Existing network/sales channels with large enterprises or Tier-1 suppliers",
+          "Major in Electrical/Electronic Engineering, Industrial Engineering, or Mechanical/Automotive/Naval Architecture Engineering",
+          "Chinese language proficiency",
+          "Internship or work experience in a related role",
+          "Residing near the workplace"
+        ],
+        "workConditions": {
+          "employment": "Full-time (3-month probationary period)",
+          "salary": "Negotiable, determined after interview",
+          "location": "B-313, Gunpo IT Valley, 1045 Dangjeong-dong, Gunpo-si, Gyeonggi-do",
+          "schedule": "5 days/week (Mon-Fri), 09:00-18:00"
+        },
+        "benefits": [
+          {
+            "heading": "Time Off",
+            "items": [
+              "Vacation allowance",
+              "Company retreat facilities",
+              "Half-day leave",
+              "Refresh leave",
+              "Founding day off",
+              "Annual leave",
+              "Summer vacation",
+              "Family event leave"
+            ]
+          },
+          {
+            "heading": "Compensation",
+            "items": [
+              "Incentive program",
+              "Bonuses",
+              "Outstanding employee awards",
+              "Severance pay",
+              "Long-service allowance",
+              "4 major insurances",
+              "Position allowance",
+              "Retirement pension",
+              "Annual leave allowance"
+            ]
+          },
+          {
+            "heading": "Commuting",
+            "items": [
+              "Fuel allowance",
+              "Parking support",
+              "Commuting transportation support",
+              "On-site parking"
+            ]
+          },
+          {
+            "heading": "Training & Daily Life",
+            "items": [
+              "In-house cafeteria",
+              "Lunch and dinner provided",
+              "Beverages (tea/coffee)",
+              "Snacks provided",
+              "New hire training (OJT)",
+              "Workshops",
+              "Founding anniversary events"
+            ]
+          },
+          {
+            "heading": "Gifts",
+            "items": [
+              "Holiday gifts/travel allowance",
+              "Birthday gifts/parties",
+              "Founding anniversary gifts",
+              "Long-service gifts"
+            ]
+          },
+          {
+            "heading": "Work Environment",
+            "items": [
+              "Uniforms provided",
+              "Cafeteria",
+              "Air purifiers",
+              "Meeting rooms",
+              "Visa sponsorship support",
+              "Break room",
+              "Laptop",
+              "Condo/resort vouchers",
+              "Office supplies provided"
+            ]
+          }
+        ],
+        "process": {
+          "period": "2026.08.12 17:00 - 2026.09.11 24:00",
+          "documents": "Saramin online resume, resume, cover letter",
+          "method": "Apply via Saramin",
+          "steps": "Document screening -> Executive interview"
+        },
+        "notes": [
+          "If false information is found in your application, the job offer may be withdrawn even after hiring is confirmed.",
+          "Closing dates may vary by position - please check carefully."
+        ]
       }
     },
     "culture": {
@@ -251,7 +358,22 @@
           "desc": "Fearless in taking on new technologies and industries"
         }
       }
-    }
+    },
+    "responsibilitiesHeading": "Key Responsibilities",
+    "requirementsHeading": "Requirements",
+    "preferredHeading": "Preferred",
+    "workConditionsHeading": "Work Conditions",
+    "benefitsHeading": "Benefits",
+    "processHeading": "Hiring Process",
+    "notesHeading": "Notes",
+    "employmentLabel": "Employment Type",
+    "salaryLabel": "Salary",
+    "locationLabel": "Work Location",
+    "scheduleLabel": "Working Days/Hours",
+    "periodLabel": "Application Period",
+    "documentsLabel": "Required Documents",
+    "methodLabel": "How to Apply",
+    "stepsLabel": "Selection Process"
   },
   "ceo": {
     "eyebrow": "CEO DIRECT CHANNEL",

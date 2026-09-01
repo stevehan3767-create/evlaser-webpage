@@ -188,10 +188,8 @@ export const newsItems = [
   { tag: "회사소식", title: "EV Laser, 글로벌 인증(ISO) 갱신 완료", date: "2026.06.15" },
 ];
 
-export const jobs = [
-  { key: "laserEngineer" },
-  { key: "overseasSales" },
-];
+// Real, currently open posting (source: Saramin, provided by the user).
+export const jobs = [{ key: "techSales" }];
 
 export const ceoCards = [
   { id: "ethics", icon: "shield" as IconName },
