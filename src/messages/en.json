@@ -207,7 +207,8 @@
       "hq": "Head Office",
       "techCenter": "Laser Technology Center",
       "suzhou": "EVLS (Suzhou, China)"
-    }
+    },
+    "distributorsEmpty": "No distributor information has been registered yet. Please contact us directly via the inquiry form."
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",

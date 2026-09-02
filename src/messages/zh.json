@@ -207,7 +207,8 @@
       "hq": "总部",
       "techCenter": "激光技术中心",
       "suzhou": "EVLS（中国苏州）"
-    }
+    },
+    "distributorsEmpty": "暂无已登记的代理商信息，请通过咨询表单直接联系我们。"
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",

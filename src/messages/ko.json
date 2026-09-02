@@ -207,7 +207,8 @@
       "hq": "본사",
       "techCenter": "레이저기술센터",
       "suzhou": "EVLS (중국 쑤저우)"
-    }
+    },
+    "distributorsEmpty": "아직 등록된 대리점 정보가 없습니다. 문의하기를 통해 담당자에게 직접 연락해 주세요."
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",

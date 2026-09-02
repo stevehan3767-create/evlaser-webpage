@@ -126,7 +126,11 @@ export default function GlobalNetwork() {
             <Icon name="handshake" className="w-[19px] h-[19px] text-blue" />
             {t("distributors")}
           </h2>
-          <DistributorTable headers={distributorHeaders} rows={distributorRows} />
+          {distributorRows.length === 0 ? (
+            <p className="py-8 text-ink-soft text-[13.5px] border-t border-line">{t("distributorsEmpty")}</p>
+          ) : (
+            <DistributorTable headers={distributorHeaders} rows={distributorRows} />
+          )}
         </div>
       </div>
     </section>

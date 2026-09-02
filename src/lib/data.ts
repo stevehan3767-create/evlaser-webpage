@@ -188,21 +188,16 @@ export const officeRows = [
   },
 ];
 
-export const distributorRows = [
-  { country: "United States", partner: "EVL Americas Inc.", contact: "J. Carter", phone: "+1 000 000 0000" },
-  { country: "Germany", partner: "EVL Europe GmbH", contact: "M. Weber", phone: "+49 000 000000" },
-  { country: "China", partner: "EVL China Co., Ltd.", contact: "L. Wang", phone: "+86 000 0000 0000" },
-  { country: "Japan", partner: "EVL Japan K.K.", contact: "K. Sato", phone: "+81 00 0000 0000" },
-];
+// No real distributor/partner list has been provided yet. Left empty rather
+// than fabricated — GlobalNetwork renders an honest empty state instead of a
+// table when this is empty. Populate with real partners once confirmed.
+export const distributorRows: { country: string; partner: string; contact: string; phone: string }[] = [];
 
 // Seed data for the news database (Korean only — admin-authored content is not
 // machine-translated; see AdminNews for adding real, dated announcements).
-export const newsItems = [
-  { tag: "회사소식", title: "EV Laser, 차세대 배터리 용접 라인 공급 계약 체결", date: "2026.08.24" },
-  { tag: "산업동향", title: "반도체 패키징 공정용 초정밀 마킹 기술 동향", date: "2026.08.11" },
-  { tag: "전시회소식", title: "SEMICON Korea 2026 참가 및 부스 안내", date: "2026.07.29" },
-  { tag: "회사소식", title: "EV Laser, 글로벌 인증(ISO) 갱신 완료", date: "2026.06.15" },
-];
+// Left empty — no real, dated announcements have been provided yet. The news
+// page shows an honest empty state until real items are added via /admin/news.
+export const newsItems: { tag: string; title: string; date: string }[] = [];
 
 export const jobs = [
   // Real, currently open posting (source: Saramin, provided by the user) — full detail.

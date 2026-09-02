@@ -207,7 +207,8 @@
       "hq": "本社",
       "techCenter": "レーザー技術センター",
       "suzhou": "EVLS（中国・蘇州）"
-    }
+    },
+    "distributorsEmpty": "現在登録されている代理店情報はありません。お問い合わせフォームより直接ご連絡ください。"
   },
   "news": {
     "eyebrow": "NEWS & UPDATES",
