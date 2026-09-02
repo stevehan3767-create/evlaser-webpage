@@ -8,6 +8,6 @@ export const metadata: Metadata = {
   description: "EV Laser의 회사소식, 전시회소식, 산업동향을 확인하세요.",
 };
 
-export default function NewsPage() {
-  return <News />;
+export default function NewsPage({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
+  return <News searchParams={searchParams} />;
 }

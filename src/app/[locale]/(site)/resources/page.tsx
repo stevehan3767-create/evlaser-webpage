@@ -8,6 +8,6 @@ export const metadata: Metadata = {
   description: "EV Laser 기술자료, 동영상자료실, 적용사례를 확인하세요.",
 };
 
-export default function ResourcesPage() {
-  return <Resources />;
+export default function ResourcesPage({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
+  return <Resources searchParams={searchParams} />;
 }

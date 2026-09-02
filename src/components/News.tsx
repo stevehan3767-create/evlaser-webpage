@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, seedIfEmpty } from "@/lib/repo";
 import type { NewsRow } from "@/lib/repo";
@@ -42,11 +43,16 @@ function NewsRowItem({ n }: { n: NewsRow }) {
   );
 }
 
-export default async function News() {
+export default async function News({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
+  const { cat: rawCat } = await searchParams;
+  const activeCat = CATEGORIES.some((c) => c.key === rawCat) ? (rawCat as string) : CATEGORIES[0].key;
+
   const t = await getTranslations("news");
   const tNav = await getTranslations("nav.news.items");
   await seedIfEmpty(seedNewsItems);
   const items = await newsRepo.list(true);
+  const activeTag = CATEGORIES.find((c) => c.key === activeCat)!.tag;
+  const activeItems = items.filter((n) => n.tag === activeTag);
 
   return (
     <section id="news" className="py-16 sm:py-22 border-b border-line bg-surface-alt">
@@ -58,21 +64,29 @@ export default async function News() {
           </h1>
         </div>
 
-        {CATEGORIES.map((cat) => {
-          const catItems = items.filter((n) => n.tag === cat.tag);
-          return (
-            <div key={cat.key} id={cat.key} className="mb-12 last:mb-0">
-              <h2 className="text-[16px] font-bold mb-4">{tNav(cat.key)}</h2>
-              <div className="border-t border-line">
-                {catItems.length === 0 ? (
-                  <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
-                ) : (
-                  catItems.map((n) => <NewsRowItem key={n.id} n={n} />)
-                )}
-              </div>
-            </div>
-          );
-        })}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {CATEGORIES.map((c) => (
+            <Link
+              key={c.key}
+              href={`/news?cat=${c.key}`}
+              className={`px-4 py-2 text-[13.5px] font-bold border rounded-sm transition-colors ${
+                c.key === activeCat
+                  ? "bg-red text-white border-red"
+                  : "bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red"
+              }`}
+            >
+              {tNav(c.key)}
+            </Link>
+          ))}
+        </div>
+
+        <div className="border-t border-line">
+          {activeItems.length === 0 ? (
+            <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
+          ) : (
+            activeItems.map((n) => <NewsRowItem key={n.id} n={n} />)
+          )}
+        </div>
       </div>
     </section>
   );
