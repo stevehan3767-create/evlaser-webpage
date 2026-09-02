@@ -27,6 +27,7 @@ export interface NewsRow {
   tag: string;
   title: string;
   date: string;
+  body: string;
   published: boolean;
   createdAt: string;
 }
@@ -63,6 +64,7 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
     tag: r.tag as string,
     title: r.title as string,
     date: r.date as string,
+    body: (r.body as string) ?? "",
     published: Boolean(r.published),
     createdAt: r.created_at as string,
   };
@@ -148,16 +150,17 @@ export const newsRepo = {
     ) as Record<string, unknown>[];
     return rows.map(rowToNews);
   },
-  create(input: { tag: string; title: string; date: string; published: boolean }): void {
+  create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): void {
     const db = getDb();
     db.prepare(
-      `INSERT INTO news_items (id, tag, title, date, published, created_at) VALUES (@id, @tag, @title, @date, @published, @createdAt)`
+      `INSERT INTO news_items (id, tag, title, date, body, published, created_at) VALUES (@id, @tag, @title, @date, @body, @published, @createdAt)`
     ).run({
       id: newId(),
       createdAt: new Date().toISOString(),
       tag: input.tag,
       title: input.title,
       date: input.date,
+      body: input.body ?? "",
       published: input.published ? 1 : 0,
     });
   },
@@ -170,7 +173,7 @@ export const newsRepo = {
   },
 };
 
-export function seedIfEmpty(seedNews: { tag: string; title: string; date: string }[]) {
+export function seedIfEmpty(seedNews: { tag: string; title: string; date: string; body?: string }[]) {
   if (newsRepo.count() === 0) {
     for (const n of seedNews) {
       newsRepo.create({ ...n, published: true });

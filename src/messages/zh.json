@@ -16,7 +16,8 @@
       "items": {
         "byTech": "按技术类型",
         "byIndustry": "按行业分类",
-        "byMaterial": "按材料"
+        "byMaterial": "按材料",
+        "lineup": "产品阵容"
       }
     },
     "resources": {
@@ -673,6 +674,12 @@
       "products": "产品与技术",
       "resources": "资料中心",
       "contact": "联系我们"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "naverBlog": "Naver博客",
+      "youtube": "YouTube"
     }
   },
   "techDetails": {
@@ -876,5 +883,11 @@
         "欢迎了解EVLASER的激光安全解决方案，体验最高水准的安全标准。只要采取正确的预防措施与技术，激光无疑将成为推动产业发展的安全且高效的工具。"
       ]
     }
+  },
+  "productLineup": {
+    "eyebrow": "PRODUCT LINEUP",
+    "title": "产品阵容",
+    "desc": "(株)EVLASER的激光塑料焊接、清洗及安全解决方案产品阵容。各产品的详细规格请参见官方网站。",
+    "note": "点击产品名称将跳转至evlaser.co.kr的产品详情页面。"
   }
 }

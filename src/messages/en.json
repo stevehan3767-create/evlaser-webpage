@@ -16,7 +16,8 @@
       "items": {
         "byTech": "By Technology",
         "byIndustry": "By Industry",
-        "byMaterial": "By Material"
+        "byMaterial": "By Material",
+        "lineup": "Product Lineup"
       }
     },
     "resources": {
@@ -673,6 +674,12 @@
       "products": "Products & Tech",
       "resources": "Resource Center",
       "contact": "Contact"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "naverBlog": "Naver Blog",
+      "youtube": "YouTube"
     }
   },
   "techDetails": {
@@ -876,5 +883,11 @@
         "See EVLASER's laser safety solutions and be assured of the highest safety standards. With the right precautions and technology, lasers are clearly a safe and effective tool that drives industrial growth."
       ]
     }
+  },
+  "productLineup": {
+    "eyebrow": "PRODUCT LINEUP",
+    "title": "Product Lineup",
+    "desc": "EVLASER CO., LTD.'s lineup of laser plastic welding, cleaning, and safety solution products. Detailed specifications for each product are available on the official website.",
+    "note": "Clicking a product name opens its detail page on evlaser.co.kr."
   }
 }

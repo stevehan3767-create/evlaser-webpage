@@ -29,6 +29,12 @@ export default function AdminNewsPage() {
             className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
+        <textarea
+          name="body"
+          placeholder="본문 (선택)"
+          rows={3}
+          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
+        />
         <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
           추가
         </button>
@@ -39,9 +45,12 @@ export default function AdminNewsPage() {
           <p className="p-4 text-[13px] text-ink-soft">등록된 뉴스가 없습니다.</p>
         ) : (
           items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
-              <span className="font-mono text-[10.5px] text-blue border border-line-strong px-1.5 py-0.5 flex-none">{item.tag}</span>
-              <span className="flex-1">{item.title}</span>
+            <div key={item.id} className="flex items-start justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
+              <span className="font-mono text-[10.5px] text-blue border border-line-strong px-1.5 py-0.5 flex-none mt-0.5">{item.tag}</span>
+              <div className="flex-1">
+                <p>{item.title}</p>
+                {item.body && <p className="mt-1 text-[12px] text-ink-soft line-clamp-2">{item.body}</p>}
+              </div>
               <span className="font-mono text-ink-faint flex-none">{item.date}</span>
               <form action={deleteNews}>
                 <input type="hidden" name="id" value={item.id} />

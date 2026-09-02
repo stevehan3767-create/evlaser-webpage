@@ -16,7 +16,8 @@
       "items": {
         "byTech": "技術別",
         "byIndustry": "産業分野別",
-        "byMaterial": "材料別"
+        "byMaterial": "材料別",
+        "lineup": "製品ラインナップ"
       }
     },
     "resources": {
@@ -673,6 +674,12 @@
       "products": "製品・技術",
       "resources": "資料室",
       "contact": "お問い合わせ"
+    },
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "naverBlog": "Naverブログ",
+      "youtube": "YouTube"
     }
   },
   "techDetails": {
@@ -876,5 +883,11 @@
         "EVLASERのレーザー安全に関するソリューションをぜひご覧いただき、最高水準の安全基準をご確認ください。適切な予防措置と技術を用いることで、レーザーは産業の成長を牽引する安全かつ効果的なツールとなります。"
       ]
     }
+  },
+  "productLineup": {
+    "eyebrow": "PRODUCT LINEUP",
+    "title": "製品ラインナップ",
+    "desc": "(株)EVLASERのレーザープラスチック溶接、クリーニング、安全ソリューション製品のラインナップです。各製品の詳細仕様は公式ウェブサイトでご確認いただけます。",
+    "note": "製品名をクリックするとevlaser.co.krの製品詳細ページに移動します。"
   }
 }

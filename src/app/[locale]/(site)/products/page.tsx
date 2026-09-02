@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Industries from "@/components/Industries";
 import TechSolutions from "@/components/TechSolutions";
+import ProductLineup from "@/components/ProductLineup";
 
 export const metadata: Metadata = {
   title: "제품·기술 | EV Laser",
@@ -18,6 +19,7 @@ export default function ProductsPage() {
       </div>
       <Industries />
       <TechSolutions />
+      <ProductLineup />
     </>
   );
 }

@@ -93,6 +93,7 @@ export const companyNav: NavItem[] = [
 ];
 
 export const productsNav: NavItem[] = [
+  { key: "lineup", href: "/products#lineup" },
   { key: "byTech", href: "/products#tech" },
   { key: "byIndustry", href: "/products#industries" },
   { key: "byMaterial", href: "/products#tech" },
@@ -182,10 +183,36 @@ export const officeRows = [
   },
   {
     key: "suzhou",
-    address: "1F, Building 1, Xinyi Vaogu Wisdom Industrial Park, 415 Changyang Street, Suzhou Industrial Park, Suzhou City, Jiangsu Province, China (215000)",
+    address: "Room 106, Zone C, Building 2, Dongshahu Fund Town, No. 345 Fengli Street, Industrial Park, Suzhou City, Jiangsu Province, China (215127)",
     phone: "+86 512 6515 8026",
     email: "info@evlaser.cn",
   },
+];
+
+// Real social links (source: evlaser.co.kr footer, provided by the user).
+export const socialLinks = [
+  { key: "facebook", url: "https://www.facebook.com/evlaser.co.kr" },
+  { key: "instagram", url: "https://www.instagram.com/evlaser.co.kr/" },
+  { key: "naverBlog", url: "https://blog.naver.com/evlaser" },
+  { key: "youtube", url: "https://www.youtube.com/@evlaser.official" },
+];
+
+// Real product series (source: evlaser.co.kr homepage, provided by the user).
+// Detailed specs/photos live on the real product pages, linked directly since
+// they aren't available to reproduce here.
+export const productLineup = [
+  { name: "ELPW-TS Series", url: "https://evlaser.co.kr/product/view.php?idx=4" },
+  { name: "ELPW-LS Series", url: "https://evlaser.co.kr/product/view.php?idx=5" },
+  { name: "ELPW-LM Series", url: "https://evlaser.co.kr/product/view.php?idx=6" },
+  { name: "ELPW-TM Series", url: "https://evlaser.co.kr/product/view.php?idx=7" },
+  { name: "ELPW-CO Series", url: "https://evlaser.co.kr/product/view.php?idx=8" },
+  { name: "ELPW-IS Series", url: "https://evlaser.co.kr/product/view.php?idx=9" },
+  { name: "ELPW-MS Series", url: "https://evlaser.co.kr/product/view.php?idx=10" },
+  { name: "ELPW-SS2 Series", url: "https://evlaser.co.kr/product/view.php?idx=11" },
+  { name: "ELPW-SS1 Series", url: "https://evlaser.co.kr/product/view.php?idx=12" },
+  { name: "ELPW-ES Series", url: "https://evlaser.co.kr/product/view.php?idx=13" },
+  { name: "ELCR-D Series", url: "https://evlaser.co.kr/product/view.php?idx=15" },
+  { name: "Laser Safety Solution", url: "https://evlaser.co.kr/product/view.php?idx=16" },
 ];
 
 // No real distributor/partner list has been provided yet. Left empty rather
@@ -197,7 +224,71 @@ export const distributorRows: { country: string; partner: string; contact: strin
 // machine-translated; see AdminNews for adding real, dated announcements).
 // Left empty — no real, dated announcements have been provided yet. The news
 // page shows an honest empty state until real items are added via /admin/news.
-export const newsItems: { tag: string; title: string; date: string }[] = [];
+// Real news history (source: evlaser.co.kr homepage news feed, provided by
+// the user). Text lightly cleaned of run-on spacing/HTML entities from the
+// source markup; facts and dates kept as published.
+export const newsItems: { tag: string; title: string; date: string; body: string }[] = [
+  {
+    tag: "회사소식",
+    title: "이브이레이저, 경영혁신형 중소기업 '메인비즈' 선정",
+    date: "2024.11.12",
+    body: "이브이레이저는 중소벤처기업부로부터 경영혁신형 중소기업 인증을 획득했습니다. 메인비즈란 Management(경영), Innovation(혁신), Business(기업)의 합성어로서 중소기업 기술혁신 촉진법에 의거해 경영혁신 활동을 수행하고 마케팅, 조직관리, 생산성 향상 분야에 탁월한 경영 성과를 나타낸 기업을 중소벤처기업부가 평가하고 인증한 기업을 말합니다. 이는 국제협력기구(OECD) 기업혁신 지침인 '오슬로 매뉴얼'에 근거해 정부가 인프라, 활동, 성과 등 다양한 평가 기준 아래 우수한 중소기업을 선정하는 국가적 인증이기도 합니다. 이브이레이저는 2002년 창립 이후로 레이저 전문 기업으로 다양한 기술 인증과 총 24건의 특허 등록과 특허 출원을 하였습니다. 거의 모든 산업분야에 응용되는 레이저를 이용한 폭넓고 혁신적인 기술들을 개발하여 국내는 물론 유럽, 남미, 중국, 동남아 등 전 세계의 수많은 협력사들과 교류하면서 함께 성장해 왔습니다. ㈜이브이레이저의 전 임직원은 현재의 환경에 머무르고 만족하기보다는 \"더 좋은 레이저기술로 더 좋은 세상을 만들어간다\"는 목표로 더욱 노력할 것입니다. 감사합니다.",
+  },
+  {
+    tag: "회사소식",
+    title: "'유로비젼레이저' → '이브이레이저' 사명 변경 안내",
+    date: "2021.06.18",
+    body: "안녕하십니까 (주)이브이레이저입니다. 작년 8월 28일 이후 기존 \"유로비젼레이저\"에서 새로운 \"이브이레이저\"로 사명을 변경하게 되었습니다. 단순 상호 변경으로 기존 구성 및 연락 채널은 동일하오니 참고 부탁드리겠습니다. 감사합니다.",
+  },
+  {
+    tag: "회사소식",
+    title: "경기지방중소벤처기업 표창 시상",
+    date: "2021.06.18",
+    body: "안녕하세요 (주)이브이레이저입니다. 지난 12월 13일 경기지방중소벤처기업청장 주관으로 시행된 모범기업 표창에 저희 \"이브이레이저\"가 모범기업으로 선정되어 경기지방중소벤처기업청장 표창을 받게 되었습니다.",
+  },
+  {
+    tag: "회사소식",
+    title: "광융합신기술 광주시장 표창",
+    date: "2021.06.18",
+    body: "안녕하세요 (주)이브이레이저입니다. 지난 11월 20일 광주에서 개최된 광기술산업 로드쇼에 참가 및 광주광역시장 표창에 선정되었습니다. 이후 따로 개최된 기술확산 교류회를 통하여 \"레이저 플라스틱 접합 기술\"에 대한 대표님 세미나 자리가 있었습니다.",
+  },
+  {
+    tag: "회사소식",
+    title: "신기술개발 우수업체 정부시상",
+    date: "2021.06.18",
+    body: "안녕하세요 (주)이브이레이저입니다. 지난 6월 26일 산업통상자원부에서 실시한 \"광, LED, OLED, 레이저 산업 신기술 개발 우수업체\"에서 \"레이저 플라스틱 접합기술\"으로 우수한 성적을 거두어 산업통상자원부장관 수상을 받았습니다. 대표님 일정이 바쁘신 관계로 이광재 이사님께서 대신 수상을 하였습니다.",
+  },
+  {
+    tag: "회사소식",
+    title: "2015년 10월 8일 경기도 유망중소기업 인증",
+    date: "2021.06.18",
+    body: "안녕하세요. (주)유로비젼레이저가 2015년 10월 8일 경기도 유망중소기업 인증을 수상하였습니다. 더욱더 발전하고 노력하는 유로비젼레이저가 되겠습니다. 유로비젼레이저 임직원일동",
+  },
+  {
+    tag: "회사소식",
+    title: "한국해양대-유로비젼레이저, 산학협력 및 기증식",
+    date: "2021.06.18",
+    body: "한국해양대학교 해사산업연구소(소장 이상태)는 28일 오전 11시 해사대학 2층 회의실에서 ㈜유로비젼레이저(대표이사 한상배)와 산학협력 업무 협약식 및 교육실습용 레이저 마킹 시스템 기증식을 가졌다. 이 날 ㈜유로비젼레이저는 한국해양대 레이저응용기술지원센터(센터장 김종도) 레이저정밀가공실험실에서 학생들 교육용으로 사용될 5천만 원 상당의 '레이저 마킹 시스템'을 기증했으며, 해사대학 및 해사산업연구소와의 산학협력을 강화하기로 했다. 해사대학 이은방 학장은 \"해양·해사분야에서 첨단 레이저 기술의 중요성은 이미 세계가 주목하고 있으며 우리 대학이 리드로서의 큰 역할을 수행해야 할 것\"이라고 당부했다. 해사산업연구소 이상태 소장은 \"우리나라 제조업의 뿌리산업인 레이저 용접기술 및 표면처리 자동화 설비의 개발과 국산화에 전념하고 있는 한상배 대표님과 인연을 맺게 돼 기쁘다\"며 \"값진 기증에 깊이 감사드리며, 활발한 산학협력을 통해 관련 산업 발전에도 함께 기여하기를 바란다\"고 말했다. 김종도 레이저응용기술지원센터장은 \"이 레이저 마킹시스템은 20W Fiber Laser Marking System으로, 정밀가공부품의 시리얼넘버 등을 각인하는 등 그 용도는 매우 다양하다\"며 \"기존에 설치돼 있는 kW급 고출력레이저와 연계해 학부 및 대학원 학생의 교육과 실습 및 연구에 폭넓게 활용될 예정\"이라고 큰 기대감을 나타냈다. 한편 ㈜유로비젼레이저는 2002년 4월 레이저전문 벤처 기업으로 설립돼 레이저를 이용한 플라스틱의 용접, 레이저열처리, 레이저클래딩 그리고 레이저 솔더링 등의 매크로기술에서부터 반도체, 전자, 의료산업에서 요구되는 초정밀가공을 위한 마이크로, 나노가공기술의 개발에 이르기까지 많은 분야에서 기술력을 인정받고 있다.",
+  },
+  {
+    tag: "회사소식",
+    title: "2015년 5월 26일 ELCR Laser CE인증!",
+    date: "2021.06.18",
+    body: "안녕하세요 (주)유로비젼레이저입니다. 2015년 5월 26일 ELCR Laser CE인증을 받았습니다! 더욱더 발전하고 노력하는 유로비젼레이저가 되겠습니다. 유로비젼레이저 임직원일동",
+  },
+  {
+    tag: "회사소식",
+    title: "유로비젼레이저 대표 중소기업청장 표창을 수상하였습니다",
+    date: "2021.06.18",
+    body: "안녕하세요. (주)유로비젼레이저의 한상배 대표님이 2012년 12월 10일 벤처기업의 경영 및 생산성향상을 통하여 국가산업 발전에 기여한 공로를 인정받아 2014년 12월 12일 중소기업청장상 표창을 수상하였습니다. 더욱더 발전하고 노력하는 유로비젼레이저가 되겠습니다. 유로비젼레이저 임직원일동",
+  },
+  {
+    tag: "회사소식",
+    title: "미국레이저협회(LIA)에서 실시하는 레이저안전교육 수료",
+    date: "2021.06.18",
+    body: "2015년 10월 공지사항을 이제야 올립니다. (주)유로비젼레이저의 한상배 대표님이 2014년 10월 20일에서 25일까지 미국 San Diego에서 개최된 2014 ICALEO학회행사를 참가하였으며, 이 기간동안 미국레이저협회(Laser Institute of America)에서 공식적으로 주관하는 5일간(10/20~25일)의 \"Laser Safety Officer Training Course\"를 수료함으로써 레이저안전에 대한 전문교육을 마쳤습니다. 레이저안전에 관심이 있는 전세계의 레이저안전전문가들과 함께 많은 정보를 공유하고 레이저안전에 대한 전문적인 교육을 이수함으로써, 레이저안전 전문가로서 국내에서의 \"레이저안전\"에 대한 인식을 개선하고 레이저를 안전하게 사용하기위한 다양한 활동을 하게될것으로 기대됩니다. (주)유로비젼레이저",
+  },
+];
 
 export const jobs = [
   // Real, currently open posting (source: Saramin, provided by the user) — full detail.

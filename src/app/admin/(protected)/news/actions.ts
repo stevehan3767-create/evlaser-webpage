@@ -7,10 +7,11 @@ export async function createNews(formData: FormData) {
   const tag = String(formData.get("tag") ?? "회사소식");
   const title = String(formData.get("title") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
 
   if (!title || !date) return;
 
-  newsRepo.create({ tag, title, date, published: true });
+  newsRepo.create({ tag, title, date, body, published: true });
   revalidatePath("/admin/news");
   revalidatePath("/news");
 }

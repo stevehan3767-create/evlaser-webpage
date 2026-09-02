@@ -16,7 +16,8 @@
       "items": {
         "byTech": "기술종류별",
         "byIndustry": "산업분야별",
-        "byMaterial": "재료별"
+        "byMaterial": "재료별",
+        "lineup": "제품 라인업"
       }
     },
     "resources": {
@@ -673,6 +674,12 @@
       "products": "제품·기술",
       "resources": "자료실",
       "contact": "문의하기"
+    },
+    "social": {
+      "facebook": "페이스북",
+      "instagram": "인스타그램",
+      "naverBlog": "네이버블로그",
+      "youtube": "유튜브"
     }
   },
   "techDetails": {
@@ -876,5 +883,11 @@
         "이브이레이저의 레이저 안전 솔루션을 통해 최고의 안전 기준을 확인하실 수 있습니다. 올바른 예방 조치와 기술을 사용하면 레이저는 산업 성장을 이끄는 안전하고 효과적인 도구가 됩니다."
       ]
     }
+  },
+  "productLineup": {
+    "eyebrow": "PRODUCT LINEUP",
+    "title": "제품 라인업",
+    "desc": "㈜이브이레이저의 레이저 플라스틱 용접, 클리닝, 안전 솔루션 제품 라인업입니다. 각 제품의 상세 사양은 공식 홈페이지에서 확인하실 수 있습니다.",
+    "note": "제품명을 클릭하면 evlaser.co.kr의 제품 상세 페이지로 이동합니다."
   }
 }

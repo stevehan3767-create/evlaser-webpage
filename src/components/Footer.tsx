@@ -2,7 +2,38 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 import Icon from "./Icon";
-import { companyNav, productsNav, resourcesNav, globalNav, supportNav } from "@/lib/data";
+import { companyNav, productsNav, resourcesNav, globalNav, supportNav, socialLinks } from "@/lib/data";
+
+const SOCIAL_ICON_PATHS: Record<string, React.ReactNode> = {
+  facebook: <path d="M14 8.5h2V5.5h-2c-2.2 0-3.5 1.3-3.5 3.5v2H8.5v3H10.5V19.5h3V14h2.3l.5-3H13.5V9.3c0-.5.2-.8.5-.8z" />,
+  instagram: (
+    <>
+      <rect x="4.5" y="4.5" width="15" height="15" rx="4" />
+      <circle cx="12" cy="12" r="3.6" />
+      <circle cx="16.6" cy="7.4" r="0.9" fill="currentColor" stroke="none" />
+    </>
+  ),
+  naverBlog: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <path d="M8 8v8l4-5.2V16h4V8l-4 5.2V8z" />
+    </>
+  ),
+  youtube: (
+    <>
+      <rect x="3.5" y="6.5" width="17" height="11" rx="3" />
+      <path d="M10.3 9.6v4.8l4.4-2.4z" fill="currentColor" stroke="none" />
+    </>
+  ),
+};
+
+function SocialIcon({ name }: { name: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {SOCIAL_ICON_PATHS[name]}
+    </svg>
+  );
+}
 
 type NavSection = "company" | "products" | "resources" | "news" | "careers" | "global" | "support" | "ceo";
 
@@ -49,6 +80,20 @@ export default function Footer() {
             <br />
             {t("footer.addressLine4")}
           </p>
+          <div className="flex gap-2.5 mt-5">
+            {socialLinks.map((s) => (
+              <a
+                key={s.key}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t(`footer.social.${s.key}`)}
+                className="w-8 h-8 flex items-center justify-center border border-white/20 rounded-full opacity-80 hover:opacity-100 hover:border-white/50 transition-colors"
+              >
+                <SocialIcon name={s.key} />
+              </a>
+            ))}
+          </div>
         </div>
         <FootCol titleKey="company" items={companyItems} />
         <FootCol titleKey="products" items={productItems} />

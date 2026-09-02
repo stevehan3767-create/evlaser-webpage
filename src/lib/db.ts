@@ -43,10 +43,16 @@ function createDb() {
       tag TEXT NOT NULL,
       title TEXT NOT NULL,
       date TEXT NOT NULL,
+      body TEXT NOT NULL DEFAULT '',
       published INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL
     );
   `);
+
+  const newsColumns = db.prepare("PRAGMA table_info(news_items)").all() as { name: string }[];
+  if (!newsColumns.some((c) => c.name === "body")) {
+    db.exec("ALTER TABLE news_items ADD COLUMN body TEXT NOT NULL DEFAULT ''");
+  }
 
   return db;
 }
