@@ -452,13 +452,19 @@
       "company": "Company",
       "email": "Email",
       "phone": "Phone",
-      "industry": "Industry of Interest",
+      "industry": "문의 내용 구분",
       "message": "Message",
       "submit": "Send Message",
       "sending": "Sending...",
       "success": "Your message has been received. Our team will be in touch shortly.",
       "errorGeneric": "Something went wrong while submitting your message.",
-      "errorNetwork": "A network error prevented submission. Please try again shortly."
+      "errorNetwork": "A network error prevented submission. Please try again shortly.",
+      "categoryOptions": [
+        "기술·설비문의",
+        "견적문의",
+        "협업문의",
+        "기타"
+      ]
     },
     "faqTitle": "자주 묻는 질문",
     "back": "← 문의하기 메인으로",

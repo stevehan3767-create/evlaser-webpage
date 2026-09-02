@@ -452,13 +452,19 @@
       "company": "公司名称",
       "email": "电子邮箱",
       "phone": "联系电话",
-      "industry": "关注行业",
+      "industry": "문의 내용 구분",
       "message": "咨询内容",
       "submit": "发送咨询",
       "sending": "发送中...",
       "success": "您的咨询已收到，负责人确认后将与您联系。",
       "errorGeneric": "提交咨询时发生错误。",
-      "errorNetwork": "由于网络错误未能提交，请稍后重试。"
+      "errorNetwork": "由于网络错误未能提交，请稍后重试。",
+      "categoryOptions": [
+        "기술·설비문의",
+        "견적문의",
+        "협업문의",
+        "기타"
+      ]
     },
     "faqTitle": "자주 묻는 질문",
     "back": "← 문의하기 메인으로",

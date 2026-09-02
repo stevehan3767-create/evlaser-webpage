@@ -64,7 +64,6 @@ function buildPayload(channel: Channel, data: FormData, anonymous: boolean) {
 
 function ContactFormInner() {
   const t = useTranslations("support");
-  const tIndustries = useTranslations("industries");
   const params = useSearchParams();
   const channelParam = params.get("channel") ?? "general";
   const channel = ((CHANNEL_KEYS as readonly string[]).includes(channelParam) ? channelParam : "general") as Channel;
@@ -224,11 +223,9 @@ function ContactFormInner() {
             <div className="flex flex-col gap-1.5 mb-4">
               <label className="text-[12.5px] font-bold text-ink-soft">{t("form.industry")}</label>
               <select name="industry" className="border border-line-strong px-3 py-[11px] bg-surface text-[13.8px] rounded-sm">
-                <option>{tIndustries("automotive")}</option>
-                <option>{tIndustries("semiconductor")}</option>
-                <option>{tIndustries("bioHealth")}</option>
-                <option>{tIndustries("aerospace")}</option>
-                <option>{tIndustries("other")}</option>
+                {(t.raw("form.categoryOptions") as string[]).map((opt) => (
+                  <option key={opt}>{opt}</option>
+                ))}
               </select>
             </div>
             <div className="flex flex-col gap-1.5 mb-4">
