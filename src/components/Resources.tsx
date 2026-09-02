@@ -26,7 +26,7 @@ export default async function Resources() {
         {CATEGORIES.map((cat) => {
           const catItems = items.filter((i) => i.category === cat.key);
           return (
-            <div key={cat.key} className="mb-12 last:mb-0">
+            <div key={cat.key} id={cat.key} className="mb-12 last:mb-0">
               <h2 className="flex items-center gap-2.5 text-[16px] mb-4">
                 <Icon name={cat.icon} className="w-[19px] h-[19px] text-blue" />
                 {t(`categories.${cat.key}.title`)}

@@ -217,15 +217,15 @@ export const productsNav: NavItem[] = [
 ];
 
 export const resourcesNav: NavItem[] = [
-  { key: "docs", href: "/resources" },
-  { key: "videos", href: "/resources" },
-  { key: "cases", href: "/resources" },
+  { key: "docs", href: "/resources#doc" },
+  { key: "videos", href: "/resources#video" },
+  { key: "cases", href: "/resources#case" },
 ];
 
 export const newsNav: NavItem[] = [
-  { key: "company", href: "/news" },
-  { key: "exhibition", href: "/news" },
-  { key: "industry", href: "/news" },
+  { key: "company", href: "/news#company" },
+  { key: "exhibition", href: "/news#exhibition" },
+  { key: "industry", href: "/news#industry" },
 ];
 
 export const careersNav: NavItem[] = [
