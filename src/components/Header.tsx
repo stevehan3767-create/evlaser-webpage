@@ -12,6 +12,7 @@ import {
   newsNav,
   careersNav,
   globalNav,
+  supportNav,
 } from "@/lib/data";
 
 const NAV_SECTIONS = [
@@ -21,6 +22,7 @@ const NAV_SECTIONS = [
   { section: "news", items: newsNav, href: "/news" },
   { section: "careers", items: careersNav, href: "/careers" },
   { section: "global", items: globalNav, href: "/global" },
+  { section: "support", items: supportNav, href: "/support" },
 ] as const;
 
 const LANG_LABELS: Record<string, string> = { ko: "한국어", en: "EN", zh: "中文", ja: "日本語" };

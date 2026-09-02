@@ -70,6 +70,22 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
   };
 }
 
+export interface FaqRow {
+  id: string;
+  question: string;
+  answer: string;
+  createdAt: string;
+}
+
+function rowToFaq(r: Record<string, unknown>): FaqRow {
+  return {
+    id: r.id as string,
+    question: r.question as string,
+    answer: r.answer as string,
+    createdAt: r.created_at as string,
+  };
+}
+
 export interface ContentPageRow {
   groupKey: string;
   itemKey: string;
@@ -197,6 +213,25 @@ export const newsRepo = {
     await ensureSchema();
     const rows = await sql`SELECT COUNT(*)::int AS c FROM news_items`;
     return (rows[0] as { c: number }).c;
+  },
+};
+
+export const faqRepo = {
+  async list(): Promise<FaqRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM faqs ORDER BY created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToFaq);
+  },
+  async create(input: { question: string; answer: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO faqs (id, question, answer, created_at)
+      VALUES (${newId()}, ${input.question}, ${input.answer}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM faqs WHERE id = ${id}`;
   },
 };
 

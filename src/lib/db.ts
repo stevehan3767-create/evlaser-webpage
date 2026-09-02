@@ -70,6 +70,17 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // Admin-managed FAQ entries, shown on /support alongside the fixed
+    // (translated) FAQ items already built into the page.
+    await sql`
+      CREATE TABLE IF NOT EXISTS faqs (
+        id TEXT PRIMARY KEY,
+        question TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     // Generic article storage shared by every /products/[group]/[key] section
     // (lineup/tech/industry/material): title + long-form description, plus
     // application-case cards (product name / equipment image / video / product image).
