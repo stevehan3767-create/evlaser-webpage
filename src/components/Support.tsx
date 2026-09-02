@@ -29,21 +29,21 @@ export default async function Support({
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[760px]">
             <Link
-              href="/support?view=faq"
-              className="group border border-line-strong bg-surface p-7 flex flex-col gap-3 hover:border-red transition-colors"
-            >
-              <Icon name="doc" className="w-8 h-8 text-red" strokeWidth={1.5} />
-              <h2 className="text-[17px] font-bold">{t("chooser.faq.title")}</h2>
-              <p className="text-ink-soft text-[13px] leading-relaxed">{t("chooser.faq.desc")}</p>
-              <span className="mt-auto text-[12.5px] font-bold text-red inline-flex items-center gap-1">→</span>
-            </Link>
-            <Link
               href="/support?view=contact"
               className="group border border-line-strong bg-surface p-7 flex flex-col gap-3 hover:border-red transition-colors"
             >
               <Icon name="bell" className="w-8 h-8 text-red" strokeWidth={1.5} />
               <h2 className="text-[17px] font-bold">{t("chooser.contact.title")}</h2>
               <p className="text-ink-soft text-[13px] leading-relaxed">{t("chooser.contact.desc")}</p>
+              <span className="mt-auto text-[12.5px] font-bold text-red inline-flex items-center gap-1">→</span>
+            </Link>
+            <Link
+              href="/support?view=faq"
+              className="group border border-line-strong bg-surface p-7 flex flex-col gap-3 hover:border-red transition-colors"
+            >
+              <Icon name="doc" className="w-8 h-8 text-red" strokeWidth={1.5} />
+              <h2 className="text-[17px] font-bold">{t("chooser.faq.title")}</h2>
+              <p className="text-ink-soft text-[13px] leading-relaxed">{t("chooser.faq.desc")}</p>
               <span className="mt-auto text-[12.5px] font-bold text-red inline-flex items-center gap-1">→</span>
             </Link>
           </div>
