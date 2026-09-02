@@ -70,6 +70,44 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
   };
 }
 
+export interface TechPageRow {
+  key: string;
+  title: string;
+  description: string;
+  updatedAt: string;
+}
+
+export interface TechCaseRow {
+  id: string;
+  techKey: string;
+  productName: string;
+  equipmentImageUrl: string | null;
+  videoUrl: string | null;
+  productImageUrl: string | null;
+  createdAt: string;
+}
+
+function rowToTechPage(r: Record<string, unknown>): TechPageRow {
+  return {
+    key: r.key as string,
+    title: (r.title as string) ?? "",
+    description: (r.description as string) ?? "",
+    updatedAt: r.updated_at as string,
+  };
+}
+
+function rowToTechCase(r: Record<string, unknown>): TechCaseRow {
+  return {
+    id: r.id as string,
+    techKey: r.tech_key as string,
+    productName: r.product_name as string,
+    equipmentImageUrl: (r.equipment_image_url as string) ?? null,
+    videoUrl: (r.video_url as string) ?? null,
+    productImageUrl: (r.product_image_url as string) ?? null,
+    createdAt: r.created_at as string,
+  };
+}
+
 export const inquiryRepo = {
   async create(input: {
     channel: string;
@@ -162,6 +200,65 @@ export async function seedIfEmpty(seedNews: { tag: string; title: string; date: 
   if ((await newsRepo.count()) === 0) {
     for (const n of seedNews) {
       await newsRepo.create({ ...n, published: true });
+    }
+  }
+}
+
+export const techPageRepo = {
+  async get(key: string): Promise<TechPageRow | null> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM tech_pages WHERE key = ${key}`;
+    return rows.length ? rowToTechPage(rows[0] as Record<string, unknown>) : null;
+  },
+  async upsert(key: string, input: { title: string; description: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO tech_pages (key, title, description, updated_at)
+      VALUES (${key}, ${input.title}, ${input.description}, ${new Date().toISOString()})
+      ON CONFLICT (key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, updated_at = EXCLUDED.updated_at
+    `;
+  },
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM tech_pages WHERE description <> ''`;
+    return (rows[0] as { c: number }).c;
+  },
+};
+
+export const techCaseRepo = {
+  async listByKey(techKey: string): Promise<TechCaseRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM tech_cases WHERE tech_key = ${techKey} ORDER BY created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToTechCase);
+  },
+  async create(input: {
+    techKey: string;
+    productName: string;
+    equipmentImageUrl?: string;
+    videoUrl?: string;
+    productImageUrl?: string;
+  }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO tech_cases (id, tech_key, product_name, equipment_image_url, video_url, product_image_url, created_at)
+      VALUES (${newId()}, ${input.techKey}, ${input.productName}, ${input.equipmentImageUrl ?? null}, ${input.videoUrl ?? null}, ${input.productImageUrl ?? null}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM tech_cases WHERE id = ${id}`;
+  },
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM tech_cases`;
+    return (rows[0] as { c: number }).c;
+  },
+};
+
+export async function seedTechPagesIfEmpty(seeds: { key: string; title: string; description: string }[]) {
+  if ((await techPageRepo.count()) === 0) {
+    for (const s of seeds) {
+      await techPageRepo.upsert(s.key, { title: s.title, description: s.description });
     }
   }
 }

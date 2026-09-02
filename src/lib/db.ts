@@ -69,6 +69,27 @@ function createSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS tech_pages (
+        key TEXT PRIMARY KEY,
+        title TEXT NOT NULL DEFAULT '',
+        description TEXT NOT NULL DEFAULT '',
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS tech_cases (
+        id TEXT PRIMARY KEY,
+        tech_key TEXT NOT NULL,
+        product_name TEXT NOT NULL,
+        equipment_image_url TEXT,
+        video_url TEXT,
+        product_image_url TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
   })();
 }
 
