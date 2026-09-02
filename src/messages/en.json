@@ -459,6 +459,18 @@
       "success": "Your message has been received. Our team will be in touch shortly.",
       "errorGeneric": "Something went wrong while submitting your message.",
       "errorNetwork": "A network error prevented submission. Please try again shortly."
+    },
+    "faqTitle": "자주 묻는 질문",
+    "back": "← 문의하기 메인으로",
+    "chooser": {
+      "faq": {
+        "title": "자주 묻는 질문",
+        "desc": "자주 문의되는 질문과 답변을 확인해보세요."
+      },
+      "contact": {
+        "title": "문의하기(Q&A)",
+        "desc": "제품, 기술, 협력 제안 등 궁금하신 내용을 남겨주세요."
+      }
     }
   },
   "company": {

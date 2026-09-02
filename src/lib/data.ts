@@ -239,8 +239,8 @@ export const globalNav: NavItem[] = [
 ];
 
 export const supportNav: NavItem[] = [
-  { key: "contact", href: "/support" },
-  { key: "faq", href: "/support#faq" },
+  { key: "contact", href: "/support?view=contact" },
+  { key: "faq", href: "/support?view=faq" },
 ];
 
 export interface SitemapBranch {
