@@ -75,14 +75,6 @@ function ContactFormInner() {
   return (
     <div>
       {channel !== "general" && (
-        <div className="flex gap-3 p-4 bg-red-soft border border-red mb-4">
-          <Icon name="alert" className="w-5 h-5 text-red flex-none" />
-          <p className="text-[12.8px] text-ink">
-            <b>{t(`channelNote.${channel}.label`)}</b> {t("channelNote.prefix")} {t(`channelNote.${channel}.note`)}
-          </p>
-        </div>
-      )}
-      {channel !== "general" && (
         <div className="flex gap-3 p-4 bg-blue-soft border border-line-strong mb-[26px]">
           <Icon name="bell" className="w-5 h-5 text-blue flex-none" />
           <p className="text-[12.8px] text-ink-soft">{t(`${channel}.banner`)}</p>

@@ -417,21 +417,6 @@
     "eyebrow": "GET IN TOUCH",
     "title": "Contact Us",
     "desc": "Send us a message about products, technology, or partnerships — our team responds quickly.",
-    "channelNote": {
-      "ethics": {
-        "label": "Ethics Report",
-        "note": "Handled directly by the CEO; your identity and content are kept strictly confidential."
-      },
-      "praise": {
-        "label": "Employee Commendation",
-        "note": "Your recommendation is forwarded directly to the CEO."
-      },
-      "complaint": {
-        "label": "CEO Direct Customer Feedback",
-        "note": "The CEO will personally review and resolve this quickly."
-      },
-      "prefix": "will be submitted through this channel."
-    },
     "mailNote": "Submissions here are forwarded to our team's mailbox. If email delivery isn't configured on this deployment, submissions are still saved but no email is actually sent.",
     "faq": {
       "quote": {

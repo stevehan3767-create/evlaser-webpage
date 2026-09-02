@@ -90,17 +90,23 @@ export default async function Support({
     );
   }
 
+  const isCeoChannel = channel === "ethics" || channel === "praise" || channel === "complaint";
+  const tCeo = isCeoChannel ? await getTranslations("ceo") : null;
+  const eyebrow = tCeo ? tCeo("eyebrow") : t("eyebrow");
+  const heading = tCeo ? tCeo(`cards.${channel}.title`) : t("title");
+  const desc = tCeo ? tCeo(`cards.${channel}.desc`) : t("desc");
+
   return (
     <section id="support" className="py-16 sm:py-22">
       <div className="mx-auto max-w-[640px] px-7">
         <Link href="/support" className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-6">
           {t("back")}
         </Link>
-        <span className="eyebrow">{t("eyebrow")}</span>
+        <span className="eyebrow">{eyebrow}</span>
         <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-          {t("title")}
+          {heading}
         </h1>
-        <p className="text-ink-soft mt-3 mb-8">{t("desc")}</p>
+        <p className="text-ink-soft mt-3 mb-8">{desc}</p>
 
         <ContactForm />
       </div>
