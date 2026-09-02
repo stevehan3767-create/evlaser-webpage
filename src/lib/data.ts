@@ -50,6 +50,21 @@ export const techItems: TechItem[] = [
   { icon: "etc", key: "other" },
 ];
 
+export interface OrgUnit {
+  icon: IconName;
+  key: string;
+}
+
+// Department breakdown provided by the user; role descriptions authored
+// editorially (see messages `company.organization` namespace).
+export const orgChart: OrgUnit[] = [
+  { icon: "briefcase", key: "management" },
+  { icon: "handshake", key: "domesticSales" },
+  { icon: "globe", key: "overseasSales" },
+  { icon: "build", key: "manufacturing" },
+  { icon: "measure", key: "rnd" },
+];
+
 // Tech items with real, user-provided detail content (source: evlaser.co.kr
 // "사업소개 > 주요공법" pages). See messages `techDetails` namespace.
 // "safety" uses a different content shape and is rendered separately.
@@ -71,6 +86,7 @@ export interface NavItem {
 export const companyNav: NavItem[] = [
   { key: "overview", href: "/company" },
   { key: "history", href: "/company#history" },
+  { key: "organization", href: "/company#organization" },
   { key: "business", href: "/company#business" },
   { key: "patents", href: "/company#patents" },
   { key: "directions", href: "/global#offices" },

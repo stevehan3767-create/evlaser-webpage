@@ -16,7 +16,10 @@ interface FootItem {
 export default function Footer() {
   const t = useTranslations();
 
-  const companyItems: FootItem[] = companyNav.slice(1, 4).map((n) => ({ href: n.href, section: "company", itemKey: n.key }));
+  const companyFootKeys = ["history", "organization", "business", "patents"];
+  const companyItems: FootItem[] = companyNav
+    .filter((n) => companyFootKeys.includes(n.key))
+    .map((n) => ({ href: n.href, section: "company", itemKey: n.key }));
   const productItems: FootItem[] = productsNav.map((n) => ({ href: n.href, section: "products", itemKey: n.key }));
   const resourceItems: FootItem[] = [
     ...resourcesNav.slice(0, 2).map((n) => ({ href: n.href, section: "resources" as const, itemKey: n.key })),

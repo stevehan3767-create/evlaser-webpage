@@ -7,7 +7,8 @@
         "history": "History",
         "business": "Business Areas",
         "patents": "Patents & Certs",
-        "directions": "Directions"
+        "directions": "Directions",
+        "organization": "Organization"
       }
     },
     "products": {
@@ -597,6 +598,65 @@
       "summary": "EVLASER CO., LTD. holds the highest level of technical expertise, backed by 23 domestically registered patents and 13 certifications. We grow together with our customers on a foundation of quality and trust.",
       "patentsHeading": "Patents",
       "certsHeading": "Certifications"
+    },
+    "organization": {
+      "eyebrow": "ORGANIZATION",
+      "title": "Organization Chart",
+      "desc": "EVLASER CO., LTD. operates through five organizations — Management Support, Domestic Sales, Overseas Sales, Manufacturing Technology, and the In-house R&D Institute — working together under the direct leadership of the CEO.",
+      "ceoTitle": "CEO",
+      "ceoName": "Steve Han",
+      "units": {
+        "management": {
+          "title": "Management Support",
+          "desc": "Oversees the company-wide functions that underpin all business activities — HR, finance, general affairs, and procurement — and supports management planning and internal controls.",
+          "tasks": [
+            "HR & General Affairs",
+            "Finance & Accounting",
+            "Purchasing & Materials",
+            "Legal & Contract Management"
+          ]
+        },
+        "domesticSales": {
+          "title": "Domestic Sales",
+          "desc": "Proposes laser processing solutions to manufacturers in Korea and manages the entire process from quotation through contract to delivery.",
+          "tasks": [
+            "New customer development and account management in Korea",
+            "Quotations, contracts, and order management",
+            "Industry-focused sales (automotive, semiconductor, battery, etc.)",
+            "Coordination with technical support for customers"
+          ]
+        },
+        "overseasSales": {
+          "title": "Overseas Sales",
+          "desc": "Partners with global customers across the Americas, Europe, China, and Southeast Asia to grow overseas revenue and build brand awareness.",
+          "tasks": [
+            "Development of new overseas markets",
+            "Sales support for overseas subsidiaries (e.g. Suzhou, China)",
+            "Participation in overseas exhibitions and marketing",
+            "Import/export and overseas turnkey project management"
+          ]
+        },
+        "manufacturing": {
+          "title": "Manufacturing Technology",
+          "desc": "Turns specifications defined by sales and R&D into actual equipment, and is responsible for production quality and on-time delivery.",
+          "tasks": [
+            "Laser system design, assembly, and inspection",
+            "Production process management",
+            "Quality control (QC/QA)",
+            "Automation equipment setup and maintenance"
+          ]
+        },
+        "rnd": {
+          "title": "In-house R&D Institute",
+          "desc": "Continuously advances the company's core laser application technology and commercializes new technologies.",
+          "tasks": [
+            "R&D of new laser processes",
+            "Patent filing and certification response",
+            "Advance development of customer-tailored solutions",
+            "Operation of the Laser Technology Center"
+          ]
+        }
+      }
     }
   },
   "footer": {
