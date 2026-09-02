@@ -17,7 +17,7 @@ export default async function AdminLoginPage({
   const error = params.error ? ERROR_MESSAGES[params.error] ?? "로그인에 실패했습니다." : null;
 
   return (
-    <div className="mx-auto max-w-[420px] px-7 py-24">
+    <div className="w-full mx-auto max-w-[420px] px-7 py-24">
       <h1 className="text-[24px] font-[family-name:var(--font-display)] tracking-tight mb-2">관리자 로그인</h1>
       <p className="text-ink-soft text-[13.5px] mb-8">EV Laser 홈페이지 관리자 모드입니다.</p>
 

@@ -3,7 +3,7 @@ import { logout } from "../login/actions";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-[1000px] px-7 py-10">
+    <div className="w-full mx-auto max-w-[1000px] px-7 py-10">
       <div className="flex items-center justify-between mb-8 pb-4 border-b border-line">
         <nav className="flex gap-5 text-[13.5px] font-semibold">
           <Link href="/admin">대시보드</Link>
