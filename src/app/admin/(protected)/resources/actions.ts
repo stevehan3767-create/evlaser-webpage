@@ -11,7 +11,7 @@ export async function createResource(formData: FormData) {
 
   if (!title || !description) return;
 
-  resourceRepo.create({ category, title, description, url: url || undefined });
+  await resourceRepo.create({ category, title, description, url: url || undefined });
   revalidatePath("/admin/resources");
   revalidatePath("/resources");
 }
@@ -19,7 +19,7 @@ export async function createResource(formData: FormData) {
 export async function deleteResource(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  resourceRepo.remove(id);
+  await resourceRepo.remove(id);
   revalidatePath("/admin/resources");
   revalidatePath("/resources");
 }

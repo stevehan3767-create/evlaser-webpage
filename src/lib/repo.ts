@@ -1,4 +1,4 @@
-import { getDb, newId } from "./db";
+import { sql, ensureSchema, newId } from "./db";
 
 export interface Inquiry {
   id: string;
@@ -71,7 +71,7 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
 }
 
 export const inquiryRepo = {
-  create(input: {
+  async create(input: {
     channel: string;
     name: string;
     company?: string;
@@ -80,25 +80,14 @@ export const inquiryRepo = {
     industry?: string;
     message: string;
     emailSent: boolean;
-  }): Inquiry {
-    const db = getDb();
+  }): Promise<Inquiry> {
+    await ensureSchema();
     const id = newId();
     const createdAt = new Date().toISOString();
-    db.prepare(
-      `INSERT INTO inquiries (id, channel, name, company, email, phone, industry, message, email_sent, created_at)
-       VALUES (@id, @channel, @name, @company, @email, @phone, @industry, @message, @emailSent, @createdAt)`
-    ).run({
-      id,
-      channel: input.channel,
-      name: input.name,
-      company: input.company ?? null,
-      email: input.email,
-      phone: input.phone ?? null,
-      industry: input.industry ?? null,
-      message: input.message,
-      emailSent: input.emailSent ? 1 : 0,
-      createdAt,
-    });
+    await sql`
+      INSERT INTO inquiries (id, channel, name, company, email, phone, industry, message, email_sent, created_at)
+      VALUES (${id}, ${input.channel}, ${input.name}, ${input.company ?? null}, ${input.email}, ${input.phone ?? null}, ${input.industry ?? null}, ${input.message}, ${input.emailSent}, ${createdAt})
+    `;
     return {
       id,
       createdAt,
@@ -112,71 +101,67 @@ export const inquiryRepo = {
       emailSent: input.emailSent,
     };
   },
-  list(): Inquiry[] {
-    const db = getDb();
-    const rows = db.prepare("SELECT * FROM inquiries ORDER BY created_at DESC").all() as Record<string, unknown>[];
-    return rows.map(rowToInquiry);
+  async list(): Promise<Inquiry[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM inquiries ORDER BY created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToInquiry);
   },
 };
 
 export const resourceRepo = {
-  list(): ResourceRow[] {
-    const db = getDb();
-    const rows = db.prepare("SELECT * FROM resources ORDER BY created_at DESC").all() as Record<string, unknown>[];
-    return rows.map(rowToResource);
+  async list(): Promise<ResourceRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM resources ORDER BY created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToResource);
   },
-  create(input: { category: string; title: string; description: string; url?: string }): void {
-    const db = getDb();
-    db.prepare(
-      `INSERT INTO resources (id, category, title, description, url, created_at) VALUES (@id, @category, @title, @description, @url, @createdAt)`
-    ).run({ id: newId(), createdAt: new Date().toISOString(), url: input.url ?? null, ...input });
+  async create(input: { category: string; title: string; description: string; url?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, ${input.category}, ${input.title}, ${input.description}, ${input.url ?? null}, ${new Date().toISOString()})
+    `;
   },
-  remove(id: string): void {
-    getDb().prepare("DELETE FROM resources WHERE id = ?").run(id);
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM resources WHERE id = ${id}`;
   },
-  count(): number {
-    const row = getDb().prepare("SELECT COUNT(*) as c FROM resources").get() as { c: number };
-    return row.c;
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM resources`;
+    return (rows[0] as { c: number }).c;
   },
 };
 
 export const newsRepo = {
-  list(onlyPublished = false): NewsRow[] {
-    const db = getDb();
-    const rows = (
-      onlyPublished
-        ? db.prepare("SELECT * FROM news_items WHERE published = 1 ORDER BY date DESC").all()
-        : db.prepare("SELECT * FROM news_items ORDER BY date DESC").all()
-    ) as Record<string, unknown>[];
-    return rows.map(rowToNews);
+  async list(onlyPublished = false): Promise<NewsRow[]> {
+    await ensureSchema();
+    const rows = onlyPublished
+      ? await sql`SELECT * FROM news_items WHERE published = true ORDER BY date DESC`
+      : await sql`SELECT * FROM news_items ORDER BY date DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToNews);
   },
-  create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): void {
-    const db = getDb();
-    db.prepare(
-      `INSERT INTO news_items (id, tag, title, date, body, published, created_at) VALUES (@id, @tag, @title, @date, @body, @published, @createdAt)`
-    ).run({
-      id: newId(),
-      createdAt: new Date().toISOString(),
-      tag: input.tag,
-      title: input.title,
-      date: input.date,
-      body: input.body ?? "",
-      published: input.published ? 1 : 0,
-    });
+  async create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO news_items (id, tag, title, date, body, published, created_at)
+      VALUES (${newId()}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${new Date().toISOString()})
+    `;
   },
-  remove(id: string): void {
-    getDb().prepare("DELETE FROM news_items WHERE id = ?").run(id);
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM news_items WHERE id = ${id}`;
   },
-  count(): number {
-    const row = getDb().prepare("SELECT COUNT(*) as c FROM news_items").get() as { c: number };
-    return row.c;
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM news_items`;
+    return (rows[0] as { c: number }).c;
   },
 };
 
-export function seedIfEmpty(seedNews: { tag: string; title: string; date: string; body?: string }[]) {
-  if (newsRepo.count() === 0) {
+export async function seedIfEmpty(seedNews: { tag: string; title: string; date: string; body?: string }[]) {
+  if ((await newsRepo.count()) === 0) {
     for (const n of seedNews) {
-      newsRepo.create({ ...n, published: true });
+      await newsRepo.create({ ...n, published: true });
     }
   }
 }

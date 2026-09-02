@@ -1,11 +1,11 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, seedIfEmpty } from "@/lib/repo";
 
-export default function News() {
-  const t = useTranslations("news");
-  seedIfEmpty(seedNewsItems);
-  const items = newsRepo.list(true);
+export default async function News() {
+  const t = await getTranslations("news");
+  await seedIfEmpty(seedNewsItems);
+  const items = await newsRepo.list(true);
 
   return (
     <section id="news" className="py-16 sm:py-22 border-b border-line bg-surface-alt">

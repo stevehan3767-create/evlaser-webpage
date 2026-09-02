@@ -1,71 +1,84 @@
-import Database from "better-sqlite3";
-import path from "path";
-import fs from "fs";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 
-const dataDir = path.join(process.cwd(), "data");
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+let sqlClient: NeonQueryFunction<false, false> | undefined;
 
-const dbPath = path.join(dataDir, "app.db");
+function getSqlClient(): NeonQueryFunction<false, false> {
+  if (!sqlClient) {
+    const connectionString =
+      process.env.DATABASE_URL ??
+      process.env.POSTGRES_URL ??
+      process.env.DATABASE_URL_UNPOOLED ??
+      process.env.POSTGRES_URL_NON_POOLING;
+
+    if (!connectionString) {
+      throw new Error(
+        "No Postgres connection string found. Set DATABASE_URL (or POSTGRES_URL) — " +
+          "in Vercel, add a Postgres/Neon database under Project Settings > Storage."
+      );
+    }
+    sqlClient = neon(connectionString);
+  }
+  return sqlClient;
+}
+
+// Lazily resolves the connection on first query, so pages/builds that never
+// touch the database don't require DATABASE_URL to be set.
+export const sql: NeonQueryFunction<false, false> = ((...args: Parameters<NeonQueryFunction<false, false>>) =>
+  getSqlClient()(...args)) as NeonQueryFunction<false, false>;
 
 declare global {
-  var __evlaserDb: Database.Database | undefined;
+  var __evlaserSchemaReady: Promise<void> | undefined;
 }
 
-function createDb() {
-  const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+function createSchema(): Promise<void> {
+  return (async () => {
+    await sql`
+      CREATE TABLE IF NOT EXISTS inquiries (
+        id TEXT PRIMARY KEY,
+        channel TEXT NOT NULL,
+        name TEXT NOT NULL,
+        company TEXT,
+        email TEXT NOT NULL,
+        phone TEXT,
+        industry TEXT,
+        message TEXT NOT NULL,
+        email_sent BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS inquiries (
-      id TEXT PRIMARY KEY,
-      channel TEXT NOT NULL,
-      name TEXT NOT NULL,
-      company TEXT,
-      email TEXT NOT NULL,
-      phone TEXT,
-      industry TEXT,
-      message TEXT NOT NULL,
-      email_sent INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL
-    );
+    await sql`
+      CREATE TABLE IF NOT EXISTS resources (
+        id TEXT PRIMARY KEY,
+        category TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        url TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
 
-    CREATE TABLE IF NOT EXISTS resources (
-      id TEXT PRIMARY KEY,
-      category TEXT NOT NULL,
-      title TEXT NOT NULL,
-      description TEXT NOT NULL,
-      url TEXT,
-      created_at TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS news_items (
-      id TEXT PRIMARY KEY,
-      tag TEXT NOT NULL,
-      title TEXT NOT NULL,
-      date TEXT NOT NULL,
-      body TEXT NOT NULL DEFAULT '',
-      published INTEGER NOT NULL DEFAULT 1,
-      created_at TEXT NOT NULL
-    );
-  `);
-
-  const newsColumns = db.prepare("PRAGMA table_info(news_items)").all() as { name: string }[];
-  if (!newsColumns.some((c) => c.name === "body")) {
-    db.exec("ALTER TABLE news_items ADD COLUMN body TEXT NOT NULL DEFAULT ''");
-  }
-
-  return db;
+    await sql`
+      CREATE TABLE IF NOT EXISTS news_items (
+        id TEXT PRIMARY KEY,
+        tag TEXT NOT NULL,
+        title TEXT NOT NULL,
+        date TEXT NOT NULL,
+        body TEXT NOT NULL DEFAULT '',
+        published BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+  })();
 }
 
-export function getDb(): Database.Database {
-  if (!global.__evlaserDb) {
-    global.__evlaserDb = createDb();
+export function ensureSchema(): Promise<void> {
+  if (!global.__evlaserSchemaReady) {
+    global.__evlaserSchemaReady = createSchema();
   }
-  return global.__evlaserDb;
+  return global.__evlaserSchemaReady;
 }
 
 export function newId(): string {
-  return (
-    Date.now().toString(36) + Math.random().toString(36).slice(2, 10)
-  );
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 }

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   const mailResult = await sendInquiryEmail({ channel, name, company, email, phone, industry, message });
 
-  inquiryRepo.create({
+  await inquiryRepo.create({
     channel,
     name,
     company,

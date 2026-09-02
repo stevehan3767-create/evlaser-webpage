@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Icon from "./Icon";
 import { resourceRepo } from "@/lib/repo";
 import type { IconName } from "@/lib/data";
@@ -9,9 +9,9 @@ const CATEGORIES: { key: string; icon: IconName }[] = [
   { key: "case", icon: "case" },
 ];
 
-export default function Resources() {
-  const t = useTranslations("resources");
-  const items = resourceRepo.list();
+export default async function Resources() {
+  const t = await getTranslations("resources");
+  const items = await resourceRepo.list();
 
   return (
     <section id="resources" className="py-16 sm:py-22 border-b border-line bg-surface-alt">

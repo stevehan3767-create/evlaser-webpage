@@ -9,8 +9,8 @@ const CHANNEL_LABELS: Record<string, string> = {
   complaint: "CEO 직속 고객불만",
 };
 
-export default function AdminInquiriesPage() {
-  const items = inquiryRepo.list();
+export default async function AdminInquiriesPage() {
+  const items = await inquiryRepo.list();
 
   return (
     <div>

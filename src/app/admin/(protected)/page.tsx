@@ -4,10 +4,12 @@ import { isMailConfigured } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminDashboard() {
-  const resourceCount = resourceRepo.count();
-  const newsCount = newsRepo.count();
-  const inquiries = inquiryRepo.list();
+export default async function AdminDashboard() {
+  const [resourceCount, newsCount, inquiries] = await Promise.all([
+    resourceRepo.count(),
+    newsRepo.count(),
+    inquiryRepo.list(),
+  ]);
 
   return (
     <div>

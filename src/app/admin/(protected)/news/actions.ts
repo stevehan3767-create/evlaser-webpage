@@ -11,7 +11,7 @@ export async function createNews(formData: FormData) {
 
   if (!title || !date) return;
 
-  newsRepo.create({ tag, title, date, body, published: true });
+  await newsRepo.create({ tag, title, date, body, published: true });
   revalidatePath("/admin/news");
   revalidatePath("/news");
 }
@@ -19,7 +19,7 @@ export async function createNews(formData: FormData) {
 export async function deleteNews(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-  newsRepo.remove(id);
+  await newsRepo.remove(id);
   revalidatePath("/admin/news");
   revalidatePath("/news");
 }

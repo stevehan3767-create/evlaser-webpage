@@ -4,9 +4,9 @@ import { createNews, deleteNews } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminNewsPage() {
-  seedIfEmpty(seedNewsItems);
-  const items = newsRepo.list();
+export default async function AdminNewsPage() {
+  await seedIfEmpty(seedNewsItems);
+  const items = await newsRepo.list();
 
   return (
     <div>

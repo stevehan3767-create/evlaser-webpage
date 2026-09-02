@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic";
 
 const CATEGORY_LABELS: Record<string, string> = { doc: "기술자료", video: "동영상자료실", case: "적용사례" };
 
-export default function AdminResourcesPage() {
-  const items = resourceRepo.list();
+export default async function AdminResourcesPage() {
+  const items = await resourceRepo.list();
 
   return (
     <div>
