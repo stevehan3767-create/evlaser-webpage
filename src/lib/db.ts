@@ -81,6 +81,28 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS offices (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        address TEXT NOT NULL,
+        phone TEXT,
+        email TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    await sql`
+      CREATE TABLE IF NOT EXISTS distributors (
+        id TEXT PRIMARY KEY,
+        country TEXT NOT NULL,
+        partner TEXT NOT NULL,
+        contact TEXT,
+        phone TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     // Generic article storage shared by every /products/[group]/[key] section
     // (lineup/tech/industry/material): title + long-form description, plus
     // application-case cards (product name / equipment image / video / product image).

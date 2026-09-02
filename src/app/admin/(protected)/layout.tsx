@@ -11,6 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/resources">자료실 관리</Link>
           <Link href="/admin/news">뉴스 관리</Link>
           <Link href="/admin/faqs">자주 묻는 질문 관리</Link>
+          <Link href="/admin/global">글로벌 네트워크 관리</Link>
           <Link href="/admin/inquiries">문의 내역</Link>
         </nav>
         <form action={logout}>

@@ -1,13 +1,14 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Icon from "./Icon";
-import { officeRows, distributorRows } from "@/lib/data";
+import { officeSeeds } from "@/lib/data";
+import { officeRepo, distributorRepo, seedOfficesIfEmpty } from "@/lib/repo";
 
 function OfficeTable({
   headers,
   rows,
 }: {
   headers: [string, string, string, string];
-  rows: { location: string; address: string; phone: string; email: string }[];
+  rows: { id: string; name: string; address: string; phone: string | null; email: string | null }[];
 }) {
   return (
     <div className="overflow-x-auto border border-line bg-surface">
@@ -26,10 +27,10 @@ function OfficeTable({
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.location}>
+            <tr key={r.id}>
               <td className="font-bold flex items-center gap-2.5 px-3.5 py-4 border-b border-line align-top">
                 <Icon name="pin" className="w-4 h-4 text-red flex-none" />
-                {r.location}
+                {r.name}
               </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] align-top">{r.address}</td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] font-mono align-top">{r.phone}</td>
@@ -47,7 +48,7 @@ function DistributorTable({
   rows,
 }: {
   headers: [string, string, string, string];
-  rows: { country: string; partner: string; contact: string; phone: string }[];
+  rows: { id: string; country: string; partner: string; contact: string | null; phone: string | null }[];
 }) {
   return (
     <div className="overflow-x-auto border border-line bg-surface">
@@ -66,7 +67,7 @@ function DistributorTable({
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.country}>
+            <tr key={r.id}>
               <td className="font-bold flex items-center gap-2.5 px-3.5 py-4 border-b border-line">
                 <Icon name="pin" className="w-4 h-4 text-red flex-none" />
                 {r.country}
@@ -82,8 +83,11 @@ function DistributorTable({
   );
 }
 
-export default function GlobalNetwork() {
-  const t = useTranslations("global");
+export default async function GlobalNetwork() {
+  const t = await getTranslations("global");
+
+  await seedOfficesIfEmpty(officeSeeds);
+  const [offices, distributors] = await Promise.all([officeRepo.list(), distributorRepo.list()]);
 
   const officeHeaders: [string, string, string, string] = [
     t("table.location"),
@@ -97,12 +101,6 @@ export default function GlobalNetwork() {
     t("table.contact"),
     t("table.phone"),
   ];
-  const offices = officeRows.map((r) => ({
-    location: t(`rows.${r.key}`),
-    address: r.address,
-    phone: r.phone,
-    email: r.email,
-  }));
 
   return (
     <section id="global" className="py-16 sm:py-22 border-b border-line">
@@ -126,10 +124,10 @@ export default function GlobalNetwork() {
             <Icon name="handshake" className="w-[19px] h-[19px] text-blue" />
             {t("distributors")}
           </h2>
-          {distributorRows.length === 0 ? (
+          {distributors.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px] border-t border-line">{t("distributorsEmpty")}</p>
           ) : (
-            <DistributorTable headers={distributorHeaders} rows={distributorRows} />
+            <DistributorTable headers={distributorHeaders} rows={distributors} />
           )}
         </div>
       </div>

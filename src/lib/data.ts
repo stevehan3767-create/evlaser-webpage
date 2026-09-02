@@ -285,21 +285,23 @@ export const sitemap: SitemapBranch[] = [
 ];
 
 // Real addresses (source: evlaser.co.kr "오시는 길" page, provided by the user).
-export const officeRows = [
+// Seeded into the `offices` table on first load; from then on admin-managed
+// via /admin/global (edit = delete + re-add, same as news/resources/faqs).
+export const officeSeeds = [
   {
-    key: "hq",
+    name: "본사",
     address: "경기도 군포시 고산로 148번길 17 군포IT밸리 B동 313호 (15850)",
     phone: "+82 31 452 9860",
     email: "info@evlaser.co.kr",
   },
   {
-    key: "techCenter",
+    name: "레이저기술센터",
     address: "경기도 군포시 농심로2 삼보 스카이비즈 706-709호 (15845)",
     phone: "+82 31 452 9860",
     email: "info@evlaser.co.kr",
   },
   {
-    key: "suzhou",
+    name: "EVLS (중국 쑤저우)",
     address: "Room 106, Zone C, Building 2, Dongshahu Fund Town, No. 345 Fengli Street, Industrial Park, Suzhou City, Jiangsu Province, China (215127)",
     phone: "+86 512 6515 8026",
     email: "info@evlaser.cn",
@@ -396,10 +398,6 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
   },
 };
 
-// No real distributor/partner list has been provided yet. Left empty rather
-// than fabricated — GlobalNetwork renders an honest empty state instead of a
-// table when this is empty. Populate with real partners once confirmed.
-export const distributorRows: { country: string; partner: string; contact: string; phone: string }[] = [];
 
 // Seed data for the news database (Korean only — admin-authored content is not
 // machine-translated; see AdminNews for adding real, dated announcements).

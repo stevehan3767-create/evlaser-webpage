@@ -86,6 +86,46 @@ function rowToFaq(r: Record<string, unknown>): FaqRow {
   };
 }
 
+export interface OfficeRow {
+  id: string;
+  name: string;
+  address: string;
+  phone: string | null;
+  email: string | null;
+  createdAt: string;
+}
+
+function rowToOffice(r: Record<string, unknown>): OfficeRow {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    address: r.address as string,
+    phone: (r.phone as string) ?? null,
+    email: (r.email as string) ?? null,
+    createdAt: r.created_at as string,
+  };
+}
+
+export interface DistributorRow {
+  id: string;
+  country: string;
+  partner: string;
+  contact: string | null;
+  phone: string | null;
+  createdAt: string;
+}
+
+function rowToDistributor(r: Record<string, unknown>): DistributorRow {
+  return {
+    id: r.id as string,
+    country: r.country as string,
+    partner: r.partner as string,
+    contact: (r.contact as string) ?? null,
+    phone: (r.phone as string) ?? null,
+    createdAt: r.created_at as string,
+  };
+}
+
 export interface ContentPageRow {
   groupKey: string;
   itemKey: string;
@@ -234,6 +274,57 @@ export const faqRepo = {
     await sql`DELETE FROM faqs WHERE id = ${id}`;
   },
 };
+
+export const officeRepo = {
+  async list(): Promise<OfficeRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM offices ORDER BY created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToOffice);
+  },
+  async create(input: { name: string; address: string; phone?: string; email?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO offices (id, name, address, phone, email, created_at)
+      VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM offices WHERE id = ${id}`;
+  },
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM offices`;
+    return (rows[0] as { c: number }).c;
+  },
+};
+
+export const distributorRepo = {
+  async list(): Promise<DistributorRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM distributors ORDER BY created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToDistributor);
+  },
+  async create(input: { country: string; partner: string; contact?: string; phone?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO distributors (id, country, partner, contact, phone, created_at)
+      VALUES (${newId()}, ${input.country}, ${input.partner}, ${input.contact ?? null}, ${input.phone ?? null}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM distributors WHERE id = ${id}`;
+  },
+};
+
+export async function seedOfficesIfEmpty(seeds: { name: string; address: string; phone?: string; email?: string }[]) {
+  if ((await officeRepo.count()) === 0) {
+    for (const s of seeds) {
+      await officeRepo.create(s);
+    }
+  }
+}
 
 export async function seedIfEmpty(seedNews: { tag: string; title: string; date: string; body?: string }[]) {
   if ((await newsRepo.count()) === 0) {
