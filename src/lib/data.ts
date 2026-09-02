@@ -4,7 +4,8 @@ export type IconName =
   | "weld" | "cut" | "mark" | "clean" | "drill" | "heat" | "clad" | "print3d"
   | "medical" | "safety" | "measure"
   | "doc" | "play" | "case" | "pin" | "globe" | "bell" | "lock" | "build"
-  | "flag" | "people" | "shield" | "star" | "alert" | "handshake" | "briefcase";
+  | "flag" | "people" | "shield" | "star" | "alert" | "handshake" | "briefcase"
+  | "metal" | "plastic" | "glass" | "ceramic" | "wood" | "fabric" | "leather" | "rubber" | "gem" | "pcb";
 
 export interface Industry {
   icon: IconName;
@@ -26,6 +27,64 @@ export const industries: Industry[] = [
   { icon: "precision", key: "precisionMachining" },
   { icon: "etc", key: "other" },
 ];
+
+// Korean labels for `industries`, used only in the admin UI (which has no
+// next-intl context). The public site uses the translated `industries.<key>`
+// messages instead.
+export const industryLabelsKo: Record<string, string> = {
+  automotive: "자동차",
+  battery: "밧데리",
+  semiconductor: "반도체",
+  bioHealth: "바이오의료헬스",
+  homeAppliance: "생활·가전",
+  shipbuilding: "조선",
+  aerospace: "항공",
+  machinery: "기계",
+  steel: "철강",
+  display: "디스플레이",
+  defense: "방위산업",
+  precisionMachining: "정밀가공",
+  other: "기타",
+};
+
+export interface MaterialItem {
+  icon: IconName;
+  key: string;
+}
+
+// Material categories provided by the user.
+export const materialItems: MaterialItem[] = [
+  { icon: "steel", key: "metalSteel" },
+  { icon: "metal", key: "copperAluminum" },
+  { icon: "plastic", key: "plastic" },
+  { icon: "glass", key: "glass" },
+  { icon: "ceramic", key: "ceramic" },
+  { icon: "wood", key: "wood" },
+  { icon: "doc", key: "paper" },
+  { icon: "fabric", key: "fabric" },
+  { icon: "leather", key: "leather" },
+  { icon: "rubber", key: "rubber" },
+  { icon: "gem", key: "preciousMetal" },
+  { icon: "pcb", key: "pcb" },
+  { icon: "etc", key: "other" },
+];
+
+// Korean labels for `materialItems`, used only in the admin UI.
+export const materialLabelsKo: Record<string, string> = {
+  metalSteel: "금속·철강",
+  copperAluminum: "동·알루미늄",
+  plastic: "플라스틱",
+  glass: "유리",
+  ceramic: "세라믹",
+  wood: "나무(목재)",
+  paper: "종이",
+  fabric: "천(옷감)",
+  leather: "가죽",
+  rubber: "고무",
+  preciousMetal: "귀금속",
+  pcb: "PCB",
+  other: "기타",
+};
 
 export interface TechItem {
   icon: IconName;
@@ -88,7 +147,7 @@ export const orgChart: OrgUnit[] = [
 
 // Each of the 15 tech items links to its own detail page
 // (/products/tech/[key]), admin-editable (title/long-form description +
-// application-case cards) via /admin/tech-pages. These seeds carry the real,
+// application-case cards) via /admin/content-pages. These seeds carry the real,
 // user-provided content (source: evlaser.co.kr "사업소개 > 주요공법" pages)
 // for the 8 items already documented; the DB starts empty otherwise and the
 // admin fills in the rest.
@@ -154,7 +213,7 @@ export const productsNav: NavItem[] = [
   { key: "lineup", href: "/products#lineup" },
   { key: "byTech", href: "/products#tech" },
   { key: "byIndustry", href: "/products#industries" },
-  { key: "byMaterial", href: "/products#tech" },
+  { key: "byMaterial", href: "/products#material" },
 ];
 
 export const resourcesNav: NavItem[] = [
@@ -255,23 +314,87 @@ export const socialLinks = [
   { key: "youtube", url: "https://www.youtube.com/@evlaser.official" },
 ];
 
-// Real product series (source: evlaser.co.kr homepage, provided by the user).
-// Detailed specs/photos live on the real product pages, linked directly since
-// they aren't available to reproduce here.
-export const productLineup = [
-  { name: "ELPW-TS Series", url: "https://evlaser.co.kr/product/view.php?idx=4" },
-  { name: "ELPW-LS Series", url: "https://evlaser.co.kr/product/view.php?idx=5" },
-  { name: "ELPW-LM Series", url: "https://evlaser.co.kr/product/view.php?idx=6" },
-  { name: "ELPW-TM Series", url: "https://evlaser.co.kr/product/view.php?idx=7" },
-  { name: "ELPW-CO Series", url: "https://evlaser.co.kr/product/view.php?idx=8" },
-  { name: "ELPW-IS Series", url: "https://evlaser.co.kr/product/view.php?idx=9" },
-  { name: "ELPW-MS Series", url: "https://evlaser.co.kr/product/view.php?idx=10" },
-  { name: "ELPW-SS2 Series", url: "https://evlaser.co.kr/product/view.php?idx=11" },
-  { name: "ELPW-SS1 Series", url: "https://evlaser.co.kr/product/view.php?idx=12" },
-  { name: "ELPW-ES Series", url: "https://evlaser.co.kr/product/view.php?idx=13" },
-  { name: "ELCR-D Series", url: "https://evlaser.co.kr/product/view.php?idx=15" },
-  { name: "Laser Safety Solution", url: "https://evlaser.co.kr/product/view.php?idx=16" },
+export interface LineupItem {
+  icon: IconName;
+  key: string;
+  name: string;
+  sourceUrl: string;
+}
+
+// Real product/equipment series (source: evlaser.co.kr homepage, provided by
+// the user). Each links to its own admin-editable detail page
+// (/products/lineup/[key]), seeded below with an honest note pointing back to
+// the real source page since full specs/photos aren't available to reproduce
+// here yet.
+export const lineupItems: LineupItem[] = [
+  { icon: "weld", key: "tsSeries", name: "ELPW-TS Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=4" },
+  { icon: "weld", key: "lsSeries", name: "ELPW-LS Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=5" },
+  { icon: "weld", key: "lmSeries", name: "ELPW-LM Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=6" },
+  { icon: "weld", key: "tmSeries", name: "ELPW-TM Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=7" },
+  { icon: "weld", key: "coSeries", name: "ELPW-CO Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=8" },
+  { icon: "weld", key: "isSeries", name: "ELPW-IS Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=9" },
+  { icon: "weld", key: "msSeries", name: "ELPW-MS Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=10" },
+  { icon: "weld", key: "ss2Series", name: "ELPW-SS2 Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=11" },
+  { icon: "weld", key: "ss1Series", name: "ELPW-SS1 Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=12" },
+  { icon: "weld", key: "esSeries", name: "ELPW-ES Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=13" },
+  { icon: "machine", key: "crdSeries", name: "ELCR-D Series", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=15" },
+  { icon: "safety", key: "safetySolution", name: "Laser Safety Solution", sourceUrl: "https://evlaser.co.kr/product/view.php?idx=16" },
 ];
+
+export const lineupLabelsKo: Record<string, string> = Object.fromEntries(lineupItems.map((i) => [i.key, i.name]));
+
+export const lineupPageSeeds: { key: string; title: string; description: string }[] = lineupItems.map((i) => ({
+  key: i.key,
+  title: i.name,
+  description: `㈜이브이레이저의 ${i.name} 설비입니다. 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서 확인하실 수 있습니다: ${i.sourceUrl}\n\n관리자 모드에서 이 페이지에 실제 설비 사진, 동영상, 적용사례를 직접 등록할 수 있습니다.`,
+}));
+
+export interface ContentGroupMeta {
+  items: { icon: IconName; key: string }[];
+  labelsKo: Record<string, string>;
+  i18nNamespace?: string;
+  seeds: { key: string; title: string; description: string }[];
+  backHref: string;
+  labelKo: string;
+}
+
+// Registry shared by the generic /products/[group]/[key] detail route and the
+// generic /admin/content-pages CRUD screen. Every group follows the same
+// article shape: title + long-form description + application-case cards
+// (product name / equipment image / video / product image).
+export const contentGroups: Record<string, ContentGroupMeta> = {
+  lineup: {
+    items: lineupItems,
+    labelsKo: lineupLabelsKo,
+    seeds: lineupPageSeeds,
+    backHref: "/products#lineup",
+    labelKo: "설비 라인업",
+  },
+  tech: {
+    items: techItems,
+    labelsKo: techLabelsKo,
+    i18nNamespace: "tech",
+    seeds: techPageSeeds,
+    backHref: "/products#tech",
+    labelKo: "기술종류별",
+  },
+  industry: {
+    items: industries,
+    labelsKo: industryLabelsKo,
+    i18nNamespace: "industries",
+    seeds: [],
+    backHref: "/products#industries",
+    labelKo: "산업분야별",
+  },
+  material: {
+    items: materialItems,
+    labelsKo: materialLabelsKo,
+    i18nNamespace: "materials",
+    seeds: [],
+    backHref: "/products#material",
+    labelKo: "재료별",
+  },
+};
 
 // No real distributor/partner list has been provided yet. Left empty rather
 // than fabricated — GlobalNetwork renders an honest empty state instead of a

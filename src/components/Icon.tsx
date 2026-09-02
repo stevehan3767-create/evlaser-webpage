@@ -279,6 +279,73 @@ const paths: Record<IconName, React.ReactNode> = {
       <line x1="3" y1="13" x2="21" y2="13" />
     </>
   ),
+  metal: (
+    <>
+      <path d="M4 17l2-9h12l2 9z" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+      <line x1="8" y1="8" x2="9" y2="17" />
+      <line x1="16" y1="8" x2="15" y2="17" />
+    </>
+  ),
+  plastic: (
+    <>
+      <path d="M10 3h4v3.2l2 2.3V21H8V8.5l2-2.3z" />
+      <line x1="9" y1="12" x2="15" y2="12" />
+    </>
+  ),
+  glass: (
+    <>
+      <path d="M6 4h12l-1.5 14a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8z" />
+      <line x1="7" y1="9" x2="17" y2="9" />
+    </>
+  ),
+  ceramic: (
+    <>
+      <path d="M9 4h6l1 3-1.5 2v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-7L8 7z" />
+      <line x1="8.3" y1="7" x2="15.7" y2="7" />
+    </>
+  ),
+  wood: (
+    <>
+      <rect x="3" y="9" width="18" height="6" rx="1" />
+      <circle cx="12" cy="12" r="1.8" />
+      <line x1="3" y1="9" x2="3" y2="15" />
+      <line x1="21" y1="9" x2="21" y2="15" />
+    </>
+  ),
+  fabric: (
+    <>
+      <path d="M4 6c2-2 4-2 6 0s4 2 6 0l1 1c-2 2-4 2-6 0s-4-2-6 0z" />
+      <path d="M4 12c2-2 4-2 6 0s4 2 6 0l1 1c-2 2-4 2-6 0s-4-2-6 0z" />
+      <path d="M4 18c2-2 4-2 6 0s4 2 6 0l1 1c-2 2-4 2-6 0s-4-2-6 0z" />
+    </>
+  ),
+  leather: (
+    <>
+      <path d="M12 3c-3 2-7 2-7 6 0 5 3 8 7 12 4-4 7-7 7-12 0-4-4-4-7-6z" />
+      <line x1="12" y1="9" x2="12" y2="17" />
+    </>
+  ),
+  rubber: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4" />
+    </>
+  ),
+  gem: (
+    <>
+      <path d="M6 3h12l3 5-9 13L3 8z" />
+      <path d="M3 8h18M9 3l-2 5 5 13 5-13-2-5" />
+    </>
+  ),
+  pcb: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="1" />
+      <circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="16" r="1.3" fill="currentColor" stroke="none" />
+      <path d="M8 9.3V13a1 1 0 0 0 1 1h3.5M16 14.7V11a1 1 0 0 0-1-1H11" />
+    </>
+  ),
 };
 
 export default function Icon({

@@ -70,16 +70,18 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
   };
 }
 
-export interface TechPageRow {
-  key: string;
+export interface ContentPageRow {
+  groupKey: string;
+  itemKey: string;
   title: string;
   description: string;
   updatedAt: string;
 }
 
-export interface TechCaseRow {
+export interface ContentCaseRow {
   id: string;
-  techKey: string;
+  groupKey: string;
+  itemKey: string;
   productName: string;
   equipmentImageUrl: string | null;
   videoUrl: string | null;
@@ -87,19 +89,21 @@ export interface TechCaseRow {
   createdAt: string;
 }
 
-function rowToTechPage(r: Record<string, unknown>): TechPageRow {
+function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
   return {
-    key: r.key as string,
+    groupKey: r.group_key as string,
+    itemKey: r.item_key as string,
     title: (r.title as string) ?? "",
     description: (r.description as string) ?? "",
     updatedAt: r.updated_at as string,
   };
 }
 
-function rowToTechCase(r: Record<string, unknown>): TechCaseRow {
+function rowToContentCase(r: Record<string, unknown>): ContentCaseRow {
   return {
     id: r.id as string,
-    techKey: r.tech_key as string,
+    groupKey: r.group_key as string,
+    itemKey: r.item_key as string,
     productName: r.product_name as string,
     equipmentImageUrl: (r.equipment_image_url as string) ?? null,
     videoUrl: (r.video_url as string) ?? null,
@@ -204,35 +208,36 @@ export async function seedIfEmpty(seedNews: { tag: string; title: string; date: 
   }
 }
 
-export const techPageRepo = {
-  async get(key: string): Promise<TechPageRow | null> {
+export const contentPageRepo = {
+  async get(groupKey: string, itemKey: string): Promise<ContentPageRow | null> {
     await ensureSchema();
-    const rows = await sql`SELECT * FROM tech_pages WHERE key = ${key}`;
-    return rows.length ? rowToTechPage(rows[0] as Record<string, unknown>) : null;
+    const rows = await sql`SELECT * FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+    return rows.length ? rowToContentPage(rows[0] as Record<string, unknown>) : null;
   },
-  async upsert(key: string, input: { title: string; description: string }): Promise<void> {
+  async upsert(groupKey: string, itemKey: string, input: { title: string; description: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO tech_pages (key, title, description, updated_at)
-      VALUES (${key}, ${input.title}, ${input.description}, ${new Date().toISOString()})
-      ON CONFLICT (key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, updated_at = EXCLUDED.updated_at
+      INSERT INTO content_pages (group_key, item_key, title, description, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${new Date().toISOString()})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, updated_at = EXCLUDED.updated_at
     `;
   },
-  async count(): Promise<number> {
+  async count(groupKey: string): Promise<number> {
     await ensureSchema();
-    const rows = await sql`SELECT COUNT(*)::int AS c FROM tech_pages WHERE description <> ''`;
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_pages WHERE group_key = ${groupKey} AND description <> ''`;
     return (rows[0] as { c: number }).c;
   },
 };
 
-export const techCaseRepo = {
-  async listByKey(techKey: string): Promise<TechCaseRow[]> {
+export const contentCaseRepo = {
+  async listByKey(groupKey: string, itemKey: string): Promise<ContentCaseRow[]> {
     await ensureSchema();
-    const rows = await sql`SELECT * FROM tech_cases WHERE tech_key = ${techKey} ORDER BY created_at DESC`;
-    return (rows as Record<string, unknown>[]).map(rowToTechCase);
+    const rows = await sql`SELECT * FROM content_cases WHERE group_key = ${groupKey} AND item_key = ${itemKey} ORDER BY created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToContentCase);
   },
   async create(input: {
-    techKey: string;
+    groupKey: string;
+    itemKey: string;
     productName: string;
     equipmentImageUrl?: string;
     videoUrl?: string;
@@ -240,25 +245,25 @@ export const techCaseRepo = {
   }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO tech_cases (id, tech_key, product_name, equipment_image_url, video_url, product_image_url, created_at)
-      VALUES (${newId()}, ${input.techKey}, ${input.productName}, ${input.equipmentImageUrl ?? null}, ${input.videoUrl ?? null}, ${input.productImageUrl ?? null}, ${new Date().toISOString()})
+      INSERT INTO content_cases (id, group_key, item_key, product_name, equipment_image_url, video_url, product_image_url, created_at)
+      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.productName}, ${input.equipmentImageUrl ?? null}, ${input.videoUrl ?? null}, ${input.productImageUrl ?? null}, ${new Date().toISOString()})
     `;
   },
   async remove(id: string): Promise<void> {
     await ensureSchema();
-    await sql`DELETE FROM tech_cases WHERE id = ${id}`;
+    await sql`DELETE FROM content_cases WHERE id = ${id}`;
   },
-  async count(): Promise<number> {
+  async count(groupKey: string, itemKey: string): Promise<number> {
     await ensureSchema();
-    const rows = await sql`SELECT COUNT(*)::int AS c FROM tech_cases`;
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_cases WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     return (rows[0] as { c: number }).c;
   },
 };
 
-export async function seedTechPagesIfEmpty(seeds: { key: string; title: string; description: string }[]) {
-  if ((await techPageRepo.count()) === 0) {
+export async function seedContentIfEmpty(groupKey: string, seeds: { key: string; title: string; description: string }[]) {
+  if ((await contentPageRepo.count(groupKey)) === 0) {
     for (const s of seeds) {
-      await techPageRepo.upsert(s.key, { title: s.title, description: s.description });
+      await contentPageRepo.upsert(groupKey, s.key, { title: s.title, description: s.description });
     }
   }
 }

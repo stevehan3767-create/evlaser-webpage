@@ -70,19 +70,25 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // Generic article storage shared by every /products/[group]/[key] section
+    // (lineup/tech/industry/material): title + long-form description, plus
+    // application-case cards (product name / equipment image / video / product image).
     await sql`
-      CREATE TABLE IF NOT EXISTS tech_pages (
-        key TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS content_pages (
+        group_key TEXT NOT NULL,
+        item_key TEXT NOT NULL,
         title TEXT NOT NULL DEFAULT '',
         description TEXT NOT NULL DEFAULT '',
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        PRIMARY KEY (group_key, item_key)
       )
     `;
 
     await sql`
-      CREATE TABLE IF NOT EXISTS tech_cases (
+      CREATE TABLE IF NOT EXISTS content_cases (
         id TEXT PRIMARY KEY,
-        tech_key TEXT NOT NULL,
+        group_key TEXT NOT NULL,
+        item_key TEXT NOT NULL,
         product_name TEXT NOT NULL,
         equipment_image_url TEXT,
         video_url TEXT,

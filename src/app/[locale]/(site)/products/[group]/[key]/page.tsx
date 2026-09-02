@@ -2,34 +2,47 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "@/components/Icon";
-import { techItems, techPageSeeds } from "@/lib/data";
-import { techPageRepo, techCaseRepo, seedTechPagesIfEmpty } from "@/lib/repo";
+import { contentGroups } from "@/lib/data";
+import { contentPageRepo, contentCaseRepo, seedContentIfEmpty } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
-export default async function TechDetailPage({ params }: { params: Promise<{ key: string }> }) {
-  const { key } = await params;
-  const item = techItems.find((t) => t.key === key);
-  if (!item) notFound();
+const GROUP_EYEBROWS: Record<string, string> = {
+  lineup: "EQUIPMENT LINEUP",
+  tech: "TECHNOLOGY",
+  industry: "INDUSTRY",
+  material: "MATERIAL",
+};
 
-  await seedTechPagesIfEmpty(techPageSeeds);
-  const [page, cases, t, tp] = await Promise.all([
-    techPageRepo.get(key),
-    techCaseRepo.listByKey(key),
-    getTranslations("tech"),
-    getTranslations("techPage"),
+export default async function ContentDetailPage({
+  params,
+}: {
+  params: Promise<{ group: string; key: string }>;
+}) {
+  const { group, key } = await params;
+  const meta = contentGroups[group];
+  const item = meta?.items.find((i) => i.key === key);
+  if (!meta || !item) notFound();
+
+  await seedContentIfEmpty(group, meta.seeds);
+  const [page, cases, tp, tLabel] = await Promise.all([
+    contentPageRepo.get(group, key),
+    contentCaseRepo.listByKey(group, key),
+    getTranslations("contentPage"),
+    meta.i18nNamespace ? getTranslations(meta.i18nNamespace) : Promise.resolve(null),
   ]);
 
-  const title = page?.title || t(item.key);
+  const label = tLabel ? tLabel(key) : meta.labelsKo[key];
+  const title = page?.title || label;
 
   return (
     <div className="py-16 sm:py-22">
       <div className="mx-auto max-w-[1240px] px-7">
-        <Link href="/products#tech" className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-6">
+        <Link href={meta.backHref} className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-6">
           ← {tp("backToList")}
         </Link>
 
-        <span className="eyebrow">{tp("eyebrow")}</span>
+        <span className="eyebrow">{GROUP_EYEBROWS[group]}</span>
         <div className="flex items-center gap-3 mt-2.5">
           <Icon name={item.icon} className="w-8 h-8 text-red flex-none" strokeWidth={1.5} />
           <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>

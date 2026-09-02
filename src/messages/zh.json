@@ -17,7 +17,7 @@
         "byTech": "按技术类型",
         "byIndustry": "按行业分类",
         "byMaterial": "按材料",
-        "lineup": "产品阵容"
+        "lineup": "설비 라인업"
       }
     },
     "resources": {
@@ -683,13 +683,12 @@
     }
   },
   "productLineup": {
-    "eyebrow": "PRODUCT LINEUP",
-    "title": "产品阵容",
-    "desc": "(株)EVLASER的激光塑料焊接、清洗及安全解决方案产品阵容。各产品的详细规格请参见官方网站。",
-    "note": "点击产品名称将跳转至evlaser.co.kr的产品详情页面。"
+    "eyebrow": "EQUIPMENT LINEUP",
+    "title": "설비 라인업",
+    "desc": "㈜이브이레이저의 레이저 플라스틱 용접, 절단, 안전 솔루션 등 설비 라인업입니다. 각 설비를 클릭하면 상세소개 페이지로 이동합니다.",
+    "note": "설비 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서도 확인하실 수 있습니다."
   },
-  "techPage": {
-    "eyebrow": "TECHNOLOGY",
+  "contentPage": {
     "backToList": "返回列表",
     "descriptionEmpty": "尚未添加技术介绍，请在管理员模式中添加。",
     "casesHeading": "应用案例",
@@ -697,5 +696,22 @@
     "equipmentImageLabel": "设备图片",
     "videoLabel": "观看视频",
     "productImageLabel": "产品图片"
+  },
+  "materials": {
+    "eyebrow": "MATERIAL SOLUTIONS",
+    "title": "재료별로 보는 레이저 솔루션",
+    "metalSteel": "금속·철강",
+    "copperAluminum": "동·알루미늄",
+    "plastic": "플라스틱",
+    "glass": "유리",
+    "ceramic": "세라믹",
+    "wood": "나무(목재)",
+    "paper": "종이",
+    "fabric": "천(옷감)",
+    "leather": "가죽",
+    "rubber": "고무",
+    "preciousMetal": "귀금속",
+    "pcb": "PCB",
+    "other": "기타"
   }
 }

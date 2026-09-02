@@ -1,13 +1,13 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
-import { industries } from "@/lib/data";
+import { materialItems } from "@/lib/data";
 
-export default function Industries() {
-  const t = useTranslations("industries");
+export default function Materials() {
+  const t = useTranslations("materials");
 
   return (
-    <section id="industries" className="py-16 sm:py-22 border-b border-line">
+    <section id="material" className="py-16 sm:py-22 border-b border-line bg-surface-alt">
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-11">
           <span className="eyebrow">{t("eyebrow")}</span>
@@ -16,14 +16,14 @@ export default function Industries() {
           </h2>
         </div>
         <div className="grid gap-px bg-line border border-line" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
-          {industries.map((ind) => (
+          {materialItems.map((m) => (
             <Link
-              key={ind.key}
-              href={`/products/industry/${ind.key}`}
+              key={m.key}
+              href={`/products/material/${m.key}`}
               className="group bg-surface p-6 flex flex-col gap-3 items-start min-h-[100px] hover:bg-surface-alt transition-colors"
             >
-              <Icon name={ind.icon} className="w-7 h-7 text-blue" />
-              <span className="font-semibold text-[13px] leading-snug">{t(ind.key)}</span>
+              <Icon name={m.icon} className="w-7 h-7 text-blue" />
+              <span className="font-semibold text-[13px] leading-snug">{t(m.key)}</span>
             </Link>
           ))}
         </div>

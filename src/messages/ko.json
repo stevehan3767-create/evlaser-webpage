@@ -17,7 +17,7 @@
         "byTech": "기술종류별",
         "byIndustry": "산업분야별",
         "byMaterial": "재료별",
-        "lineup": "제품 라인업"
+        "lineup": "설비 라인업"
       }
     },
     "resources": {
@@ -683,13 +683,12 @@
     }
   },
   "productLineup": {
-    "eyebrow": "PRODUCT LINEUP",
-    "title": "제품 라인업",
-    "desc": "㈜이브이레이저의 레이저 플라스틱 용접, 클리닝, 안전 솔루션 제품 라인업입니다. 각 제품의 상세 사양은 공식 홈페이지에서 확인하실 수 있습니다.",
-    "note": "제품명을 클릭하면 evlaser.co.kr의 제품 상세 페이지로 이동합니다."
+    "eyebrow": "EQUIPMENT LINEUP",
+    "title": "설비 라인업",
+    "desc": "㈜이브이레이저의 레이저 플라스틱 용접, 절단, 안전 솔루션 등 설비 라인업입니다. 각 설비를 클릭하면 상세소개 페이지로 이동합니다.",
+    "note": "설비 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서도 확인하실 수 있습니다."
   },
-  "techPage": {
-    "eyebrow": "TECHNOLOGY",
+  "contentPage": {
     "backToList": "목록으로",
     "descriptionEmpty": "아직 등록된 기술소개가 없습니다. 관리자 모드에서 입력해 주세요.",
     "casesHeading": "적용사례",
@@ -697,5 +696,22 @@
     "equipmentImageLabel": "설비 이미지",
     "videoLabel": "동영상 보기",
     "productImageLabel": "제품 이미지"
+  },
+  "materials": {
+    "eyebrow": "MATERIAL SOLUTIONS",
+    "title": "재료별로 보는 레이저 솔루션",
+    "metalSteel": "금속·철강",
+    "copperAluminum": "동·알루미늄",
+    "plastic": "플라스틱",
+    "glass": "유리",
+    "ceramic": "세라믹",
+    "wood": "나무(목재)",
+    "paper": "종이",
+    "fabric": "천(옷감)",
+    "leather": "가죽",
+    "rubber": "고무",
+    "preciousMetal": "귀금속",
+    "pcb": "PCB",
+    "other": "기타"
   }
 }

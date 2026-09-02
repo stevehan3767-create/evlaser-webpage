@@ -1,52 +1,71 @@
 import Link from "next/link";
-import { techItems, techLabelsKo, techPageSeeds } from "@/lib/data";
-import { techPageRepo, techCaseRepo, seedTechPagesIfEmpty } from "@/lib/repo";
-import { saveTechPage, createTechCase, deleteTechCase } from "./actions";
+import { contentGroups } from "@/lib/data";
+import { contentPageRepo, contentCaseRepo, seedContentIfEmpty } from "@/lib/repo";
+import { saveContentPage, createContentCase, deleteContentCase } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminTechPagesPage({
+const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
+
+export default async function AdminContentPagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ key?: string }>;
+  searchParams: Promise<{ group?: string; key?: string }>;
 }) {
-  const { key: rawKey } = await searchParams;
-  const key = techItems.some((t) => t.key === rawKey) ? (rawKey as string) : techItems[0].key;
+  const { group: rawGroup, key: rawKey } = await searchParams;
+  const group = GROUP_ORDER.includes(rawGroup ?? "") ? (rawGroup as string) : GROUP_ORDER[0];
+  const meta = contentGroups[group];
+  const key = meta.items.some((i) => i.key === rawKey) ? (rawKey as string) : meta.items[0].key;
 
-  await seedTechPagesIfEmpty(techPageSeeds);
-  const [page, cases] = await Promise.all([techPageRepo.get(key), techCaseRepo.listByKey(key)]);
+  await seedContentIfEmpty(group, meta.seeds);
+  const [page, cases] = await Promise.all([contentPageRepo.get(group, key), contentCaseRepo.listByKey(group, key)]);
 
   return (
     <div>
-      <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-6">기술 페이지 관리</h1>
+      <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-6">제품·기술 페이지 관리</h1>
 
-      <div className="flex flex-wrap gap-1.5 mb-8">
-        {techItems.map((t, i) => (
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {GROUP_ORDER.map((g) => (
           <Link
-            key={t.key}
-            href={`/admin/tech-pages?key=${t.key}`}
-            className={`px-3 py-1.5 text-[12.5px] border rounded-sm ${
-              t.key === key ? "bg-red text-white border-red font-bold" : "border-line-strong text-ink-soft hover:border-blue"
+            key={g}
+            href={`/admin/content-pages?group=${g}`}
+            className={`px-3.5 py-2 text-[13px] border rounded-sm font-bold ${
+              g === group ? "bg-ink text-white border-ink" : "border-line-strong text-ink-soft hover:border-blue"
             }`}
           >
-            {String(i + 1).padStart(2, "0")}. {techLabelsKo[t.key] ?? t.key}
+            {contentGroups[g].labelKo}
           </Link>
         ))}
       </div>
 
-      <form action={saveTechPage} className="border border-line p-5 mb-10 grid gap-3.5">
+      <div className="flex flex-wrap gap-1.5 mb-8 pb-8 border-b border-line">
+        {meta.items.map((t, i) => (
+          <Link
+            key={t.key}
+            href={`/admin/content-pages?group=${group}&key=${t.key}`}
+            className={`px-3 py-1.5 text-[12.5px] border rounded-sm ${
+              t.key === key ? "bg-red text-white border-red font-bold" : "border-line-strong text-ink-soft hover:border-blue"
+            }`}
+          >
+            {String(i + 1).padStart(2, "0")}. {meta.labelsKo[t.key] ?? t.key}
+          </Link>
+        ))}
+      </div>
+
+      <form action={saveContentPage} className="border border-line p-5 mb-10 grid gap-3.5">
+        <input type="hidden" name="group" value={group} />
         <input type="hidden" name="key" value={key} />
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목 (비워두면 기본 명칭 사용)</label>
           <input
             name="title"
             defaultValue={page?.title ?? ""}
-            placeholder={techLabelsKo[key] ?? key}
+            placeholder={meta.labelsKo[key] ?? key}
             className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
         <div>
-          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">기술소개 (A4 1장 분량 권장)</label>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">내용 (A4 1장 분량 권장)</label>
           <textarea
             name="description"
             defaultValue={page?.description ?? ""}
@@ -60,8 +79,9 @@ export default async function AdminTechPagesPage({
       </form>
 
       <h2 className="text-[15px] font-bold mb-3">적용사례 추가</h2>
-      <form action={createTechCase} className="border border-line p-5 mb-8 grid gap-3.5">
-        <input type="hidden" name="techKey" value={key} />
+      <form action={createContentCase} className="border border-line p-5 mb-8 grid gap-3.5">
+        <input type="hidden" name="group" value={group} />
+        <input type="hidden" name="key" value={key} />
         <input name="productName" placeholder="제품명" required className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
         <input
           name="equipmentImageUrl"
@@ -94,9 +114,10 @@ export default async function AdminTechPagesPage({
                   {c.productImageUrl && <span>제품 이미지: {c.productImageUrl}</span>}
                 </p>
               </div>
-              <form action={deleteTechCase}>
+              <form action={deleteContentCase}>
                 <input type="hidden" name="id" value={c.id} />
-                <input type="hidden" name="techKey" value={key} />
+                <input type="hidden" name="group" value={group} />
+                <input type="hidden" name="key" value={key} />
                 <button type="submit" className="text-[12px] text-red font-bold flex-none">
                   삭제
                 </button>
