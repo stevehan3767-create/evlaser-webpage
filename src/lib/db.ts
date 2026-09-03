@@ -103,6 +103,32 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // Small admin-configurable key/value settings store (e.g. the recipient
+    // email for job applications).
+    await sql`
+      CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `;
+
+    // Job applications submitted via the careers "지원하기" form. Only
+    // metadata is stored here — attached files are forwarded as email
+    // attachments only, never persisted.
+    await sql`
+      CREATE TABLE IF NOT EXISTS job_applications (
+        id TEXT PRIMARY KEY,
+        job_title TEXT NOT NULL,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT,
+        message TEXT,
+        file_names TEXT,
+        email_sent BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     // Generic article storage shared by every /products/[group]/[key] section
     // (lineup/tech/industry/material): title + long-form description, plus
     // application-case cards (product name / equipment image / video / product image).

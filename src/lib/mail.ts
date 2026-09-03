@@ -15,6 +15,62 @@ export function isMailConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
+function getTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+export const DEFAULT_CAREERS_EMAIL = process.env.MAIL_TO_CAREERS || "info@evlaser.co.kr";
+
+export async function sendJobApplicationEmail(input: {
+  to: string;
+  jobTitle: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  attachments: { filename: string; content: Buffer }[];
+}): Promise<{ sent: boolean; error?: string }> {
+  if (!isMailConfigured()) {
+    return { sent: false, error: "SMTP not configured (SMTP_HOST/SMTP_USER/SMTP_PASS missing)" };
+  }
+
+  try {
+    await getTransporter().sendMail({
+      from: process.env.MAIL_FROM || process.env.SMTP_USER,
+      to: input.to,
+      replyTo: input.email,
+      subject: `[EV Laser 채용지원] ${input.jobTitle} - ${input.name}`,
+      text: [
+        `지원 직무: ${input.jobTitle}`,
+        `이름: ${input.name}`,
+        `이메일: ${input.email}`,
+        input.phone ? `연락처: ${input.phone}` : null,
+        "",
+        input.message ? "자기소개/메시지:" : null,
+        input.message || null,
+        "",
+        input.attachments.length > 0
+          ? `첨부파일: ${input.attachments.map((a) => a.filename).join(", ")}`
+          : "첨부파일 없음",
+      ]
+        .filter((line) => line !== null)
+        .join("\n"),
+      attachments: input.attachments,
+    });
+    return { sent: true };
+  } catch (err) {
+    return { sent: false, error: err instanceof Error ? err.message : "unknown error" };
+  }
+}
+
 export async function sendInquiryEmail(input: {
   channel: string;
   name: string;
@@ -28,16 +84,7 @@ export async function sendInquiryEmail(input: {
     return { sent: false, error: "SMTP not configured (SMTP_HOST/SMTP_USER/SMTP_PASS missing)" };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-
+  const transporter = getTransporter();
   const to = recipientForChannel(input.channel);
   const channelLabel: Record<string, string> = {
     general: "일반 문의",

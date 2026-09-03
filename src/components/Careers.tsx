@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
+import ApplyButton from "./ApplyButton";
 import { jobs } from "@/lib/data";
 
 const VALUE_KEYS = ["expertise", "integrity", "challenge"] as const;
@@ -70,9 +71,7 @@ function SimpleJobCard({ job }: { job: SimpleJob }) {
         <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{job.loc}</span>
         <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{job.due}</span>
       </div>
-      <Link href="/support" className="mt-2 text-[12.5px] font-bold text-blue inline-flex items-center gap-[5px]">
-        {t("apply")}
-      </Link>
+      <ApplyButton jobTitle={job.title} label={t("apply")} className="mt-2 text-[12.5px] font-bold text-blue inline-flex items-center gap-[5px] self-start" />
     </div>
   );
 }
@@ -176,9 +175,11 @@ function DetailedJobCard({ j }: { j: JobDetail }) {
                 </div>
               </div>
 
-              <Link href="/support" className="mt-8 inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
-                {t("apply")}
-              </Link>
+              <ApplyButton
+                jobTitle={j.title}
+                label={t("apply")}
+                className="mt-8 inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]"
+              />
             </div>
           </details>
   );

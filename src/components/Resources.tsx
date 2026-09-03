@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
+import LinkPreviewButton from "./LinkPreviewButton";
 import { resourceRepo } from "@/lib/repo";
 import type { IconName } from "@/lib/data";
 
@@ -58,14 +59,7 @@ export default async function Resources({ searchParams }: { searchParams: Promis
                   <h3 className="text-[15.5px] mb-2">{item.title}</h3>
                   <p className="text-[13px] text-ink-soft">{item.description}</p>
                   {item.url && (
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-block text-[12.5px] font-bold text-blue"
-                    >
-                      {t("linkCta")} →
-                    </a>
+                    <LinkPreviewButton url={item.url} label={`${t("linkCta")} →`} className="mt-3 inline-block text-[12.5px] font-bold text-blue" />
                   )}
                 </div>
               ))}

@@ -270,6 +270,70 @@ export const newsRepo = {
   },
 };
 
+export const settingsRepo = {
+  async get(key: string): Promise<string | null> {
+    await ensureSchema();
+    const rows = await sql`SELECT value FROM settings WHERE key = ${key}`;
+    return rows.length ? (rows[0] as { value: string }).value : null;
+  },
+  async set(key: string, value: string): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO settings (key, value) VALUES (${key}, ${value})
+      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+    `;
+  },
+};
+
+export interface JobApplicationRow {
+  id: string;
+  jobTitle: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string | null;
+  fileNames: string | null;
+  emailSent: boolean;
+  createdAt: string;
+}
+
+function rowToJobApplication(r: Record<string, unknown>): JobApplicationRow {
+  return {
+    id: r.id as string,
+    jobTitle: r.job_title as string,
+    name: r.name as string,
+    email: r.email as string,
+    phone: (r.phone as string) ?? null,
+    message: (r.message as string) ?? null,
+    fileNames: (r.file_names as string) ?? null,
+    emailSent: Boolean(r.email_sent),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const jobApplicationRepo = {
+  async list(): Promise<JobApplicationRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM job_applications ORDER BY created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToJobApplication);
+  },
+  async create(input: {
+    jobTitle: string;
+    name: string;
+    email: string;
+    phone?: string;
+    message?: string;
+    fileNames?: string;
+    emailSent: boolean;
+  }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO job_applications (id, job_title, name, email, phone, message, file_names, email_sent, created_at)
+      VALUES (${newId()}, ${input.jobTitle}, ${input.name}, ${input.email}, ${input.phone ?? null}, ${input.message ?? null}, ${input.fileNames ?? null}, ${input.emailSent}, ${new Date().toISOString()})
+    `;
+  },
+};
+
 export const faqRepo = {
   async list(): Promise<FaqRow[]> {
     await ensureSchema();
