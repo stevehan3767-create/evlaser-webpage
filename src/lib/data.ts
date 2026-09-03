@@ -301,7 +301,7 @@ export const officeSeeds = [
     email: "info@evlaser.co.kr",
   },
   {
-    name: "EVLS (중국 쑤저우)",
+    name: "중국 쑤저우법인 (欧威激光科技（苏州）有限公司)",
     address: "Room 106, Zone C, Building 2, Dongshahu Fund Town, No. 345 Fengli Street, Industrial Park, Suzhou City, Jiangsu Province, China (215127)",
     phone: "+86 512 6515 8026",
     email: "info@evlaser.cn",

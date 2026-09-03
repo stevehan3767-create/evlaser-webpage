@@ -1,7 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import Icon from "./Icon";
 import { officeSeeds } from "@/lib/data";
 import { officeRepo, distributorRepo, seedOfficesIfEmpty } from "@/lib/repo";
+import { countryFlag, countryName, isCountryCode } from "@/lib/countries";
 
 function OfficeTable({
   headers,
@@ -46,9 +47,11 @@ function OfficeTable({
 function DistributorTable({
   headers,
   rows,
+  locale,
 }: {
   headers: [string, string, string, string];
   rows: { id: string; country: string; partner: string; contact: string | null; phone: string | null }[];
+  locale: string;
 }) {
   return (
     <div className="overflow-x-auto border border-line bg-surface">
@@ -69,8 +72,17 @@ function DistributorTable({
           {rows.map((r) => (
             <tr key={r.id}>
               <td className="font-bold flex items-center gap-2.5 px-3.5 py-4 border-b border-line">
-                <Icon name="pin" className="w-4 h-4 text-red flex-none" />
-                {r.country}
+                {isCountryCode(r.country) ? (
+                  <>
+                    <span className="text-[16px] leading-none flex-none">{countryFlag(r.country)}</span>
+                    {countryName(r.country, locale)}
+                  </>
+                ) : (
+                  <>
+                    <Icon name="pin" className="w-4 h-4 text-red flex-none" />
+                    {r.country}
+                  </>
+                )}
               </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px]">{r.partner}</td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px]">{r.contact}</td>
@@ -85,6 +97,7 @@ function DistributorTable({
 
 export default async function GlobalNetwork() {
   const t = await getTranslations("global");
+  const locale = await getLocale();
 
   await seedOfficesIfEmpty(officeSeeds);
   const [offices, distributors] = await Promise.all([officeRepo.list(), distributorRepo.list()]);
@@ -127,7 +140,7 @@ export default async function GlobalNetwork() {
           {distributors.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px] border-t border-line">{t("distributorsEmpty")}</p>
           ) : (
-            <DistributorTable headers={distributorHeaders} rows={distributors} />
+            <DistributorTable headers={distributorHeaders} rows={distributors} locale={locale} />
           )}
         </div>
       </div>

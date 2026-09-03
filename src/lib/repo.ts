@@ -288,6 +288,13 @@ export const officeRepo = {
       VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${new Date().toISOString()})
     `;
   },
+  async update(id: string, input: { name: string; address: string; phone?: string; email?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE offices SET name = ${input.name}, address = ${input.address}, phone = ${input.phone ?? null}, email = ${input.email ?? null}
+      WHERE id = ${id}
+    `;
+  },
   async remove(id: string): Promise<void> {
     await ensureSchema();
     await sql`DELETE FROM offices WHERE id = ${id}`;
@@ -310,6 +317,13 @@ export const distributorRepo = {
     await sql`
       INSERT INTO distributors (id, country, partner, contact, phone, created_at)
       VALUES (${newId()}, ${input.country}, ${input.partner}, ${input.contact ?? null}, ${input.phone ?? null}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { country: string; partner: string; contact?: string; phone?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE distributors SET country = ${input.country}, partner = ${input.partner}, contact = ${input.contact ?? null}, phone = ${input.phone ?? null}
+      WHERE id = ${id}
     `;
   },
   async remove(id: string): Promise<void> {
