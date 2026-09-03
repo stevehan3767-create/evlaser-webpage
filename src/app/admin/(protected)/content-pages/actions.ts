@@ -21,7 +21,8 @@ export async function saveContentPage(formData: FormData) {
   revalidatePath(`/products/${group}/${key}`);
 }
 
-export async function createContentCase(formData: FormData) {
+export async function saveContentCase(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
   const group = String(formData.get("group") ?? "");
   const key = String(formData.get("key") ?? "");
   const productName = String(formData.get("productName") ?? "").trim();
@@ -30,14 +31,17 @@ export async function createContentCase(formData: FormData) {
   const productImageUrl = String(formData.get("productImageUrl") ?? "").trim();
   if (!isValid(group, key) || !productName) return;
 
-  await contentCaseRepo.create({
-    groupKey: group,
-    itemKey: key,
+  const input = {
     productName,
     equipmentImageUrl: equipmentImageUrl || undefined,
     videoUrl: videoUrl || undefined,
     productImageUrl: productImageUrl || undefined,
-  });
+  };
+  if (id) {
+    await contentCaseRepo.update(id, input);
+  } else {
+    await contentCaseRepo.create({ groupKey: group, itemKey: key, ...input });
+  }
   revalidatePath("/admin/content-pages");
   revalidatePath(`/products/${group}/${key}`);
 }

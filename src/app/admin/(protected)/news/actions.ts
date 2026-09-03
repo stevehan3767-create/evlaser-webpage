@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { newsRepo } from "@/lib/repo";
 
-export async function createNews(formData: FormData) {
+export async function saveNews(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
   const tag = String(formData.get("tag") ?? "회사소식");
   const title = String(formData.get("title") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
@@ -11,7 +12,11 @@ export async function createNews(formData: FormData) {
 
   if (!title || !date) return;
 
-  await newsRepo.create({ tag, title, date, body, published: true });
+  if (id) {
+    await newsRepo.update(id, { tag, title, date, body });
+  } else {
+    await newsRepo.create({ tag, title, date, body, published: true });
+  }
   revalidatePath("/admin/news");
   revalidatePath("/news");
 }

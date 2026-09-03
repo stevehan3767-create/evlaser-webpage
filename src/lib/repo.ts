@@ -219,6 +219,13 @@ export const resourceRepo = {
       VALUES (${newId()}, ${input.category}, ${input.title}, ${input.description}, ${input.url ?? null}, ${new Date().toISOString()})
     `;
   },
+  async update(id: string, input: { category: string; title: string; description: string; url?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE resources SET category = ${input.category}, title = ${input.title}, description = ${input.description}, url = ${input.url ?? null}
+      WHERE id = ${id}
+    `;
+  },
   async remove(id: string): Promise<void> {
     await ensureSchema();
     await sql`DELETE FROM resources WHERE id = ${id}`;
@@ -245,6 +252,13 @@ export const newsRepo = {
       VALUES (${newId()}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${new Date().toISOString()})
     `;
   },
+  async update(id: string, input: { tag: string; title: string; date: string; body?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE news_items SET tag = ${input.tag}, title = ${input.title}, date = ${input.date}, body = ${input.body ?? ""}
+      WHERE id = ${id}
+    `;
+  },
   async remove(id: string): Promise<void> {
     await ensureSchema();
     await sql`DELETE FROM news_items WHERE id = ${id}`;
@@ -268,6 +282,10 @@ export const faqRepo = {
       INSERT INTO faqs (id, question, answer, created_at)
       VALUES (${newId()}, ${input.question}, ${input.answer}, ${new Date().toISOString()})
     `;
+  },
+  async update(id: string, input: { question: string; answer: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE faqs SET question = ${input.question}, answer = ${input.answer} WHERE id = ${id}`;
   },
   async remove(id: string): Promise<void> {
     await ensureSchema();
@@ -387,6 +405,18 @@ export const contentCaseRepo = {
     await sql`
       INSERT INTO content_cases (id, group_key, item_key, product_name, equipment_image_url, video_url, product_image_url, created_at)
       VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.productName}, ${input.equipmentImageUrl ?? null}, ${input.videoUrl ?? null}, ${input.productImageUrl ?? null}, ${new Date().toISOString()})
+    `;
+  },
+  async update(
+    id: string,
+    input: { productName: string; equipmentImageUrl?: string; videoUrl?: string; productImageUrl?: string }
+  ): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE content_cases
+      SET product_name = ${input.productName}, equipment_image_url = ${input.equipmentImageUrl ?? null},
+          video_url = ${input.videoUrl ?? null}, product_image_url = ${input.productImageUrl ?? null}
+      WHERE id = ${id}
     `;
   },
   async remove(id: string): Promise<void> {

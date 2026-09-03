@@ -1,30 +1,55 @@
+import Link from "next/link";
 import { faqRepo } from "@/lib/repo";
-import { createFaq, deleteFaq } from "./actions";
+import { saveFaq, deleteFaq } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminFaqsPage() {
+export default async function AdminFaqsPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
+  const { edit } = await searchParams;
+
   const items = await faqRepo.list();
+  const editing = edit ? items.find((f) => f.id === edit) : undefined;
 
   return (
     <div>
-      <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-2">자주 묻는 질문 관리</h1>
+      <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-2">
+        자주 묻는 질문 관리{editing && " — 수정"}
+      </h1>
       <p className="text-[13px] text-ink-soft mb-6">
         문의하기(/support) 페이지에 기본으로 표시되는 3개 질문 외에, 여기서 추가한 질문이 이어서 표시됩니다.
       </p>
 
-      <form action={createFaq} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form action={saveFaq} className="border border-line p-5 mb-8 grid gap-3.5">
+        <input type="hidden" name="id" value={editing?.id ?? ""} />
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">질문</label>
-          <input name="question" required className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+          <input
+            name="question"
+            defaultValue={editing?.question ?? ""}
+            required
+            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
         </div>
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">답변</label>
-          <textarea name="answer" rows={4} required className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y" />
+          <textarea
+            name="answer"
+            defaultValue={editing?.answer ?? ""}
+            rows={4}
+            required
+            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
+          />
         </div>
-        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
-          추가
-        </button>
+        <div className="flex gap-3">
+          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            {editing ? "저장" : "추가"}
+          </button>
+          {editing && (
+            <Link href="/admin/faqs" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
+              취소
+            </Link>
+          )}
+        </div>
       </form>
 
       <div className="border border-line">
@@ -37,12 +62,17 @@ export default async function AdminFaqsPage() {
                 <p className="font-bold">{f.question}</p>
                 <p className="mt-1 text-[12px] text-ink-soft whitespace-pre-wrap">{f.answer}</p>
               </div>
-              <form action={deleteFaq}>
-                <input type="hidden" name="id" value={f.id} />
-                <button type="submit" className="text-[12px] text-red font-bold flex-none">
-                  삭제
-                </button>
-              </form>
+              <div className="flex gap-3 flex-none">
+                <Link href={`/admin/faqs?edit=${f.id}`} className="text-[12px] text-blue font-bold">
+                  수정
+                </Link>
+                <form action={deleteFaq}>
+                  <input type="hidden" name="id" value={f.id} />
+                  <button type="submit" className="text-[12px] text-red font-bold">
+                    삭제
+                  </button>
+                </form>
+              </div>
             </div>
           ))
         )}

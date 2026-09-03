@@ -3,12 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { faqRepo } from "@/lib/repo";
 
-export async function createFaq(formData: FormData) {
+export async function saveFaq(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
   const question = String(formData.get("question") ?? "").trim();
   const answer = String(formData.get("answer") ?? "").trim();
   if (!question || !answer) return;
 
-  await faqRepo.create({ question, answer });
+  if (id) {
+    await faqRepo.update(id, { question, answer });
+  } else {
+    await faqRepo.create({ question, answer });
+  }
   revalidatePath("/admin/faqs");
   revalidatePath("/support");
 }

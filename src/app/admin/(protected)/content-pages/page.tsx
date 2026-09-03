@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { contentGroups } from "@/lib/data";
 import { contentPageRepo, contentCaseRepo, seedContentIfEmpty } from "@/lib/repo";
-import { saveContentPage, createContentCase, deleteContentCase } from "./actions";
+import { saveContentPage, saveContentCase, deleteContentCase } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -10,15 +10,16 @@ const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
 export default async function AdminContentPagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ group?: string; key?: string }>;
+  searchParams: Promise<{ group?: string; key?: string; editCase?: string }>;
 }) {
-  const { group: rawGroup, key: rawKey } = await searchParams;
+  const { group: rawGroup, key: rawKey, editCase } = await searchParams;
   const group = GROUP_ORDER.includes(rawGroup ?? "") ? (rawGroup as string) : GROUP_ORDER[0];
   const meta = contentGroups[group];
   const key = meta.items.some((i) => i.key === rawKey) ? (rawKey as string) : meta.items[0].key;
 
   await seedContentIfEmpty(group, meta.seeds);
   const [page, cases] = await Promise.all([contentPageRepo.get(group, key), contentCaseRepo.listByKey(group, key)]);
+  const editingCase = editCase ? cases.find((c) => c.id === editCase) : undefined;
 
   return (
     <div>
@@ -78,25 +79,49 @@ export default async function AdminContentPagesPage({
         </button>
       </form>
 
-      <h2 className="text-[15px] font-bold mb-3">적용사례 추가</h2>
-      <form action={createContentCase} className="border border-line p-5 mb-8 grid gap-3.5">
+      <h2 className="text-[15px] font-bold mb-3">적용사례{editingCase ? " 수정" : " 추가"}</h2>
+      <form action={saveContentCase} className="border border-line p-5 mb-8 grid gap-3.5">
+        <input type="hidden" name="id" value={editingCase?.id ?? ""} />
         <input type="hidden" name="group" value={group} />
         <input type="hidden" name="key" value={key} />
-        <input name="productName" placeholder="제품명" required className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+        <input
+          name="productName"
+          placeholder="제품명"
+          defaultValue={editingCase?.productName ?? ""}
+          required
+          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+        />
         <input
           name="equipmentImageUrl"
           placeholder="기계설비 이미지 URL (선택)"
+          defaultValue={editingCase?.equipmentImageUrl ?? ""}
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
         />
-        <input name="videoUrl" placeholder="동영상 URL (선택)" className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+        <input
+          name="videoUrl"
+          placeholder="동영상 URL (선택)"
+          defaultValue={editingCase?.videoUrl ?? ""}
+          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+        />
         <input
           name="productImageUrl"
           placeholder="제품 이미지 URL (선택)"
+          defaultValue={editingCase?.productImageUrl ?? ""}
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
         />
-        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
-          추가
-        </button>
+        <div className="flex gap-3">
+          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            {editingCase ? "저장" : "추가"}
+          </button>
+          {editingCase && (
+            <Link
+              href={`/admin/content-pages?group=${group}&key=${key}`}
+              className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold"
+            >
+              취소
+            </Link>
+          )}
+        </div>
       </form>
 
       <h2 className="text-[15px] font-bold mb-3">등록된 적용사례</h2>
@@ -114,14 +139,19 @@ export default async function AdminContentPagesPage({
                   {c.productImageUrl && <span>제품 이미지: {c.productImageUrl}</span>}
                 </p>
               </div>
-              <form action={deleteContentCase}>
-                <input type="hidden" name="id" value={c.id} />
-                <input type="hidden" name="group" value={group} />
-                <input type="hidden" name="key" value={key} />
-                <button type="submit" className="text-[12px] text-red font-bold flex-none">
-                  삭제
-                </button>
-              </form>
+              <div className="flex gap-3 flex-none">
+                <Link href={`/admin/content-pages?group=${group}&key=${key}&editCase=${c.id}`} className="text-[12px] text-blue font-bold">
+                  수정
+                </Link>
+                <form action={deleteContentCase}>
+                  <input type="hidden" name="id" value={c.id} />
+                  <input type="hidden" name="group" value={group} />
+                  <input type="hidden" name="key" value={key} />
+                  <button type="submit" className="text-[12px] text-red font-bold">
+                    삭제
+                  </button>
+                </form>
+              </div>
             </div>
           ))
         )}

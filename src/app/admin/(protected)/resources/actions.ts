@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { resourceRepo } from "@/lib/repo";
 
-export async function createResource(formData: FormData) {
+export async function saveResource(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
   const category = String(formData.get("category") ?? "doc");
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -11,7 +12,11 @@ export async function createResource(formData: FormData) {
 
   if (!title || !description) return;
 
-  await resourceRepo.create({ category, title, description, url: url || undefined });
+  if (id) {
+    await resourceRepo.update(id, { category, title, description, url: url || undefined });
+  } else {
+    await resourceRepo.create({ category, title, description, url: url || undefined });
+  }
   revalidatePath("/admin/resources");
   revalidatePath("/resources");
 }
