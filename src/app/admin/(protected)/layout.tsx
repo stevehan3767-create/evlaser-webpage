@@ -14,11 +14,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/global">글로벌 네트워크 관리</Link>
           <Link href="/admin/inquiries">문의 내역</Link>
         </nav>
-        <form action={logout}>
-          <button type="submit" className="text-[12.5px] text-ink-soft hover:text-red">
-            로그아웃
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-[12.5px] text-ink-soft hover:text-blue">
+            홈페이지 보기
+          </Link>
+          <form action={logout}>
+            <button type="submit" className="text-[12.5px] text-ink-soft hover:text-red">
+              로그아웃
+            </button>
+          </form>
+        </div>
       </div>
       {children}
     </div>

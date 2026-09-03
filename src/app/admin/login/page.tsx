@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { isAdminConfigured } from "@/lib/auth";
 import { login } from "./actions";
 
@@ -18,6 +19,9 @@ export default async function AdminLoginPage({
 
   return (
     <div className="w-full mx-auto max-w-[420px] px-7 py-24">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-8">
+        ← 메인화면으로
+      </Link>
       <h1 className="text-[24px] font-[family-name:var(--font-display)] tracking-tight mb-2">관리자 로그인</h1>
       <p className="text-ink-soft text-[13.5px] mb-8">EV Laser 홈페이지 관리자 모드입니다.</p>
 
