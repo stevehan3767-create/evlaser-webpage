@@ -375,6 +375,23 @@ if (tsSeriesSeed) {
     "- 용접 완료 후 품질 검사 기능을 추가하여 생산된 제품의 고정밀 양/불 판정 가능",
     "- Process Head 방식은 용접 시 온도측정을 이용한 양/불 판정 검사 방식 가능",
     "- MES(Manufacturing Execution System) 구축 가능",
+    "",
+    "[사양 (Data Sheet)]",
+    "| 항목 | 내용 |",
+    "|---|---|",
+    "| Laser Type | ELCR D Series (100/200/300/500 watt) |",
+    "| Welding Area | 100 x 100 / 160 x 160 / 200 x 200mm |",
+    "| Welding Product Size | 250 x 250 x 150 mm |",
+    "| Number of Station | 1/2 Station |",
+    "| Welding Quality Function | Welding Depth Control, Vision / Flatness / Welding Temperature Check |",
+    "| Beam Delivery Type | Laser Scanning / Process Head |",
+    "| System Drive Type | Semi-Auto |",
+    "| JIG Type | ATC(Auto Tool Change) / Normal Jig Change(Clamping) / None |",
+    "| System Control | PLC Control |",
+    "| Cooling Type | Forced Air Cooling |",
+    "| Dimension | Approx. 1,800 x 1,800 x 2,100 mm |",
+    "| Power | 220VAC, 50/60Hz, Single Phase / 3 Phase |",
+    "| Option | ATC, MES, 3D Scanner, ETM, Power meter |",
   ].join("\n");
 }
 
