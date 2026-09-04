@@ -15,9 +15,17 @@ export async function saveContentPage(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
+  const videoUrl = String(formData.get("videoUrl") ?? "").trim();
+  const videoThumbnailUrl = String(formData.get("videoThumbnailUrl") ?? "").trim();
   if (!isValid(group, key)) return;
 
-  await contentPageRepo.upsert(group, key, { title, description, imageUrl: imageUrl || undefined });
+  await contentPageRepo.upsert(group, key, {
+    title,
+    description,
+    imageUrl: imageUrl || undefined,
+    videoUrl: videoUrl || undefined,
+    videoThumbnailUrl: videoThumbnailUrl || undefined,
+  });
   revalidatePath("/admin/content-pages");
   revalidatePath(`/products/${group}/${key}`);
 }
@@ -63,6 +71,7 @@ export async function saveContentCase(formData: FormData) {
   if (id) {
     await contentCaseRepo.update(id, input);
   } else {
+    if ((await contentCaseRepo.count(group, key)) >= 5) return;
     await contentCaseRepo.create({ groupKey: group, itemKey: key, ...input });
   }
   revalidatePath("/admin/content-pages");

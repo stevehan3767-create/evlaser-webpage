@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
-export default function LinkPreviewButton({ url, label, className }: { url: string; label: string; className?: string }) {
+export default function LinkPreviewButton({
+  url,
+  label,
+  className,
+  children,
+}: {
+  url: string;
+  label: string;
+  className?: string;
+  children?: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={className}>
-        {label}
+        {children ?? label}
       </button>
       {open && (
         <div

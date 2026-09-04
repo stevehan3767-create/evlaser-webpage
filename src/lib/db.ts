@@ -139,13 +139,17 @@ function createSchema(): Promise<void> {
         title TEXT NOT NULL DEFAULT '',
         description TEXT NOT NULL DEFAULT '',
         image_url TEXT,
+        video_url TEXT,
+        video_thumbnail_url TEXT,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (group_key, item_key)
       )
     `;
-    // content_pages existed before image_url was added; make sure older
-    // deployments pick it up too.
+    // content_pages existed before these columns were added; make sure
+    // older deployments pick them up too.
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS image_url TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS video_url TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS video_thumbnail_url TEXT`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS content_cases (

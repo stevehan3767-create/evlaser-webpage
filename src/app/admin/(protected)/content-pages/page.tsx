@@ -80,7 +80,8 @@ export default async function AdminContentPagesPage({
         </div>
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
-            내용 (A4 1장 분량 권장) — <code>| 항목 | 내용 |</code> 형식의 줄은 자동으로 표(사양서)로 변환됩니다
+            내용 (A4 1장 분량 권장) — <code>[소제목]</code> 줄은 소제목으로, <code>- 항목</code> 줄은 목록으로,{" "}
+            <code>| 항목 | 내용 |</code> 형식의 줄은 자동으로 표(사양서)로 변환됩니다
           </label>
           <textarea
             name="description"
@@ -88,6 +89,26 @@ export default async function AdminContentPagesPage({
             rows={16}
             className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y font-mono"
           />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">동영상 URL (선택)</label>
+            <input
+              name="videoUrl"
+              defaultValue={page?.videoUrl ?? ""}
+              placeholder="https://..."
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">동영상 미리보기 이미지 URL (선택)</label>
+            <input
+              name="videoThumbnailUrl"
+              defaultValue={page?.videoThumbnailUrl ?? ""}
+              placeholder="https://..."
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+          </div>
         </div>
         <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
           저장
@@ -127,50 +148,58 @@ export default async function AdminContentPagesPage({
         )}
       </div>
 
-      <h2 className="text-[15px] font-bold mb-3">적용사례{editingCase ? " 수정" : " 추가"}</h2>
-      <form action={saveContentCase} className="border border-line p-5 mb-8 grid gap-3.5">
-        <input type="hidden" name="id" value={editingCase?.id ?? ""} />
-        <input type="hidden" name="group" value={group} />
-        <input type="hidden" name="key" value={key} />
-        <input
-          name="productName"
-          placeholder="제품명"
-          defaultValue={editingCase?.productName ?? ""}
-          required
-          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-        />
-        <input
-          name="equipmentImageUrl"
-          placeholder="기계설비 이미지 URL (선택)"
-          defaultValue={editingCase?.equipmentImageUrl ?? ""}
-          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-        />
-        <input
-          name="videoUrl"
-          placeholder="동영상 URL (선택)"
-          defaultValue={editingCase?.videoUrl ?? ""}
-          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-        />
-        <input
-          name="productImageUrl"
-          placeholder="제품 이미지 URL (선택)"
-          defaultValue={editingCase?.productImageUrl ?? ""}
-          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-        />
-        <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
-            {editingCase ? "저장" : "추가"}
-          </button>
-          {editingCase && (
-            <Link
-              href={`/admin/content-pages?group=${group}&key=${key}`}
-              className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold"
-            >
-              취소
-            </Link>
-          )}
-        </div>
-      </form>
+      <h2 className="text-[15px] font-bold mb-3">
+        적용사례{editingCase ? " 수정" : " 추가"} <span className="font-mono text-ink-faint text-[12px]">({cases.length}/5)</span>
+      </h2>
+      {!editingCase && cases.length >= 5 ? (
+        <p className="border border-line p-5 mb-8 text-[13px] text-ink-soft">
+          적용사례는 최대 5개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
+        </p>
+      ) : (
+        <form action={saveContentCase} className="border border-line p-5 mb-8 grid gap-3.5">
+          <input type="hidden" name="id" value={editingCase?.id ?? ""} />
+          <input type="hidden" name="group" value={group} />
+          <input type="hidden" name="key" value={key} />
+          <input
+            name="productName"
+            placeholder="제품명"
+            defaultValue={editingCase?.productName ?? ""}
+            required
+            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+          <input
+            name="equipmentImageUrl"
+            placeholder="기계설비 이미지 URL (선택)"
+            defaultValue={editingCase?.equipmentImageUrl ?? ""}
+            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+          <input
+            name="videoUrl"
+            placeholder="동영상 URL (선택)"
+            defaultValue={editingCase?.videoUrl ?? ""}
+            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+          <input
+            name="productImageUrl"
+            placeholder="제품 이미지 URL (선택)"
+            defaultValue={editingCase?.productImageUrl ?? ""}
+            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+          <div className="flex gap-3">
+            <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+              {editingCase ? "저장" : "추가"}
+            </button>
+            {editingCase && (
+              <Link
+                href={`/admin/content-pages?group=${group}&key=${key}`}
+                className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold"
+              >
+                취소
+              </Link>
+            )}
+          </div>
+        </form>
+      )}
 
       <h2 className="text-[15px] font-bold mb-3">등록된 적용사례</h2>
       <div className="border border-line">

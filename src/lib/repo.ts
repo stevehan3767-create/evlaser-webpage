@@ -132,6 +132,8 @@ export interface ContentPageRow {
   title: string;
   description: string;
   imageUrl: string | null;
+  videoUrl: string | null;
+  videoThumbnailUrl: string | null;
   updatedAt: string;
 }
 
@@ -175,6 +177,8 @@ function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
     title: (r.title as string) ?? "",
     description: (r.description as string) ?? "",
     imageUrl: (r.image_url as string) ?? null,
+    videoUrl: (r.video_url as string) ?? null,
+    videoThumbnailUrl: (r.video_thumbnail_url as string) ?? null,
     updatedAt: r.updated_at as string,
   };
 }
@@ -460,12 +464,18 @@ export const contentPageRepo = {
     const rows = await sql`SELECT * FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     return rows.length ? rowToContentPage(rows[0] as Record<string, unknown>) : null;
   },
-  async upsert(groupKey: string, itemKey: string, input: { title: string; description: string; imageUrl?: string }): Promise<void> {
+  async upsert(
+    groupKey: string,
+    itemKey: string,
+    input: { title: string; description: string; imageUrl?: string; videoUrl?: string; videoThumbnailUrl?: string }
+  ): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_pages (group_key, item_key, title, description, image_url, updated_at)
-      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${new Date().toISOString()})
-      ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, video_url, video_thumbnail_url, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.videoUrl ?? null}, ${input.videoThumbnailUrl ?? null}, ${new Date().toISOString()})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET
+        title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url,
+        video_url = EXCLUDED.video_url, video_thumbnail_url = EXCLUDED.video_thumbnail_url, updated_at = EXCLUDED.updated_at
     `;
   },
   async count(groupKey: string): Promise<number> {
