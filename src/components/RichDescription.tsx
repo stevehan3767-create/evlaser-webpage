@@ -130,8 +130,16 @@ export default function RichDescription({ text }: { text: string }) {
             </div>
           );
         }
+        const isLeadCaption = i === 0;
         return (
-          <p key={i} className="text-ink-soft text-[14.5px] leading-relaxed whitespace-pre-wrap">
+          <p
+            key={i}
+            className={
+              isLeadCaption
+                ? "text-ink font-bold text-center text-[16px] leading-relaxed whitespace-pre-wrap"
+                : "text-ink-soft text-[14.5px] leading-relaxed whitespace-pre-wrap"
+            }
+          >
             {block.text}
           </p>
         );

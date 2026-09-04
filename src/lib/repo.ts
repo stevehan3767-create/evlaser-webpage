@@ -132,8 +132,6 @@ export interface ContentPageRow {
   title: string;
   description: string;
   imageUrl: string | null;
-  videoUrl: string | null;
-  videoThumbnailUrl: string | null;
   updatedAt: string;
 }
 
@@ -159,15 +157,28 @@ function rowToContentImage(r: Record<string, unknown>): ContentImageRow {
   };
 }
 
-export interface ContentCaseRow {
+export interface ContentVideoRow {
   id: string;
   groupKey: string;
   itemKey: string;
-  productName: string;
-  equipmentImageUrl: string | null;
-  videoUrl: string | null;
-  productImageUrl: string | null;
+  url: string;
+  thumbnailUrl: string | null;
+  caption: string | null;
+  sortOrder: number;
   createdAt: string;
+}
+
+function rowToContentVideo(r: Record<string, unknown>): ContentVideoRow {
+  return {
+    id: r.id as string,
+    groupKey: r.group_key as string,
+    itemKey: r.item_key as string,
+    url: r.url as string,
+    thumbnailUrl: (r.thumbnail_url as string) ?? null,
+    caption: (r.caption as string) ?? null,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
 }
 
 function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
@@ -177,24 +188,55 @@ function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
     title: (r.title as string) ?? "",
     description: (r.description as string) ?? "",
     imageUrl: (r.image_url as string) ?? null,
-    videoUrl: (r.video_url as string) ?? null,
-    videoThumbnailUrl: (r.video_thumbnail_url as string) ?? null,
     updatedAt: r.updated_at as string,
   };
 }
 
-function rowToContentCase(r: Record<string, unknown>): ContentCaseRow {
+export interface HeroSlideRow {
+  id: string;
+  imageUrl: string;
+  title: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToHeroSlide(r: Record<string, unknown>): HeroSlideRow {
   return {
     id: r.id as string,
-    groupKey: r.group_key as string,
-    itemKey: r.item_key as string,
-    productName: r.product_name as string,
-    equipmentImageUrl: (r.equipment_image_url as string) ?? null,
-    videoUrl: (r.video_url as string) ?? null,
-    productImageUrl: (r.product_image_url as string) ?? null,
+    imageUrl: r.image_url as string,
+    title: (r.title as string) ?? "",
+    sortOrder: Number(r.sort_order ?? 0),
     createdAt: r.created_at as string,
   };
 }
+
+export const heroSlideRepo = {
+  async list(): Promise<HeroSlideRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM hero_slides ORDER BY sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToHeroSlide);
+  },
+  async create(input: { imageUrl: string; title: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO hero_slides (id, image_url, title, sort_order, created_at)
+      VALUES (${newId()}, ${input.imageUrl}, ${input.title}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { imageUrl: string; title: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE hero_slides SET image_url = ${input.imageUrl}, title = ${input.title} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM hero_slides WHERE id = ${id}`;
+  },
+  async count(): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM hero_slides`;
+    return (rows[0] as { c: number }).c;
+  },
+};
 
 export const inquiryRepo = {
   async create(input: {
@@ -464,66 +506,18 @@ export const contentPageRepo = {
     const rows = await sql`SELECT * FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     return rows.length ? rowToContentPage(rows[0] as Record<string, unknown>) : null;
   },
-  async upsert(
-    groupKey: string,
-    itemKey: string,
-    input: { title: string; description: string; imageUrl?: string; videoUrl?: string; videoThumbnailUrl?: string }
-  ): Promise<void> {
+  async upsert(groupKey: string, itemKey: string, input: { title: string; description: string; imageUrl?: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_pages (group_key, item_key, title, description, image_url, video_url, video_thumbnail_url, updated_at)
-      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.videoUrl ?? null}, ${input.videoThumbnailUrl ?? null}, ${new Date().toISOString()})
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${new Date().toISOString()})
       ON CONFLICT (group_key, item_key) DO UPDATE SET
-        title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url,
-        video_url = EXCLUDED.video_url, video_thumbnail_url = EXCLUDED.video_thumbnail_url, updated_at = EXCLUDED.updated_at
+        title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
     `;
   },
   async count(groupKey: string): Promise<number> {
     await ensureSchema();
     const rows = await sql`SELECT COUNT(*)::int AS c FROM content_pages WHERE group_key = ${groupKey} AND description <> ''`;
-    return (rows[0] as { c: number }).c;
-  },
-};
-
-export const contentCaseRepo = {
-  async listByKey(groupKey: string, itemKey: string): Promise<ContentCaseRow[]> {
-    await ensureSchema();
-    const rows = await sql`SELECT * FROM content_cases WHERE group_key = ${groupKey} AND item_key = ${itemKey} ORDER BY created_at DESC`;
-    return (rows as Record<string, unknown>[]).map(rowToContentCase);
-  },
-  async create(input: {
-    groupKey: string;
-    itemKey: string;
-    productName: string;
-    equipmentImageUrl?: string;
-    videoUrl?: string;
-    productImageUrl?: string;
-  }): Promise<void> {
-    await ensureSchema();
-    await sql`
-      INSERT INTO content_cases (id, group_key, item_key, product_name, equipment_image_url, video_url, product_image_url, created_at)
-      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.productName}, ${input.equipmentImageUrl ?? null}, ${input.videoUrl ?? null}, ${input.productImageUrl ?? null}, ${new Date().toISOString()})
-    `;
-  },
-  async update(
-    id: string,
-    input: { productName: string; equipmentImageUrl?: string; videoUrl?: string; productImageUrl?: string }
-  ): Promise<void> {
-    await ensureSchema();
-    await sql`
-      UPDATE content_cases
-      SET product_name = ${input.productName}, equipment_image_url = ${input.equipmentImageUrl ?? null},
-          video_url = ${input.videoUrl ?? null}, product_image_url = ${input.productImageUrl ?? null}
-      WHERE id = ${id}
-    `;
-  },
-  async remove(id: string): Promise<void> {
-    await ensureSchema();
-    await sql`DELETE FROM content_cases WHERE id = ${id}`;
-  },
-  async count(groupKey: string, itemKey: string): Promise<number> {
-    await ensureSchema();
-    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_cases WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     return (rows[0] as { c: number }).c;
   },
 };
@@ -544,9 +538,59 @@ export const contentImageRepo = {
       VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.caption ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
     `;
   },
+  async update(id: string, input: { url: string; caption?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE content_images SET url = ${input.url}, caption = ${input.caption ?? null} WHERE id = ${id}`;
+  },
   async remove(id: string): Promise<void> {
     await ensureSchema();
     await sql`DELETE FROM content_images WHERE id = ${id}`;
+  },
+  async count(groupKey: string, itemKey: string): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+    return (rows[0] as { c: number }).c;
+  },
+};
+
+export const contentVideoRepo = {
+  async listByKey(groupKey: string, itemKey: string): Promise<ContentVideoRow[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT * FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    return (rows as Record<string, unknown>[]).map(rowToContentVideo);
+  },
+  async create(input: {
+    groupKey: string;
+    itemKey: string;
+    url: string;
+    thumbnailUrl?: string;
+    caption?: string;
+    sortOrder?: number;
+  }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO content_videos (id, group_key, item_key, url, thumbnail_url, caption, sort_order, created_at)
+      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.thumbnailUrl ?? null}, ${input.caption ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { url: string; thumbnailUrl?: string; caption?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE content_videos SET url = ${input.url}, thumbnail_url = ${input.thumbnailUrl ?? null}, caption = ${input.caption ?? null}
+      WHERE id = ${id}
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM content_videos WHERE id = ${id}`;
+  },
+  async count(groupKey: string, itemKey: string): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+    return (rows[0] as { c: number }).c;
   },
 };
 

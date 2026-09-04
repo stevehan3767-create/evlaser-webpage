@@ -32,6 +32,17 @@ declare global {
 
 function createSchema(): Promise<void> {
   return (async () => {
+    // Home page hero carousel slides (max 5, enforced in the admin action).
+    await sql`
+      CREATE TABLE IF NOT EXISTS hero_slides (
+        id TEXT PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        title TEXT NOT NULL DEFAULT '',
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     await sql`
       CREATE TABLE IF NOT EXISTS inquiries (
         id TEXT PRIMARY KEY,
@@ -130,8 +141,8 @@ function createSchema(): Promise<void> {
     `;
 
     // Generic article storage shared by every /products/[group]/[key] section
-    // (lineup/tech/industry/material): title + long-form description, plus
-    // application-case cards (product name / equipment image / video / product image).
+    // (lineup/tech/industry/material): title + long-form description
+    // (features/spec table authored as text), plus 적용사례 photos/videos below.
     await sql`
       CREATE TABLE IF NOT EXISTS content_pages (
         group_key TEXT NOT NULL,
@@ -139,8 +150,6 @@ function createSchema(): Promise<void> {
         title TEXT NOT NULL DEFAULT '',
         description TEXT NOT NULL DEFAULT '',
         image_url TEXT,
-        video_url TEXT,
-        video_thumbnail_url TEXT,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (group_key, item_key)
       )
@@ -148,30 +157,28 @@ function createSchema(): Promise<void> {
     // content_pages existed before these columns were added; make sure
     // older deployments pick them up too.
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS image_url TEXT`;
-    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS video_url TEXT`;
-    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS video_thumbnail_url TEXT`;
 
-    await sql`
-      CREATE TABLE IF NOT EXISTS content_cases (
-        id TEXT PRIMARY KEY,
-        group_key TEXT NOT NULL,
-        item_key TEXT NOT NULL,
-        product_name TEXT NOT NULL,
-        equipment_image_url TEXT,
-        video_url TEXT,
-        product_image_url TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-      )
-    `;
-
-    // General-purpose photo gallery per content page (e.g. 설비 사진/샘플
-    // 사진), separate from the "적용사례" cases above.
+    // 적용사례 photos (max 10, enforced in the admin action).
     await sql`
       CREATE TABLE IF NOT EXISTS content_images (
         id TEXT PRIMARY KEY,
         group_key TEXT NOT NULL,
         item_key TEXT NOT NULL,
         url TEXT NOT NULL,
+        caption TEXT,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    // 적용사례 videos (max 5, enforced in the admin action).
+    await sql`
+      CREATE TABLE IF NOT EXISTS content_videos (
+        id TEXT PRIMARY KEY,
+        group_key TEXT NOT NULL,
+        item_key TEXT NOT NULL,
+        url TEXT NOT NULL,
+        thumbnail_url TEXT,
         caption TEXT,
         sort_order INT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()

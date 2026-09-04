@@ -4,6 +4,8 @@ import Industries from "@/components/Industries";
 import TechSolutions from "@/components/TechSolutions";
 import Sitemap from "@/components/Sitemap";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

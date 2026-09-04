@@ -1,32 +1,14 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
+import HeroCarousel from "./HeroCarousel";
 import { showcaseSlides } from "@/lib/data";
+import { heroSlideRepo } from "@/lib/repo";
 
-export default function Hero() {
-  const t = useTranslations("hero");
-  const tShowcase = useTranslations("showcase");
-  const [slide, setSlide] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const start = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setSlide((s) => (s + 1) % showcaseSlides.length);
-    }, 4200);
-  };
-  const stop = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-  };
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduceMotion) start();
-    return stop;
-  }, []);
+export default async function Hero() {
+  const t = await getTranslations("hero");
+  const tShowcase = await getTranslations("showcase");
+  const heroSlides = await heroSlideRepo.list();
 
   return (
     <section
@@ -76,38 +58,25 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative border border-line bg-surface shadow-xl">
-          <div className="relative aspect-[4/3] overflow-hidden" onMouseEnter={stop} onMouseLeave={start}>
-            {showcaseSlides.map((s, i) => (
-              <div
-                key={s.key}
-                className="absolute inset-0 flex flex-col justify-end p-[22px] text-white transition-opacity"
-                style={{
-                  opacity: i === slide ? 1 : 0,
-                  background: `linear-gradient(135deg, ${s.from}, ${s.to})`,
-                  transitionDuration: "600ms",
-                }}
-              >
-                <Icon name={s.icon} className="w-[46px] h-[46px] opacity-90 mb-auto" strokeWidth={1.4} />
-                <span className="font-mono text-[10.5px] tracking-wider opacity-[.85]">{tShowcase(`${s.key}.tag`)}</span>
-                <h3 className="text-[19px] text-white mt-1">{tShowcase(`${s.key}.title`)}</h3>
-              </div>
-            ))}
+        {heroSlides.length > 0 ? (
+          <HeroCarousel slides={heroSlides.map((s) => ({ id: s.id, imageUrl: s.imageUrl, title: s.title }))} />
+        ) : (
+          <div className="relative border border-line bg-surface shadow-xl">
+            <div className="relative aspect-[4/3] overflow-hidden">
+              {showcaseSlides.map((s, i) => (
+                <div
+                  key={s.key}
+                  className="absolute inset-0 flex flex-col justify-end p-[22px] text-white"
+                  style={{ opacity: i === 0 ? 1 : 0, background: `linear-gradient(135deg, ${s.from}, ${s.to})` }}
+                >
+                  <Icon name={s.icon} className="w-[46px] h-[46px] opacity-90 mb-auto" strokeWidth={1.4} />
+                  <span className="font-mono text-[10.5px] tracking-wider opacity-[.85]">{tShowcase(`${s.key}.tag`)}</span>
+                  <h3 className="text-[19px] text-white mt-1">{tShowcase(`${s.key}.title`)}</h3>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-[7px] p-3.5 justify-center border-t border-line">
-            {showcaseSlides.map((s, i) => (
-              <button
-                key={s.key}
-                aria-label={`slide ${i + 1}`}
-                onClick={() => {
-                  setSlide(i);
-                  start();
-                }}
-                className={`w-5 h-[3px] ${i === slide ? "bg-red" : "bg-line-strong"}`}
-              />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="mx-auto max-w-[1240px] px-7 grid grid-cols-2 sm:grid-cols-4 border-t border-line">
