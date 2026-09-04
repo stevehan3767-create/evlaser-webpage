@@ -345,17 +345,44 @@ export const lineupItems: LineupItem[] = [
 
 export const lineupLabelsKo: Record<string, string> = Object.fromEntries(lineupItems.map((i) => [i.key, i.name]));
 
-export const lineupPageSeeds: { key: string; title: string; description: string }[] = lineupItems.map((i) => ({
-  key: i.key,
-  title: i.name,
-  description: `㈜이브이레이저의 ${i.name} 설비입니다. 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서 확인하실 수 있습니다: ${i.sourceUrl}\n\n관리자 모드에서 이 페이지에 실제 설비 사진, 동영상, 적용사례를 직접 등록할 수 있습니다.`,
-}));
+export const lineupPageSeeds: { key: string; title: string; description: string; imageUrl?: string }[] = lineupItems.map(
+  (i) => ({
+    key: i.key,
+    title: i.name,
+    description: `㈜이브이레이저의 ${i.name} 설비입니다. 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서 확인하실 수 있습니다: ${i.sourceUrl}\n\n관리자 모드에서 이 페이지에 실제 설비 사진, 동영상, 적용사례를 직접 등록할 수 있습니다.`,
+  })
+);
+
+// Real content for ELPW-TS Series (source: evlaser.co.kr product page,
+// provided by the user). Registered first as a trial of the richer
+// lineup-page template (hero image + text description); the other 11
+// series will follow the same pattern once confirmed.
+const tsSeriesSeed = lineupPageSeeds.find((s) => s.key === "tsSeries");
+if (tsSeriesSeed) {
+  tsSeriesSeed.title = "ELPW-TS Series";
+  tsSeriesSeed.imageUrl = "https://evlaser.co.kr/uploaded/product/4/large_8f5eb232deec620221c0feb0f0979c000.png";
+  tsSeriesSeed.description = [
+    "듀얼 셔틀 구동 방식 레이저 플라스틱 용접 시스템",
+    "",
+    "[주요 특징]",
+    "- 중대형 제품의 레이저 플라스틱 용접 시스템",
+    "- 검사 장치 추가 가능 구조",
+    "- 케이블 타입 제품 용접 가능 (하부 구조 제거 가능)",
+    "- 제품 특성에 따라 Beam Delivery Type 선정 가능",
+    "- 용접 전 제품의 구분 및 검사가 가능하여 안정적인 생산 가능",
+    "- 자동 불량 취출 기능 가능",
+    "- ATC(Auto Tool Change) 기능을 적용하여 다품종에 대한 안정적인 생산 가능",
+    "- 용접 완료 후 품질 검사 기능을 추가하여 생산된 제품의 고정밀 양/불 판정 가능",
+    "- Process Head 방식은 용접 시 온도측정을 이용한 양/불 판정 검사 방식 가능",
+    "- MES(Manufacturing Execution System) 구축 가능",
+  ].join("\n");
+}
 
 export interface ContentGroupMeta {
   items: { icon: IconName; key: string }[];
   labelsKo: Record<string, string>;
   i18nNamespace?: string;
-  seeds: { key: string; title: string; description: string }[];
+  seeds: { key: string; title: string; description: string; imageUrl?: string }[];
   backHref: string;
   labelKo: string;
 }

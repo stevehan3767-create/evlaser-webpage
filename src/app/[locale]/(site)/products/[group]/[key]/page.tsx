@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "@/components/Icon";
+import RichDescription from "@/components/RichDescription";
 import { contentGroups } from "@/lib/data";
-import { contentPageRepo, contentCaseRepo, seedContentIfEmpty } from "@/lib/repo";
+import { contentPageRepo, contentCaseRepo, contentImageRepo, seedContentIfEmpty } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,10 @@ export default async function ContentDetailPage({
   if (!meta || !item) notFound();
 
   await seedContentIfEmpty(group, meta.seeds);
-  const [page, cases, tp, tLabel] = await Promise.all([
+  const [page, cases, images, tp, tLabel] = await Promise.all([
     contentPageRepo.get(group, key),
     contentCaseRepo.listByKey(group, key),
+    contentImageRepo.listByKey(group, key),
     getTranslations("contentPage"),
     meta.i18nNamespace ? getTranslations(meta.i18nNamespace) : Promise.resolve(null),
   ]);
@@ -48,13 +50,35 @@ export default async function ContentDetailPage({
           <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>
         </div>
 
-        <div className="mt-8 max-w-[74ch]">
-          {page?.description ? (
-            <p className="text-ink-soft text-[14.5px] leading-relaxed whitespace-pre-wrap">{page.description}</p>
-          ) : (
-            <p className="text-ink-faint text-[13.5px]">{tp("descriptionEmpty")}</p>
+        <div className={`mt-8 grid gap-8 ${page?.imageUrl ? "lg:grid-cols-[1fr_360px]" : ""}`}>
+          <div className="max-w-[74ch]">
+            {page?.description ? (
+              <RichDescription text={page.description} />
+            ) : (
+              <p className="text-ink-faint text-[13.5px]">{tp("descriptionEmpty")}</p>
+            )}
+          </div>
+          {page?.imageUrl && (
+            <div className="border border-line-strong bg-surface-alt flex-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={page.imageUrl} alt={title} className="w-full h-auto object-cover" />
+            </div>
           )}
         </div>
+
+        {images.length > 0 && (
+          <div className="mt-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {images.map((img) => (
+                <figure key={img.id} className="border border-line-strong bg-surface">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt={img.caption ?? title} className="w-full aspect-[4/3] object-cover" />
+                  {img.caption && <figcaption className="p-2.5 text-[12px] text-ink-soft border-t border-line">{img.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-14 pt-10 border-t border-line">
           <h2 className="text-[18px] font-bold mb-6">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { contentGroups } from "@/lib/data";
-import { contentPageRepo, contentCaseRepo, seedContentIfEmpty } from "@/lib/repo";
-import { saveContentPage, saveContentCase, deleteContentCase } from "./actions";
+import { contentPageRepo, contentCaseRepo, contentImageRepo, seedContentIfEmpty } from "@/lib/repo";
+import { saveContentPage, saveContentCase, deleteContentCase, createContentImage, deleteContentImage } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,11 @@ export default async function AdminContentPagesPage({
   const key = meta.items.some((i) => i.key === rawKey) ? (rawKey as string) : meta.items[0].key;
 
   await seedContentIfEmpty(group, meta.seeds);
-  const [page, cases] = await Promise.all([contentPageRepo.get(group, key), contentCaseRepo.listByKey(group, key)]);
+  const [page, cases, images] = await Promise.all([
+    contentPageRepo.get(group, key),
+    contentCaseRepo.listByKey(group, key),
+    contentImageRepo.listByKey(group, key),
+  ]);
   const editingCase = editCase ? cases.find((c) => c.id === editCase) : undefined;
 
   return (
@@ -66,7 +70,18 @@ export default async function AdminContentPagesPage({
           />
         </div>
         <div>
-          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">내용 (A4 1장 분량 권장)</label>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">대표 이미지 URL (선택)</label>
+          <input
+            name="imageUrl"
+            defaultValue={page?.imageUrl ?? ""}
+            placeholder="https://..."
+            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+        </div>
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
+            내용 (A4 1장 분량 권장) — <code>| 항목 | 내용 |</code> 형식의 줄은 자동으로 표(사양서)로 변환됩니다
+          </label>
           <textarea
             name="description"
             defaultValue={page?.description ?? ""}
@@ -78,6 +93,39 @@ export default async function AdminContentPagesPage({
           저장
         </button>
       </form>
+
+      <h2 className="text-[15px] font-bold mb-3">이미지 갤러리 (설비 사진·샘플 사진 등)</h2>
+      <form action={createContentImage} className="border border-line p-5 mb-8 grid gap-3.5">
+        <input type="hidden" name="group" value={group} />
+        <input type="hidden" name="key" value={key} />
+        <input name="url" placeholder="이미지 URL" required className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+        <input name="caption" placeholder="설명 (예: 설비 사진, 선택)" className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          추가
+        </button>
+      </form>
+      <div className="border border-line mb-10">
+        {images.length === 0 ? (
+          <p className="p-4 text-[13px] text-ink-soft">등록된 이미지가 없습니다.</p>
+        ) : (
+          images.map((img) => (
+            <div key={img.id} className="flex items-start justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
+              <div className="flex-1">
+                {img.caption && <p className="font-bold">{img.caption}</p>}
+                <p className="mt-1 text-[11.5px] text-ink-faint break-all">{img.url}</p>
+              </div>
+              <form action={deleteContentImage}>
+                <input type="hidden" name="id" value={img.id} />
+                <input type="hidden" name="group" value={group} />
+                <input type="hidden" name="key" value={key} />
+                <button type="submit" className="text-[12px] text-red font-bold flex-none">
+                  삭제
+                </button>
+              </form>
+            </div>
+          ))
+        )}
+      </div>
 
       <h2 className="text-[15px] font-bold mb-3">적용사례{editingCase ? " 수정" : " 추가"}</h2>
       <form action={saveContentCase} className="border border-line p-5 mb-8 grid gap-3.5">

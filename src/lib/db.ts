@@ -138,10 +138,14 @@ function createSchema(): Promise<void> {
         item_key TEXT NOT NULL,
         title TEXT NOT NULL DEFAULT '',
         description TEXT NOT NULL DEFAULT '',
+        image_url TEXT,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (group_key, item_key)
       )
     `;
+    // content_pages existed before image_url was added; make sure older
+    // deployments pick it up too.
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS image_url TEXT`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS content_cases (
@@ -152,6 +156,20 @@ function createSchema(): Promise<void> {
         equipment_image_url TEXT,
         video_url TEXT,
         product_image_url TEXT,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    // General-purpose photo gallery per content page (e.g. 설비 사진/샘플
+    // 사진), separate from the "적용사례" cases above.
+    await sql`
+      CREATE TABLE IF NOT EXISTS content_images (
+        id TEXT PRIMARY KEY,
+        group_key TEXT NOT NULL,
+        item_key TEXT NOT NULL,
+        url TEXT NOT NULL,
+        caption TEXT,
+        sort_order INT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;

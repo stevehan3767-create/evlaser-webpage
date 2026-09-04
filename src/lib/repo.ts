@@ -131,7 +131,30 @@ export interface ContentPageRow {
   itemKey: string;
   title: string;
   description: string;
+  imageUrl: string | null;
   updatedAt: string;
+}
+
+export interface ContentImageRow {
+  id: string;
+  groupKey: string;
+  itemKey: string;
+  url: string;
+  caption: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToContentImage(r: Record<string, unknown>): ContentImageRow {
+  return {
+    id: r.id as string,
+    groupKey: r.group_key as string,
+    itemKey: r.item_key as string,
+    url: r.url as string,
+    caption: (r.caption as string) ?? null,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
 }
 
 export interface ContentCaseRow {
@@ -151,6 +174,7 @@ function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
     itemKey: r.item_key as string,
     title: (r.title as string) ?? "",
     description: (r.description as string) ?? "",
+    imageUrl: (r.image_url as string) ?? null,
     updatedAt: r.updated_at as string,
   };
 }
@@ -436,12 +460,12 @@ export const contentPageRepo = {
     const rows = await sql`SELECT * FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     return rows.length ? rowToContentPage(rows[0] as Record<string, unknown>) : null;
   },
-  async upsert(groupKey: string, itemKey: string, input: { title: string; description: string }): Promise<void> {
+  async upsert(groupKey: string, itemKey: string, input: { title: string; description: string; imageUrl?: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_pages (group_key, item_key, title, description, updated_at)
-      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${new Date().toISOString()})
-      ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, updated_at = EXCLUDED.updated_at
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${new Date().toISOString()})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
     `;
   },
   async count(groupKey: string): Promise<number> {
@@ -494,10 +518,35 @@ export const contentCaseRepo = {
   },
 };
 
-export async function seedContentIfEmpty(groupKey: string, seeds: { key: string; title: string; description: string }[]) {
+export const contentImageRepo = {
+  async listByKey(groupKey: string, itemKey: string): Promise<ContentImageRow[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT * FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    return (rows as Record<string, unknown>[]).map(rowToContentImage);
+  },
+  async create(input: { groupKey: string; itemKey: string; url: string; caption?: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at)
+      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.caption ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM content_images WHERE id = ${id}`;
+  },
+};
+
+export async function seedContentIfEmpty(
+  groupKey: string,
+  seeds: { key: string; title: string; description: string; imageUrl?: string }[]
+) {
   if ((await contentPageRepo.count(groupKey)) === 0) {
     for (const s of seeds) {
-      await contentPageRepo.upsert(groupKey, s.key, { title: s.title, description: s.description });
+      await contentPageRepo.upsert(groupKey, s.key, { title: s.title, description: s.description, imageUrl: s.imageUrl });
     }
   }
 }
