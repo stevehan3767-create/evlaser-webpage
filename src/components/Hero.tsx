@@ -37,10 +37,18 @@ export default async function Hero() {
 
       <div className="relative mx-auto max-w-[1240px] px-7 grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-12 items-center py-6 pb-14">
         <div>
-          <span className="eyebrow">{t("eyebrow")}</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 bg-red text-white font-mono font-extrabold text-[14px] sm:text-[15px] tracking-wider px-4 py-[8px] rounded-full shadow-[0_3px_14px_rgba(228,0,43,0.4)]">
+              SINCE 2002
+            </span>
+            <span className="text-[13.5px] sm:text-[14.5px] font-bold text-blue-deep tracking-wide">{t("tagline")}</span>
+          </div>
           <h1 className="mt-[18px] text-[32px] sm:text-[44px] lg:text-[52px] font-extrabold leading-tight tracking-tight text-balance font-[family-name:var(--font-display)]">
             {t.rich("title", { em: (chunks) => <em className="not-italic text-red">{chunks}</em> })}
           </h1>
+          {t("titleSub") && (
+            <p className="mt-2.5 text-[13.5px] sm:text-[15px] font-semibold tracking-wide text-blue uppercase">{t("titleSub")}</p>
+          )}
           <p className="mt-5 max-w-[52ch] text-ink-soft text-[16.5px]">{t("body")}</p>
           <div className="flex gap-3 mt-8 flex-wrap">
             <Link
@@ -82,9 +90,9 @@ export default async function Hero() {
       <div className="mx-auto max-w-[1240px] px-7 grid grid-cols-2 sm:grid-cols-4 border-t border-line">
         {[
           ["2002", "stat0"],
-          ["24+", "stat1"],
-          ["13", "stat2"],
-          ["4", "stat3"],
+          ["28", "stat1"],
+          ["11", "stat2"],
+          ["450+", "stat3"],
         ].map(([num, key], i) => (
           <div key={key} className={`py-[22px] px-[18px] ${i !== 0 ? "border-l border-line" : ""}`}>
             <b className="block font-mono text-[26px] sm:text-[28px] text-blue-deep">{num}</b>

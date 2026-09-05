@@ -78,15 +78,16 @@
     "since": "SINCE 2002"
   },
   "hero": {
-    "eyebrow": "SINCE 2002 · 专注激光技术企业",
-    "title": "以精密缔造<em>未来产业</em>",
+    "tagline": "专注激光技术企业",
+    "title": "更好的<em>激光技术</em>成就更好的世界",
+    "titleSub": "Better Laser technology shapes better world",
     "body": "从汽车、半导体到生物医疗与航空航天 —— EV Laser 的精密激光技术支撑着下一代制造现场。",
     "cta1": "了解产品技术",
     "cta2": "咨询合作",
     "stat0": "成立年份",
-    "stat1": "年激光技术经验",
-    "stat2": "细分服务行业",
-    "stat3": "全球服务语言"
+    "stat1": "国内外专利（件）",
+    "stat2": "国内外认证（件）",
+    "stat3": "全球合作伙伴（家）"
   },
   "showcase": {
     "s1": {

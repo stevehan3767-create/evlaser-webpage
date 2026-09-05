@@ -78,15 +78,16 @@
     "since": "SINCE 2002"
   },
   "hero": {
-    "eyebrow": "SINCE 2002 · レーザー技術専門企業",
-    "title": "精密さが<em>未来産業</em>をつくる",
+    "tagline": "レーザー技術専門企業",
+    "title": "より良い<em>レーザー技術</em>でより良い世界をつくる",
+    "titleSub": "Better Laser technology shapes better world",
     "body": "自動車、半導体からバイオメディカル、航空まで — EV Laserの精密レーザー技術が次世代の製造現場を支えます。",
     "cta1": "製品・技術を見る",
     "cta2": "お問い合わせ",
     "stat0": "設立年",
-    "stat1": "年のレーザー技術実績",
-    "stat2": "詳細対応産業",
-    "stat3": "対応言語数"
+    "stat1": "国内・国際特許（件）",
+    "stat2": "国内・国際認証（件）",
+    "stat3": "世界の協力会社（社）"
   },
   "showcase": {
     "s1": {

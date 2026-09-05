@@ -80,7 +80,7 @@ export default function Header() {
             </span>
           </Link>
 
-          <nav aria-label="Primary" className="hidden [@media(min-width:1180px)]:flex items-stretch flex-1 min-w-0">
+          <nav aria-label="Primary" className="hidden [@media(min-width:1320px)]:flex items-stretch flex-1 min-w-0">
             {NAV_SECTIONS.map(({ section, items, href }) => (
               <div key={section} className="relative group">
                 <Link
@@ -112,19 +112,24 @@ export default function Header() {
             </div>
           </nav>
 
-          <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1180px)]:ml-0">
+          <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1320px)]:ml-0">
             <button
-              aria-label="Search"
+              type="button"
+              aria-label={tSearch("label")}
               onClick={() => setSearchOpen((v) => !v)}
-              className="hidden [@media(min-width:1180px)]:flex w-[38px] h-[38px] items-center justify-center text-ink-soft hover:text-blue"
+              className="hidden [@media(min-width:1320px)]:flex items-center gap-1.5 h-[38px] px-3.5 border-2 border-blue rounded-full bg-blue-soft text-blue font-bold text-[13px] hover:bg-blue hover:text-white transition-colors"
             >
-              <svg viewBox="0 0 24 24" className="w-[19px] h-[19px]" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" className="w-[15px] h-[15px] flex-none" fill="none" stroke="currentColor" strokeWidth="2.2">
                 <circle cx="10.5" cy="10.5" r="6.5" />
                 <line x1="15.5" y1="15.5" x2="20.5" y2="20.5" />
               </svg>
+              {tSearch("label")}
             </button>
             {searchOpen && (
-              <form className="absolute top-full right-0 mt-px bg-surface border border-line shadow-lg p-2.5 flex items-center">
+              <form
+                className="absolute top-full right-0 mt-2 bg-surface border border-line shadow-lg p-3 flex items-center gap-2 z-10"
+                onSubmit={(e) => e.preventDefault()}
+              >
                 <input
                   autoFocus
                   type="search"
@@ -136,7 +141,7 @@ export default function Header() {
             <button
               aria-label="Menu"
               onClick={() => setDrawerOpen(true)}
-              className="flex [@media(min-width:1180px)]:hidden w-[38px] h-[38px] items-center justify-center"
+              className="flex [@media(min-width:1320px)]:hidden w-[38px] h-[38px] items-center justify-center"
             >
               <svg viewBox="0 0 24 24" className="w-[22px] h-[22px]" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <line x1="4" y1="7" x2="20" y2="7" />

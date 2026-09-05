@@ -33,7 +33,16 @@ export default function FileUploadField({
       });
       setUrl(blob.url);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "업로드에 실패했습니다.");
+      const message = e instanceof Error ? e.message : "";
+      if (message.includes("client token") || message.includes("BLOB_READ_WRITE_TOKEN")) {
+        setError(
+          "파일 저장소(Vercel Blob)가 아직 연결되지 않았습니다. Vercel 프로젝트의 Storage 탭에서 Blob 저장소를 생성한 뒤 다시 배포해 주세요."
+        );
+      } else if (message.includes("401")) {
+        setError("관리자 로그인이 만료되었습니다. 새로고침 후 다시 로그인해 주세요.");
+      } else {
+        setError(message || "업로드에 실패했습니다.");
+      }
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";

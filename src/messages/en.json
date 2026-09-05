@@ -78,15 +78,16 @@
     "since": "SINCE 2002"
   },
   "hero": {
-    "eyebrow": "SINCE 2002 · SPECIALIZED IN LASER TECHNOLOGY",
-    "title": "Precision engineering <em>the future of industry</em>",
+    "tagline": "SPECIALIZED IN LASER TECHNOLOGY",
+    "title": "Better <em>laser technology</em> shapes a better world",
+    "titleSub": "",
     "body": "From automotive and semiconductors to biomedical and aerospace — EV Laser's precision laser technology powers next-generation manufacturing.",
     "cta1": "Explore Technology",
     "cta2": "Talk to Us",
     "stat0": "Founded",
-    "stat1": "Years of laser expertise",
-    "stat2": "Specialized industries",
-    "stat3": "Languages supported"
+    "stat1": "Patents (KR/Intl.)",
+    "stat2": "Certifications (KR/Intl.)",
+    "stat3": "Partners worldwide"
   },
   "showcase": {
     "s1": {

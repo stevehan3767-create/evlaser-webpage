@@ -78,15 +78,16 @@
     "since": "SINCE 2002"
   },
   "hero": {
-    "eyebrow": "SINCE 2002 · 레이저기술 전문기업",
-    "title": "정밀함이 <em>미래 산업</em>을 만듭니다",
+    "tagline": "레이저기술 전문기업",
+    "title": "더 좋은 <em>레이저기술</em>로 더 좋은 세상을 만듭니다",
+    "titleSub": "Better Laser technology shapes better world",
     "body": "자동차·반도체·바이오의료·항공까지 — EV Laser의 정밀 레이저 기술이 차세대 제조 현장을 지탱합니다.",
     "cta1": "제품·기술 보기",
     "cta2": "상담 문의하기",
     "stat0": "설립 연도",
-    "stat1": "년간 레이저 기술 경험",
-    "stat2": "세부 산업 분야",
-    "stat3": "글로벌 서비스 언어"
+    "stat1": "국내·국제 특허 (건)",
+    "stat2": "국내·국제 인증 (건)",
+    "stat3": "전세계 협력사 (개)"
   },
   "showcase": {
     "s1": {
