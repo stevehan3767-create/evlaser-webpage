@@ -53,6 +53,29 @@ export default async function ContentDetailPage({
           <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>
         </div>
 
+        {/* 같은 그룹의 다른 항목으로 바로 이동 */}
+        <div className="flex flex-wrap gap-2 mt-6">
+          {meta.items.map((it) => {
+            const active = it.key === key;
+            const itemLabel = tLabel ? tLabel(it.key) : meta.labelsKo[it.key] ?? it.key;
+            return (
+              <Link
+                key={it.key}
+                href={`/products/${group}/${it.key}`}
+                aria-current={active ? "page" : undefined}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 border rounded-sm text-[12.5px] font-semibold whitespace-nowrap transition-colors ${
+                  active
+                    ? "bg-red text-white border-red"
+                    : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
+                }`}
+              >
+                <Icon name={it.icon} className="w-4 h-4 flex-none" strokeWidth={1.6} />
+                {itemLabel}
+              </Link>
+            );
+          })}
+        </div>
+
         {/* 2. 설비 사진 */}
         {page?.imageUrl && (
           <div className="mt-8 border border-line-strong bg-surface-alt overflow-hidden">
