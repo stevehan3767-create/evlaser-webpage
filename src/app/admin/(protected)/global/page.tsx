@@ -25,7 +25,7 @@ export default async function AdminGlobalPage({
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-8">글로벌 네트워크 관리</h1>
 
       <h2 className="text-[15px] font-bold mb-3">지사·연락처{officeBeingEdited && " — 수정"}</h2>
-      <form action={saveOffice} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form key={officeBeingEdited?.id ?? "new"} action={saveOffice} className="border border-line p-5 mb-8 grid gap-3.5">
         <input type="hidden" name="id" value={officeBeingEdited?.id ?? ""} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <input
@@ -101,7 +101,11 @@ export default async function AdminGlobalPage({
       </div>
 
       <h2 className="text-[15px] font-bold mb-3">대리점 찾기{distributorBeingEdited && " — 수정"}</h2>
-      <form action={saveDistributor} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form
+        key={distributorBeingEdited?.id ?? "new"}
+        action={saveDistributor}
+        className="border border-line p-5 mb-8 grid gap-3.5"
+      >
         <input type="hidden" name="id" value={distributorBeingEdited?.id ?? ""} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <select

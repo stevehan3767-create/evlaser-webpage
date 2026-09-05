@@ -16,7 +16,7 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-6">뉴스 관리{editing && " — 수정"}</h1>
 
-      <form action={saveNews} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form key={editing?.id ?? "new"} action={saveNews} className="border border-line p-5 mb-8 grid gap-3.5">
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr_140px] gap-3.5">
           <select name="tag" defaultValue={editing?.tag ?? "회사소식"} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm">

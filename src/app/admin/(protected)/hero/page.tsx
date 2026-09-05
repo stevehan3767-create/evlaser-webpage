@@ -24,7 +24,11 @@ export default async function AdminHeroPage({ searchParams }: { searchParams: Pr
           대표이미지는 최대 {MAX_SLIDES}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
         </p>
       ) : (
-        <form action={saveHeroSlide} className="border border-line p-5 mb-8 grid gap-3.5 max-w-[560px]">
+        <form
+          key={editing?.id ?? "new"}
+          action={saveHeroSlide}
+          className="border border-line p-5 mb-8 grid gap-3.5 max-w-[560px]"
+        >
           <input type="hidden" name="id" value={editing?.id ?? ""} />
           <FileUploadField
             name="imageUrl"

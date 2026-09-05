@@ -19,7 +19,7 @@ export default async function AdminFaqsPage({ searchParams }: { searchParams: Pr
         문의하기(/support) 페이지에 기본으로 표시되는 3개 질문 외에, 여기서 추가한 질문이 이어서 표시됩니다.
       </p>
 
-      <form action={saveFaq} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form key={editing?.id ?? "new"} action={saveFaq} className="border border-line p-5 mb-8 grid gap-3.5">
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">질문</label>

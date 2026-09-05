@@ -17,7 +17,7 @@ export default async function AdminResourcesPage({ searchParams }: { searchParam
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-6">자료실 관리{editing && " — 수정"}</h1>
 
-      <form action={saveResource} className="border border-line p-5 mb-8 grid gap-3.5">
+      <form key={editing?.id ?? "new"} action={saveResource} className="border border-line p-5 mb-8 grid gap-3.5">
         <input type="hidden" name="id" value={editing?.id ?? ""} />
         <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-3.5">
           <select name="category" defaultValue={editing?.category ?? "doc"} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm">

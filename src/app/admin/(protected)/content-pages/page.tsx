@@ -64,7 +64,7 @@ export default async function AdminContentPagesPage({
 
       {/* 1~3. 제목 / 대표 이미지 / 내용(캡션+주요특징+사양서) */}
       <h2 className="text-[15px] font-bold mb-3">제목 · 대표 이미지 · 내용</h2>
-      <form action={saveContentPage} className="border border-line p-5 mb-12 grid gap-3.5">
+      <form key={`${group}-${key}`} action={saveContentPage} className="border border-line p-5 mb-12 grid gap-3.5">
         <input type="hidden" name="group" value={group} />
         <input type="hidden" name="key" value={key} />
         <div>
@@ -109,7 +109,11 @@ export default async function AdminContentPagesPage({
           적용사례 사진은 최대 {MAX_IMAGES}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
         </p>
       ) : (
-        <form action={saveContentImage} className="border border-line p-5 mb-8 grid gap-3.5">
+        <form
+          key={`${group}-${key}-${editingImage?.id ?? "new"}`}
+          action={saveContentImage}
+          className="border border-line p-5 mb-8 grid gap-3.5"
+        >
           <input type="hidden" name="id" value={editingImage?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
@@ -175,7 +179,11 @@ export default async function AdminContentPagesPage({
           적용사례 동영상은 최대 {MAX_VIDEOS}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
         </p>
       ) : (
-        <form action={saveContentVideo} className="border border-line p-5 mb-8 grid gap-3.5">
+        <form
+          key={`${group}-${key}-${editingVideo?.id ?? "new"}`}
+          action={saveContentVideo}
+          className="border border-line p-5 mb-8 grid gap-3.5"
+        >
           <input type="hidden" name="id" value={editingVideo?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
