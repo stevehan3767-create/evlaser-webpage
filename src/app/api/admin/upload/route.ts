@@ -11,9 +11,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const body = (await request.json()) as HandleUploadBody;
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN?.trim();
 
   try {
     const jsonResponse = await handleUpload({
+      token: blobToken,
       body,
       request,
       onBeforeGenerateToken: async () => ({
