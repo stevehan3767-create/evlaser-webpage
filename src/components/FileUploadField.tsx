@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 
 export default function FileUploadField({
   name,
@@ -24,25 +23,25 @@ export default function FileUploadField({
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(file: File) {
+    if (file.size > 4 * 1024 * 1024) {
+      setError("파일 용량은 4MB를 넘을 수 없습니다.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
     setUploading(true);
     setError("");
     try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/admin/upload",
-      });
-      setUrl(blob.url);
+      const formData = new FormData();
+      formData.set("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data: { url?: string; error?: string } = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "업로드에 실패했습니다.");
+      }
+      setUrl(data.url);
     } catch (e) {
       const message = e instanceof Error ? e.message : "";
-      if (message.includes("client token") || message.includes("BLOB_READ_WRITE_TOKEN")) {
-        setError(
-          "파일 저장소(Vercel Blob)가 아직 연결되지 않았습니다. Vercel 프로젝트의 Storage 탭에서 Blob 저장소를 생성한 뒤 다시 배포해 주세요."
-        );
-      } else if (message.includes("401")) {
-        setError("관리자 로그인이 만료되었습니다. 새로고침 후 다시 로그인해 주세요.");
-      } else {
-        setError(message || "업로드에 실패했습니다.");
-      }
+      setError(message || "업로드에 실패했습니다.");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -80,7 +79,13 @@ export default function FileUploadField({
           {uploading ? "업로드 중..." : "파일 선택"}
         </button>
       </div>
-      {error && <p className="text-[11.5px] text-red">{error}</p>}
+      {error ? (
+        <p className="text-[11.5px] text-red">{error}</p>
+      ) : (
+        <p className="text-[11px] text-ink-faint">
+          파일 업로드는 4MB까지 가능합니다. 더 큰 동영상은 유튜브 등에 올린 뒤 그 주소를 입력해 주세요.
+        </p>
+      )}
       {preview === "image" && url && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
