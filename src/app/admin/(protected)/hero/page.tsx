@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { heroSlideRepo } from "@/lib/repo";
 import { saveHeroSlide, deleteHeroSlide } from "./actions";
+import FileUploadField from "@/components/FileUploadField";
 
 export const dynamic = "force-dynamic";
 
@@ -25,16 +26,13 @@ export default async function AdminHeroPage({ searchParams }: { searchParams: Pr
       ) : (
         <form action={saveHeroSlide} className="border border-line p-5 mb-8 grid gap-3.5 max-w-[560px]">
           <input type="hidden" name="id" value={editing?.id ?? ""} />
-          <div>
-            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">이미지 URL</label>
-            <input
-              name="imageUrl"
-              defaultValue={editing?.imageUrl ?? ""}
-              placeholder="https://..."
-              required
-              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-            />
-          </div>
+          <FileUploadField
+            name="imageUrl"
+            label="이미지"
+            defaultValue={editing?.imageUrl ?? ""}
+            accept="image/*"
+            preview="image"
+          />
           <div>
             <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목</label>
             <input

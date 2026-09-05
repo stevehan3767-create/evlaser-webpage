@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { resourceRepo } from "@/lib/repo";
 import { saveResource, deleteResource } from "./actions";
+import FileUploadField from "@/components/FileUploadField";
 
 export const dynamic = "force-dynamic";
 
@@ -40,11 +41,11 @@ export default async function AdminResourcesPage({ searchParams }: { searchParam
           rows={2}
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
         />
-        <input
+        <FileUploadField
           name="url"
-          placeholder="링크 URL (선택, 파일/영상 주소)"
+          label="첨부파일 / 링크 (선택, 파일 업로드 또는 URL 직접 입력)"
           defaultValue={editing?.url ?? ""}
-          className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          preview="none"
         />
         <div className="flex gap-3">
           <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">

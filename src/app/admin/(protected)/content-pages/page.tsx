@@ -2,6 +2,7 @@ import Link from "next/link";
 import { contentGroups } from "@/lib/data";
 import { contentPageRepo, contentImageRepo, contentVideoRepo, seedContentIfEmpty } from "@/lib/repo";
 import { saveContentPage, saveContentImage, deleteContentImage, saveContentVideo, deleteContentVideo } from "./actions";
+import FileUploadField from "@/components/FileUploadField";
 
 export const dynamic = "force-dynamic";
 
@@ -75,15 +76,13 @@ export default async function AdminContentPagesPage({
             className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
-        <div>
-          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">대표(설비) 이미지 URL</label>
-          <input
-            name="imageUrl"
-            defaultValue={page?.imageUrl ?? ""}
-            placeholder="https://..."
-            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
-          />
-        </div>
+        <FileUploadField
+          name="imageUrl"
+          label="대표(설비) 이미지"
+          defaultValue={page?.imageUrl ?? ""}
+          accept="image/*"
+          preview="image"
+        />
         <div>
           <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
             내용 (A4 1장 분량 권장) — 첫 줄은 이미지 아래 캡션(굵게·가운데정렬)으로, <code>[소제목]</code> 줄은 소제목으로,{" "}
@@ -114,12 +113,12 @@ export default async function AdminContentPagesPage({
           <input type="hidden" name="id" value={editingImage?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
-          <input
+          <FileUploadField
             name="url"
-            placeholder="이미지 URL"
+            label="이미지"
             defaultValue={editingImage?.url ?? ""}
-            required
-            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            accept="image/*"
+            preview="image"
           />
           <input
             name="caption"
@@ -180,18 +179,19 @@ export default async function AdminContentPagesPage({
           <input type="hidden" name="id" value={editingVideo?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
-          <input
+          <FileUploadField
             name="url"
-            placeholder="동영상 URL"
+            label="동영상"
             defaultValue={editingVideo?.url ?? ""}
-            required
-            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            accept="video/*"
+            preview="video"
           />
-          <input
+          <FileUploadField
             name="thumbnailUrl"
-            placeholder="동영상 미리보기 이미지 URL (선택)"
+            label="동영상 미리보기 이미지 (선택)"
             defaultValue={editingVideo?.thumbnailUrl ?? ""}
-            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            accept="image/*"
+            preview="image"
           />
           <input
             name="caption"

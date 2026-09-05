@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { toEmbeddableVideo } from "@/lib/videoEmbed";
 
 export default function LinkPreviewButton({
   url,
@@ -14,6 +15,7 @@ export default function LinkPreviewButton({
   children?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const embed = toEmbeddableVideo(url);
 
   return (
     <>
@@ -47,7 +49,11 @@ export default function LinkPreviewButton({
                 </svg>
               </button>
             </div>
-            <iframe src={url} className="flex-1 w-full border-0" />
+            {embed.kind === "video" ? (
+              <video src={embed.src} controls autoPlay className="flex-1 w-full bg-black" />
+            ) : (
+              <iframe src={embed.src} allow="autoplay; fullscreen; encrypted-media" allowFullScreen className="flex-1 w-full border-0" />
+            )}
             <div className="p-2.5 border-t border-line text-[11.5px] text-ink-faint text-center flex-none">
               화면이 표시되지 않으면 위의 &quot;새 탭에서 열기&quot;를 이용해 주세요.
             </div>
