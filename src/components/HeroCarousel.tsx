@@ -17,7 +17,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setSlide((s) => (s + 1) % slides.length);
-    }, 1500);
+    }, 2500);
   };
   const stop = () => {
     if (timerRef.current) clearInterval(timerRef.current);
