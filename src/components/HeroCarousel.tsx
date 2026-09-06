@@ -17,10 +17,14 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setSlide((s) => (s + 1) % slides.length);
-    }, 4200);
+    }, 1500);
   };
   const stop = () => {
     if (timerRef.current) clearInterval(timerRef.current);
+  };
+  const goTo = (i: number) => {
+    setSlide((i + slides.length) % slides.length);
+    start();
   };
 
   useEffect(() => {
@@ -45,6 +49,30 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
             </div>
           </div>
         ))}
+        {slides.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="이전 이미지"
+              onClick={() => goTo(slide - 1)}
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/35 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="다음 이미지"
+              onClick={() => goTo(slide + 1)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/35 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
       {slides.length > 1 && (
         <div className="flex gap-[7px] p-3.5 justify-center border-t border-line">
@@ -52,10 +80,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
             <button
               key={s.id}
               aria-label={`slide ${i + 1}`}
-              onClick={() => {
-                setSlide(i);
-                start();
-              }}
+              onClick={() => goTo(i)}
               className={`w-5 h-[3px] ${i === slide ? "bg-red" : "bg-line-strong"}`}
             />
           ))}
