@@ -1,4 +1,6 @@
-import { inquiryRepo } from "@/lib/repo";
+import { inquiryRepo, settingsRepo } from "@/lib/repo";
+import { DEFAULT_GENERAL_EMAIL, DEFAULT_CEO_EMAIL } from "@/lib/mail";
+import { saveInquiryEmails } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +12,50 @@ const CHANNEL_LABELS: Record<string, string> = {
 };
 
 export default async function AdminInquiriesPage() {
-  const items = await inquiryRepo.list();
+  const [items, generalEmail, ceoEmail] = await Promise.all([
+    inquiryRepo.list(),
+    settingsRepo.get("generalEmail"),
+    settingsRepo.get("ceoEmail"),
+  ]);
 
   return (
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-6">문의 내역</h1>
+
+      <h2 className="text-[15px] font-bold mb-3">문의 수신 이메일</h2>
+      <form action={saveInquiryEmails} className="border border-line p-5 mb-12 grid gap-3.5 max-w-[560px]">
+        <p className="text-[12.5px] text-ink-soft">
+          홈페이지 &quot;문의하기&quot;로 접수된 내용이 전달될 이메일 주소입니다. 일반 문의와 대표이사 직속 소통센터(윤리경영 신고·임직원
+          칭찬·고객불만)를 서로 다른 주소로 받을 수 있습니다.
+        </p>
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">일반 문의 수신 이메일</label>
+          <input
+            name="generalEmail"
+            type="email"
+            defaultValue={generalEmail ?? ""}
+            placeholder={DEFAULT_GENERAL_EMAIL}
+            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+        </div>
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">대표이사 직속 소통센터 수신 이메일</label>
+          <input
+            name="ceoEmail"
+            type="email"
+            defaultValue={ceoEmail ?? ""}
+            placeholder={DEFAULT_CEO_EMAIL}
+            className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          />
+        </div>
+        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          저장
+        </button>
+      </form>
+
+      <h2 className="text-[15px] font-bold mb-3">
+        접수된 문의 <span className="font-mono text-ink-faint text-[13px]">({items.length})</span>
+      </h2>
       <div className="border border-line">
         {items.length === 0 ? (
           <p className="p-4 text-[13px] text-ink-soft">아직 접수된 문의가 없습니다.</p>

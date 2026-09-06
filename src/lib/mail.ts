@@ -1,14 +1,16 @@
 import nodemailer from "nodemailer";
+import { settingsRepo } from "./repo";
 
-const CHANNEL_RECIPIENTS: Record<string, string | undefined> = {
-  general: process.env.MAIL_TO_GENERAL || "info@evlaser.co.kr",
-  ethics: process.env.MAIL_TO_CEO || "sbhan3763@naver.com",
-  praise: process.env.MAIL_TO_CEO || "sbhan3763@naver.com",
-  complaint: process.env.MAIL_TO_CEO || "sbhan3763@naver.com",
-};
+export const DEFAULT_GENERAL_EMAIL = process.env.MAIL_TO_GENERAL || "info@evlaser.co.kr";
+export const DEFAULT_CEO_EMAIL = process.env.MAIL_TO_CEO || "sbhan3763@naver.com";
 
-export function recipientForChannel(channel: string): string {
-  return CHANNEL_RECIPIENTS[channel] ?? CHANNEL_RECIPIENTS.general!;
+const CEO_CHANNELS = new Set(["ethics", "praise", "complaint"]);
+
+export async function recipientForChannel(channel: string): Promise<string> {
+  if (CEO_CHANNELS.has(channel)) {
+    return (await settingsRepo.get("ceoEmail")) || DEFAULT_CEO_EMAIL;
+  }
+  return (await settingsRepo.get("generalEmail")) || DEFAULT_GENERAL_EMAIL;
 }
 
 export function isMailConfigured(): boolean {
@@ -85,7 +87,7 @@ export async function sendInquiryEmail(input: {
   }
 
   const transporter = getTransporter();
-  const to = recipientForChannel(input.channel);
+  const to = await recipientForChannel(input.channel);
   const channelLabel: Record<string, string> = {
     general: "일반 문의",
     ethics: "윤리경영 신고",
