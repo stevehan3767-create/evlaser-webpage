@@ -27,13 +27,13 @@ function MessageBanner({ msg, only }: { msg?: string; only: string[] }) {
   const m = MESSAGES[msg];
   if (!m) return null;
   return (
-    <p
-      className={`mb-3 px-3.5 py-2.5 text-[13px] font-bold rounded-sm ${
+    <span
+      className={`inline-flex items-center px-3 py-2 text-[12.5px] font-bold rounded-sm ${
         m.tone === "ok" ? "bg-[#e9f7ee] text-[#0a7a3d] border border-[#b8e6c8]" : "bg-[#fdeceb] text-red border border-[#f5c2bd]"
       }`}
     >
       {m.text}
-    </p>
+    </span>
   );
 }
 
@@ -91,7 +91,6 @@ export default async function AdminContentPagesPage({
 
       {/* 1~3. 제목 / 대표 이미지 / 내용(캡션+주요특징+사양서) */}
       <h2 className="text-[15px] font-bold mb-3">제목 · 대표 이미지 · 내용</h2>
-      <MessageBanner msg={msg} only={["page_saved"]} />
       <form key={`${group}-${key}`} action={saveContentPage} className="border border-line p-5 mb-12 grid gap-3.5">
         <input type="hidden" name="group" value={group} />
         <input type="hidden" name="key" value={key} />
@@ -123,16 +122,19 @@ export default async function AdminContentPagesPage({
             className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y font-mono"
           />
         </div>
-        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
-          저장
-        </button>
+        <div className="flex items-center gap-3">
+          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            저장
+          </button>
+          <MessageBanner msg={msg} only={["page_saved"]} />
+        </div>
       </form>
 
       {/* 4. 적용사례 - 사진 */}
-      <h2 className="text-[15px] font-bold mb-3">
+      <h2 className="text-[15px] font-bold mb-3 flex items-center gap-2.5">
         적용사례 — 사진{editingImage ? " 수정" : ""} <span className="font-mono text-ink-faint text-[12px]">({images.length}/{MAX_IMAGES})</span>
+        <MessageBanner msg={msg} only={["image_max"]} />
       </h2>
-      <MessageBanner msg={msg} only={["image_added", "image_saved", "image_max", "image_error"]} />
       {!editingImage && images.length >= MAX_IMAGES ? (
         <p className="border border-line p-5 mb-8 text-[13px] text-ink-soft">
           적용사례 사진은 최대 {MAX_IMAGES}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
@@ -160,7 +162,7 @@ export default async function AdminContentPagesPage({
             defaultValue={editingImage?.caption ?? ""}
             className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
               {editingImage ? "저장" : "추가"}
             </button>
@@ -169,6 +171,7 @@ export default async function AdminContentPagesPage({
                 취소
               </Link>
             )}
+            <MessageBanner msg={msg} only={["image_added", "image_saved", "image_error"]} />
           </div>
         </form>
       )}
@@ -201,10 +204,10 @@ export default async function AdminContentPagesPage({
       </div>
 
       {/* 4. 적용사례 - 동영상 */}
-      <h2 className="text-[15px] font-bold mb-3">
+      <h2 className="text-[15px] font-bold mb-3 flex items-center gap-2.5">
         적용사례 — 동영상{editingVideo ? " 수정" : ""} <span className="font-mono text-ink-faint text-[12px]">({videos.length}/{MAX_VIDEOS})</span>
+        <MessageBanner msg={msg} only={["video_max"]} />
       </h2>
-      <MessageBanner msg={msg} only={["video_added", "video_saved", "video_max", "video_error"]} />
       {!editingVideo && videos.length >= MAX_VIDEOS ? (
         <p className="border border-line p-5 mb-8 text-[13px] text-ink-soft">
           적용사례 동영상은 최대 {MAX_VIDEOS}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
@@ -239,7 +242,7 @@ export default async function AdminContentPagesPage({
             defaultValue={editingVideo?.caption ?? ""}
             className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
               {editingVideo ? "저장" : "추가"}
             </button>
@@ -248,6 +251,7 @@ export default async function AdminContentPagesPage({
                 취소
               </Link>
             )}
+            <MessageBanner msg={msg} only={["video_added", "video_saved", "video_error"]} />
           </div>
         </form>
       )}
