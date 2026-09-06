@@ -8,6 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex gap-5 text-[13.5px] font-semibold">
           <Link href="/admin">대시보드</Link>
           <Link href="/admin/hero">메인화면 대표이미지 관리</Link>
+          <Link href="/admin/clients">주요 고객사 로고 관리</Link>
           <Link href="/admin/content-pages">제품·기술 페이지 관리</Link>
           <Link href="/admin/resources">자료실 관리</Link>
           <Link href="/admin/news">뉴스 관리</Link>

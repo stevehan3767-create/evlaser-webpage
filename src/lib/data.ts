@@ -574,6 +574,26 @@ export const certifications = [
   { image: "/images/certifications/cert-13.jpg", title: "벤처기업확인서" },
 ];
 
+// Initial 주요 고객사 name list, transcribed from the client-logo list the
+// user pasted (old-site 고객사 페이지 screenshot). Registered on first load
+// with a neutral placeholder image — the admin replaces each with the real
+// logo file via /admin/clients.
+export const defaultClientNames: string[] = [
+  "HYUNDAI", "KIA MOTORS", "HYUNDAI MOBIS", "SAMSUNG", "SAMSUNG 삼성전기", "SAMSUNG SDI",
+  "LG전자", "LG이노텍", "GM", "Continental", "TESLA", "POSCO",
+  "현대케피코", "LG화학", "현대IHL", "삼보에이앤티", "한전KPS", "DN AUTOMOTIVE",
+  "케이디에스", "대동모빌시스템", "대동시스템", "ITOPS AUTOMOTIVE", "WONIK QnC", "삼신화학공업",
+  "SEKONIX", "SECO에코플라스틱", "동아하이텍", "SAMYANG", "KOLON", "AMOSENSE",
+  "AMOTECH", "TE", "WOORY", "KANAVI MOBILITY", "ALPS ALPINE", "신성오토모티브",
+  "Inventage Lab", "INFAC", "AU Inc.", "MOATECH", "GNST", "DOOSAN",
+  "Guring", "티에스모스트", "POWERLOGICS", "POONGSAN SYSTEM", "HANKOOK", "myunghwa",
+  "HWA YOUNG", "INZI CONTROLS", "SL Corporation", "TPTAQ", "星宇股份", "삼성아이마켓코리아",
+  "SERVEONE", "KEP", "VAATZ", "DELPHI", "SMEC", "DMS",
+  "COAVIS", "SIS Corporation", "신화에프에이", "INZI DISPLAY", "MHE", "비케이티",
+  "MNtech", "동부라이텍", "대한소결금속", "DLS", "AP시스템", "MCNEX",
+  "엘엠에스", "SEMES", "성우하이텍", "ILJIN LED", "신화인터텍", "DUKIN",
+];
+
 export const showcaseSlides = [
   { key: "s1", icon: "weld" as IconName, from: "#0B4DA2", to: "#062C63" },
   { key: "s2", icon: "cut" as IconName, from: "#E4002B", to: "#7A0016" },

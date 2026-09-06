@@ -188,6 +188,17 @@ function createSchema(): Promise<void> {
       )
     `;
     await sql`ALTER TABLE content_videos ADD COLUMN IF NOT EXISTS content TEXT`;
+
+    // Main-page "주요 고객사" logo strip.
+    await sql`
+      CREATE TABLE IF NOT EXISTS client_logos (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        logo_url TEXT NOT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
   })();
 }
 

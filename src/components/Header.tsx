@@ -30,6 +30,7 @@ const LANG_LABELS: Record<string, string> = { ko: "한국어", en: "EN", zh: "�
 export default function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const t = useTranslations("nav");
   const tTop = useTranslations("topbar");
   const tSearch = useTranslations("search");
@@ -128,11 +129,19 @@ export default function Header() {
             {searchOpen && (
               <form
                 className="absolute top-full right-0 mt-2 bg-surface border border-line shadow-lg p-3 flex items-center gap-2 z-10"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const query = searchQuery.trim();
+                  if (!query) return;
+                  setSearchOpen(false);
+                  router.push({ pathname: "/search", query: { q: query } });
+                }}
               >
                 <input
                   autoFocus
                   type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={tSearch("placeholder")}
                   className="w-[240px] px-3 py-2 border border-line-strong bg-surface-alt text-[13px] text-ink rounded-sm"
                 />

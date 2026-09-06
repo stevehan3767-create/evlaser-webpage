@@ -242,6 +242,68 @@ export const heroSlideRepo = {
   },
 };
 
+export interface ClientLogoRow {
+  id: string;
+  name: string;
+  logoUrl: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToClientLogo(r: Record<string, unknown>): ClientLogoRow {
+  return {
+    id: r.id as string,
+    name: r.name as string,
+    logoUrl: r.logo_url as string,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const clientLogoRepo = {
+  async list(): Promise<ClientLogoRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM client_logos ORDER BY sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToClientLogo);
+  },
+  async create(input: { name: string; logoUrl: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO client_logos (id, name, logo_url, sort_order, created_at)
+      VALUES (${newId()}, ${input.name}, ${input.logoUrl}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { name: string; logoUrl: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE client_logos SET name = ${input.name}, logo_url = ${input.logoUrl} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM client_logos WHERE id = ${id}`;
+  },
+};
+
+// Neutral "logo pending" placeholder shown until the admin uploads the real
+// logo file for a seeded client name — a self-contained SVG data URI, never
+// a hotlinked external image.
+function placeholderLogoDataUri(name: string): string {
+  const label = (name.length > 20 ? name.slice(0, 19) + "…" : name)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="160"><rect width="300" height="160" fill="#f2f4f7"/><text x="150" y="86" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#6b7280" text-anchor="middle">${label}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+export async function seedClientLogosIfEmpty(names: string[]): Promise<void> {
+  await ensureSchema();
+  const rows = await sql`SELECT COUNT(*)::int AS c FROM client_logos`;
+  if ((rows[0] as { c: number }).c > 0) return;
+  for (let i = 0; i < names.length; i++) {
+    await clientLogoRepo.create({ name: names[i], logoUrl: placeholderLogoDataUri(names[i]), sortOrder: i });
+  }
+}
+
 export const inquiryRepo = {
   async create(input: {
     channel: string;
@@ -523,6 +585,11 @@ export const contentPageRepo = {
     await ensureSchema();
     const rows = await sql`SELECT COUNT(*)::int AS c FROM content_pages WHERE group_key = ${groupKey} AND description <> ''`;
     return (rows[0] as { c: number }).c;
+  },
+  async listAll(): Promise<ContentPageRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM content_pages`;
+    return (rows as Record<string, unknown>[]).map(rowToContentPage);
   },
 };
 
