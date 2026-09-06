@@ -9,6 +9,7 @@ export default function FileUploadField({
   accept,
   preview = "image",
   placeholder,
+  required,
 }: {
   name: string;
   label: string;
@@ -16,6 +17,7 @@ export default function FileUploadField({
   accept?: string;
   preview?: "image" | "video" | "none";
   placeholder?: string;
+  required?: boolean;
 }) {
   const [url, setUrl] = useState(defaultValue ?? "");
   const [uploading, setUploading] = useState(false);
@@ -57,7 +59,8 @@ export default function FileUploadField({
           name={name}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder={placeholder ?? "파일을 업로드하거나 URL을 입력하세요"}
+          required={required}
+          placeholder={uploading ? "업로드 중입니다. 잠시만 기다려 주세요..." : placeholder ?? "파일을 업로드하거나 URL을 입력하세요"}
           className="flex-1 min-w-0 border border-line-strong px-3 py-2.5 text-[13px] rounded-sm"
         />
         <input
