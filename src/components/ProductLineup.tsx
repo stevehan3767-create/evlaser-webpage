@@ -1,10 +1,17 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
-import { lineupItems } from "@/lib/data";
+import { lineupItems, contentGroups } from "@/lib/data";
+import { contentPageRepo, seedContentIfEmpty } from "@/lib/repo";
 
-export default function ProductLineup() {
-  const t = useTranslations("productLineup");
+export default async function ProductLineup() {
+  const t = await getTranslations("productLineup");
+  const meta = contentGroups.lineup;
+  await seedContentIfEmpty("lineup", meta.seeds);
+  const pages = await contentPageRepo.listAll().catch(() => []);
+  const imageByKey = new Map(
+    pages.filter((p) => p.groupKey === "lineup" && p.imageUrl).map((p) => [p.itemKey, p.imageUrl as string])
+  );
 
   return (
     <section id="lineup" className="py-16 sm:py-22 border-b border-line">
@@ -14,16 +21,25 @@ export default function ProductLineup() {
         <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("desc")}</p>
 
         <div className="mt-8 grid gap-px bg-line border border-line" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-          {lineupItems.map((item) => (
-            <Link
-              key={item.key}
-              href={`/products/lineup/${item.key}`}
-              className="group bg-surface p-5 flex flex-col gap-2.5 min-h-[110px] hover:bg-surface-alt transition-colors"
-            >
-              <Icon name={item.icon} className="w-7 h-7 text-red" strokeWidth={1.5} />
-              <h3 className="text-[14px] font-semibold leading-snug mt-0.5">{item.name}</h3>
-            </Link>
-          ))}
+          {lineupItems.map((item) => {
+            const imageUrl = imageByKey.get(item.key);
+            return (
+              <Link
+                key={item.key}
+                href={`/products/lineup/${item.key}`}
+                className="group bg-surface flex flex-col min-h-[110px] hover:bg-surface-alt transition-colors"
+              >
+                {imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={imageUrl} alt="" className="w-full h-[72px] object-cover bg-surface-alt border-b border-line" />
+                )}
+                <div className="p-5 flex flex-col gap-2.5">
+                  <Icon name={item.icon} className="w-7 h-7 text-red" strokeWidth={1.5} />
+                  <h3 className="text-[14px] font-semibold leading-snug mt-0.5">{item.name}</h3>
+                </div>
+              </Link>
+            );
+          })}
         </div>
         <p className="mt-5 text-ink-faint text-[12px]">{t("note")}</p>
       </div>
