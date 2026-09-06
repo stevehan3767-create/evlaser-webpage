@@ -17,6 +17,16 @@ function backTo(group: string, key: string, msg: string): string {
   return `/admin/content-pages?group=${group}&key=${key}&msg=${msg}`;
 }
 
+function parseStagedList<T>(raw: FormDataEntryValue | null): T[] {
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 // Saves everything present on the page in one submit — the main title/
 // image/description, and (if filled in) one 적용사례 photo and one
 // 적용사례 video — so filling in several sections before pressing the
@@ -31,27 +41,15 @@ export async function saveContentAll(formData: FormData) {
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   await contentPageRepo.upsert(group, key, { title, description, imageUrl: imageUrl || undefined });
 
+  // Editing one existing photo/video is a direct, immediate update.
   const imgId = String(formData.get("imgId") ?? "").trim();
   const imgUrl = String(formData.get("imgUrl") ?? "").trim();
   const imgCaption = String(formData.get("imgCaption") ?? "").trim();
   const imgContent = String(formData.get("imgContent") ?? "").trim();
   let msg = "page_saved";
-  if (imgUrl) {
-    if (imgId) {
-      await contentImageRepo.update(imgId, { url: imgUrl, caption: imgCaption || undefined, content: imgContent || undefined });
-      msg = "image_saved";
-    } else if ((await contentImageRepo.count(group, key)) < MAX_IMAGES) {
-      await contentImageRepo.create({
-        groupKey: group,
-        itemKey: key,
-        url: imgUrl,
-        caption: imgCaption || undefined,
-        content: imgContent || undefined,
-      });
-      msg = "image_added";
-    } else {
-      msg = "image_max";
-    }
+  if (imgId && imgUrl) {
+    await contentImageRepo.update(imgId, { url: imgUrl, caption: imgCaption || undefined, content: imgContent || undefined });
+    msg = "image_saved";
   }
 
   const vidId = String(formData.get("vidId") ?? "").trim();
@@ -59,22 +57,59 @@ export async function saveContentAll(formData: FormData) {
   const vidThumbnailUrl = String(formData.get("vidThumbnailUrl") ?? "").trim();
   const vidCaption = String(formData.get("vidCaption") ?? "").trim();
   const vidContent = String(formData.get("vidContent") ?? "").trim();
-  if (vidUrl) {
-    const vidInput = {
+  if (vidId && vidUrl) {
+    await contentVideoRepo.update(vidId, {
       url: vidUrl,
       thumbnailUrl: vidThumbnailUrl || undefined,
       caption: vidCaption || undefined,
       content: vidContent || undefined,
-    };
-    if (vidId) {
-      await contentVideoRepo.update(vidId, vidInput);
-      msg = "video_saved";
-    } else if ((await contentVideoRepo.count(group, key)) < MAX_VIDEOS) {
-      await contentVideoRepo.create({ groupKey: group, itemKey: key, ...vidInput });
-      msg = "video_added";
-    } else {
-      msg = "video_max";
+    });
+    msg = "video_saved";
+  }
+
+  // New photos/videos staged client-side (add several, then one 저장 persists
+  // all of them together) arrive as JSON arrays.
+  const newImages = parseStagedList<{ url: string; caption: string; content: string }>(formData.get("newImages"));
+  if (newImages.length > 0) {
+    let count = await contentImageRepo.count(group, key);
+    let added = 0;
+    for (const item of newImages) {
+      if (!item.url || count >= MAX_IMAGES) continue;
+      await contentImageRepo.create({
+        groupKey: group,
+        itemKey: key,
+        url: item.url,
+        caption: item.caption || undefined,
+        content: item.content || undefined,
+      });
+      count += 1;
+      added += 1;
     }
+    if (added > 0) msg = "image_added";
+    if (added < newImages.length) msg = "image_max";
+  }
+
+  const newVideos = parseStagedList<{ url: string; thumbnailUrl: string; caption: string; content: string }>(
+    formData.get("newVideos")
+  );
+  if (newVideos.length > 0) {
+    let count = await contentVideoRepo.count(group, key);
+    let added = 0;
+    for (const item of newVideos) {
+      if (!item.url || count >= MAX_VIDEOS) continue;
+      await contentVideoRepo.create({
+        groupKey: group,
+        itemKey: key,
+        url: item.url,
+        thumbnailUrl: item.thumbnailUrl || undefined,
+        caption: item.caption || undefined,
+        content: item.content || undefined,
+      });
+      count += 1;
+      added += 1;
+    }
+    if (added > 0) msg = "video_added";
+    if (added < newVideos.length) msg = "video_max";
   }
 
   revalidatePath("/admin/content-pages");

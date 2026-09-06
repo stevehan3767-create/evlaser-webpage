@@ -3,6 +3,8 @@ import { contentGroups } from "@/lib/data";
 import { contentPageRepo, contentImageRepo, contentVideoRepo, seedContentIfEmpty } from "@/lib/repo";
 import { saveContentAll, deleteContentImage, deleteContentVideo } from "./actions";
 import FileUploadField from "@/components/FileUploadField";
+import CaseImageStager from "@/components/CaseImageStager";
+import CaseVideoStager from "@/components/CaseVideoStager";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +16,10 @@ const MESSAGES: Record<string, { text: string; tone: "ok" | "error" }> = {
   page_saved: { text: "저장되었습니다.", tone: "ok" },
   image_added: { text: "저장되었습니다. (사진 추가됨)", tone: "ok" },
   image_saved: { text: "저장되었습니다. (사진 수정됨)", tone: "ok" },
-  image_max: { text: `저장되었습니다. 단, 적용사례 사진은 최대 ${MAX_IMAGES}개까지라 사진은 추가되지 않았습니다.`, tone: "error" },
+  image_max: { text: `저장되었습니다. 단, 적용사례 사진은 최대 ${MAX_IMAGES}개까지라 일부 사진은 추가되지 않았습니다.`, tone: "error" },
   video_added: { text: "저장되었습니다. (동영상 추가됨)", tone: "ok" },
   video_saved: { text: "저장되었습니다. (동영상 수정됨)", tone: "ok" },
-  video_max: { text: `저장되었습니다. 단, 적용사례 동영상은 최대 ${MAX_VIDEOS}개까지라 동영상은 추가되지 않았습니다.`, tone: "error" },
+  video_max: { text: `저장되었습니다. 단, 적용사례 동영상은 최대 ${MAX_VIDEOS}개까지라 일부 동영상은 추가되지 않았습니다.`, tone: "error" },
 };
 
 function MessageBanner({ msg }: { msg?: string }) {
@@ -54,8 +56,6 @@ export default async function AdminContentPagesPage({
   const editingImage = editImage ? images.find((i) => i.id === editImage) : undefined;
   const editingVideo = editVideo ? videos.find((v) => v.id === editVideo) : undefined;
   const baseHref = `/admin/content-pages?group=${group}&key=${key}`;
-  const imageFull = !editingImage && images.length >= MAX_IMAGES;
-  const videoFull = !editingVideo && videos.length >= MAX_VIDEOS;
 
   return (
     <div>
@@ -90,8 +90,8 @@ export default async function AdminContentPagesPage({
       </div>
 
       <p className="text-[12.5px] text-ink-soft mb-4">
-        아래 내용은 <b>하나의 저장 버튼</b>으로 한 번에 저장됩니다 — 제목·대표이미지·내용을 채우고, 적용사례 사진·동영상까지 함께
-        입력한 뒤 맨 아래 저장 버튼을 한 번만 누르면 전부 저장됩니다.
+        아래 내용은 <b>하나의 저장 버튼</b>으로 한 번에 저장됩니다 — 제목·대표이미지·내용을 채우고, 적용사례 사진·동영상은 하나씩{" "}
+        <b>+ 추가</b> 버튼으로 원하는 만큼 쌓아둔 뒤, 맨 아래 <b>저장</b> 버튼을 한 번만 누르면 전부 저장됩니다.
       </p>
 
       <form key={`${group}-${key}-${editingImage?.id ?? "newimg"}-${editingVideo?.id ?? "newvid"}`} action={saveContentAll} className="border border-line p-5 mb-10 grid gap-8">
@@ -134,22 +134,18 @@ export default async function AdminContentPagesPage({
         {/* 4. 적용사례 - 사진 */}
         <div className="grid gap-3.5 pt-6 border-t border-line">
           <h2 className="text-[15px] font-bold flex items-center gap-2.5">
-            적용사례 — 사진{editingImage ? " 수정" : " 추가"}{" "}
+            적용사례 — 사진{editingImage ? " 수정" : ""}{" "}
             <span className="font-mono text-ink-faint text-[12px]">({images.length}/{MAX_IMAGES})</span>
           </h2>
-          {imageFull ? (
-            <p className="text-[13px] text-ink-soft">
-              적용사례 사진은 최대 {MAX_IMAGES}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
-            </p>
-          ) : (
+          {editingImage ? (
             <>
-              <input type="hidden" name="imgId" value={editingImage?.id ?? ""} />
+              <input type="hidden" name="imgId" value={editingImage.id} />
               <div>
                 <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목 (선택)</label>
                 <input
                   name="imgCaption"
                   placeholder="예: 제품명"
-                  defaultValue={editingImage?.caption ?? ""}
+                  defaultValue={editingImage.caption ?? ""}
                   className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
                 />
               </div>
@@ -158,16 +154,22 @@ export default async function AdminContentPagesPage({
                 <textarea
                   name="imgContent"
                   rows={2}
-                  defaultValue={editingImage?.content ?? ""}
+                  defaultValue={editingImage.content ?? ""}
                   className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
                 />
               </div>
-              <FileUploadField name="imgUrl" label="이미지" defaultValue={editingImage?.url ?? ""} accept="image/*" preview="image" />
-              {editingImage && (
-                <Link href={baseHref} className="justify-self-start inline-flex items-center px-4 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm">
-                  사진 수정 취소
-                </Link>
-              )}
+              <FileUploadField name="imgUrl" label="이미지" defaultValue={editingImage.url} accept="image/*" preview="image" />
+              <Link href={baseHref} className="justify-self-start inline-flex items-center px-4 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm">
+                사진 수정 취소
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-[12px] text-ink-faint -mt-1">
+                사진을 채우고 <b>+ 사진 추가</b>를 누르면 아래 목록에 임시로 쌓입니다. 필요한 만큼 반복한 뒤, 맨 아래{" "}
+                <b>저장</b> 버튼을 눌러야 실제로 저장됩니다.
+              </p>
+              <CaseImageStager fieldName="newImages" remaining={Math.max(0, MAX_IMAGES - images.length)} />
             </>
           )}
         </div>
@@ -175,22 +177,18 @@ export default async function AdminContentPagesPage({
         {/* 4. 적용사례 - 동영상 */}
         <div className="grid gap-3.5 pt-6 border-t border-line">
           <h2 className="text-[15px] font-bold flex items-center gap-2.5">
-            적용사례 — 동영상{editingVideo ? " 수정" : " 추가"}{" "}
+            적용사례 — 동영상{editingVideo ? " 수정" : ""}{" "}
             <span className="font-mono text-ink-faint text-[12px]">({videos.length}/{MAX_VIDEOS})</span>
           </h2>
-          {videoFull ? (
-            <p className="text-[13px] text-ink-soft">
-              적용사례 동영상은 최대 {MAX_VIDEOS}개까지 등록할 수 있습니다. 새로 추가하려면 기존 항목을 먼저 삭제해 주세요.
-            </p>
-          ) : (
+          {editingVideo ? (
             <>
-              <input type="hidden" name="vidId" value={editingVideo?.id ?? ""} />
+              <input type="hidden" name="vidId" value={editingVideo.id} />
               <div>
                 <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목 (선택)</label>
                 <input
                   name="vidCaption"
                   placeholder="예: 적용 영상 제목"
-                  defaultValue={editingVideo?.caption ?? ""}
+                  defaultValue={editingVideo.caption ?? ""}
                   className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
                 />
               </div>
@@ -199,23 +197,29 @@ export default async function AdminContentPagesPage({
                 <textarea
                   name="vidContent"
                   rows={2}
-                  defaultValue={editingVideo?.content ?? ""}
+                  defaultValue={editingVideo.content ?? ""}
                   className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
                 />
               </div>
               <FileUploadField
                 name="vidThumbnailUrl"
                 label="동영상 미리보기 이미지 (선택)"
-                defaultValue={editingVideo?.thumbnailUrl ?? ""}
+                defaultValue={editingVideo.thumbnailUrl ?? ""}
                 accept="image/*"
                 preview="image"
               />
-              <FileUploadField name="vidUrl" label="동영상" defaultValue={editingVideo?.url ?? ""} accept="video/*" preview="video" />
-              {editingVideo && (
-                <Link href={baseHref} className="justify-self-start inline-flex items-center px-4 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm">
-                  동영상 수정 취소
-                </Link>
-              )}
+              <FileUploadField name="vidUrl" label="동영상" defaultValue={editingVideo.url} accept="video/*" preview="video" />
+              <Link href={baseHref} className="justify-self-start inline-flex items-center px-4 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm">
+                동영상 수정 취소
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-[12px] text-ink-faint -mt-1">
+                동영상을 채우고 <b>+ 동영상 추가</b>를 누르면 아래 목록에 임시로 쌓입니다. 필요한 만큼 반복한 뒤, 맨 아래{" "}
+                <b>저장</b> 버튼을 눌러야 실제로 저장됩니다.
+              </p>
+              <CaseVideoStager fieldName="newVideos" remaining={Math.max(0, MAX_VIDEOS - videos.length)} />
             </>
           )}
         </div>

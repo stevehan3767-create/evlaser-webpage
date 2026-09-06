@@ -10,6 +10,7 @@ export default function FileUploadField({
   preview = "image",
   placeholder,
   required,
+  onValueChange,
 }: {
   name: string;
   label: string;
@@ -18,11 +19,17 @@ export default function FileUploadField({
   preview?: "image" | "video" | "none";
   placeholder?: string;
   required?: boolean;
+  onValueChange?: (url: string) => void;
 }) {
-  const [url, setUrl] = useState(defaultValue ?? "");
+  const [url, setUrlState] = useState(defaultValue ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  function setUrl(next: string) {
+    setUrlState(next);
+    onValueChange?.(next);
+  }
 
   async function handleFile(file: File) {
     if (file.size > 4 * 1024 * 1024) {
