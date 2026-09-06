@@ -7,6 +7,7 @@
         "history": "沿革",
         "business": "事業分野",
         "patents": "特許・認証",
+        "clients": "主要顧客",
         "directions": "アクセス",
         "organization": "組織図"
       }
@@ -646,6 +647,11 @@
       "summary": "(株)EVLASERは、韓国内で認められた23件の特許と13件の認証により、最高水準の技術力を保有しています。品質と信頼を基盤に、お客様と共に成長してまいります。",
       "patentsHeading": "特許",
       "certsHeading": "認証"
+    },
+    "clients": {
+      "eyebrow": "OUR PARTNERS",
+      "title": "主要顧客",
+      "desc": "(株)EVLASERと共に成長してきた主要顧客です。"
     },
     "organization": {
       "eyebrow": "ORGANIZATION",

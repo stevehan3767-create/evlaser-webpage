@@ -16,7 +16,8 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-2">주요 고객사 로고 관리</h1>
       <p className="text-[13px] text-ink-soft mb-6">
-        메인화면 하단에 표시되는 주요 고객사 로고입니다. 등록된 순서대로 노출되며, 로고 이미지는 화면에서 동일한 크기 박스 안에
+        회사소개 페이지의 &quot;주요 고객사&quot; 섹션(회사소개 메뉴 → 주요 고객사)에 표시되는 로고입니다. 등록된 순서대로
+        노출되며, 로고 이미지는 화면에서 동일한 크기 박스 안에
         비율을 유지한 채 자동으로 맞춰집니다. 가급적 배경이 투명하거나 흰색인 고해상도 이미지를 등록해 주세요.
         <br />
         아래 목록은 기존 고객사 명단을 기준으로 임시 등록된 항목이며, 회색 placeholder 로고로 표시된 항목은 아직 실제

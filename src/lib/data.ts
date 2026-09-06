@@ -206,6 +206,7 @@ export const companyNav: NavItem[] = [
   { key: "organization", href: "/company#organization" },
   { key: "business", href: "/company#business" },
   { key: "patents", href: "/company#patents" },
+  { key: "clients", href: "/company#clients" },
   { key: "directions", href: "/global#offices" },
 ];
 

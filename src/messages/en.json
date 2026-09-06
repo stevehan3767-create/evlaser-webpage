@@ -7,6 +7,7 @@
         "history": "History",
         "business": "Business Areas",
         "patents": "Patents & Certs",
+        "clients": "Key Clients",
         "directions": "Directions",
         "organization": "Organization"
       }
@@ -646,6 +647,11 @@
       "summary": "EVLASER CO., LTD. holds the highest level of technical expertise, backed by 23 domestically registered patents and 13 certifications. We grow together with our customers on a foundation of quality and trust.",
       "patentsHeading": "Patents",
       "certsHeading": "Certifications"
+    },
+    "clients": {
+      "eyebrow": "OUR PARTNERS",
+      "title": "Key Clients",
+      "desc": "Major clients who have grown together with EVLASER CO., LTD."
     },
     "organization": {
       "eyebrow": "ORGANIZATION",

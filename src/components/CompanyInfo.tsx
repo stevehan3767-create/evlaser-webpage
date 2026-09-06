@@ -1,8 +1,9 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
-import { patents, certifications, orgChart } from "@/lib/data";
+import { patents, certifications, orgChart, defaultClientNames } from "@/lib/data";
+import { clientLogoRepo, seedClientLogosIfEmpty } from "@/lib/repo";
 
 interface HistoryYear {
   year: string;
@@ -15,12 +16,15 @@ interface OrgUnitDetail {
   tasks: string[];
 }
 
-export default function CompanyInfo() {
-  const t = useTranslations("company");
+export default async function CompanyInfo() {
+  const t = await getTranslations("company");
   const greetingParagraphs = t.raw("greeting.paragraphs") as string[];
   const historyItems = t.raw("history.items") as HistoryYear[];
   const org = t.raw("organization") as { ceoTitle: string; ceoName: string };
   const orgUnits = t.raw("organization.units") as Record<string, OrgUnitDetail>;
+  const clientLogos = await seedClientLogosIfEmpty(defaultClientNames)
+    .then(() => clientLogoRepo.list())
+    .catch(() => []);
 
   return (
     <>
@@ -169,6 +173,29 @@ export default function CompanyInfo() {
           </div>
         </div>
       </section>
+
+      {clientLogos.length > 0 && (
+        <section id="clients" className="py-16 sm:py-22 border-b border-line scroll-mt-24">
+          <div className="mx-auto max-w-[1240px] px-7">
+            <span className="eyebrow">{t("clients.eyebrow")}</span>
+            <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{t("clients.title")}</h2>
+            <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("clients.desc")}</p>
+
+            <div className="mt-9 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+              {clientLogos.map((l) => (
+                <div
+                  key={l.id}
+                  title={l.name}
+                  className="flex items-center justify-center h-[84px] border border-line-strong bg-white p-3"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={l.logoUrl} alt={l.name} className="max-w-full max-h-full object-contain" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

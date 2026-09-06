@@ -7,6 +7,7 @@
         "history": "发展历程",
         "business": "业务领域",
         "patents": "专利与认证",
+        "clients": "主要客户",
         "directions": "交通指南",
         "organization": "组织架构"
       }
@@ -646,6 +647,11 @@
       "summary": "(株)EVLASER凭借在韩国获得认可的23项专利与13项认证，拥有最高水平的技术实力，并以品质与信赖为基础与客户共同成长。",
       "patentsHeading": "专利",
       "certsHeading": "认证"
+    },
+    "clients": {
+      "eyebrow": "OUR PARTNERS",
+      "title": "主要客户",
+      "desc": "与(株)EVLASER共同成长的主要客户。"
     },
     "organization": {
       "eyebrow": "ORGANIZATION",
