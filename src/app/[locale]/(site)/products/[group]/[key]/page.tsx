@@ -107,8 +107,11 @@ export default async function ContentDetailPage({
                     <figure key={img.id} className="border border-line-strong bg-surface">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={img.url} alt={img.caption ?? title} className="w-full aspect-square object-cover" />
-                      {img.caption && (
-                        <figcaption className="p-2 text-[12px] text-ink-soft border-t border-line text-center">{img.caption}</figcaption>
+                      {(img.caption || img.content) && (
+                        <figcaption className="p-2 text-[12px] text-ink-soft border-t border-line text-center">
+                          {img.caption && <span className="block font-bold text-ink">{img.caption}</span>}
+                          {img.content && <span className="block mt-0.5 whitespace-pre-wrap">{img.content}</span>}
+                        </figcaption>
                       )}
                     </figure>
                   ))}
@@ -132,7 +135,8 @@ export default async function ContentDetailPage({
                           </span>
                         </span>
                       </LinkPreviewButton>
-                      {v.caption && <p className="mt-2 text-[12.5px] text-ink-soft text-center">{v.caption}</p>}
+                      {v.caption && <p className="mt-2 text-[12.5px] font-bold text-ink text-center">{v.caption}</p>}
+                      {v.content && <p className="mt-0.5 text-[12.5px] text-ink-soft text-center whitespace-pre-wrap">{v.content}</p>}
                     </div>
                   ))}
                 </div>

@@ -29,7 +29,7 @@ function MessageBanner({ msg, only }: { msg?: string; only: string[] }) {
   return (
     <span
       className={`inline-flex items-center px-3 py-2 text-[12.5px] font-bold rounded-sm ${
-        m.tone === "ok" ? "bg-[#e9f7ee] text-[#0a7a3d] border border-[#b8e6c8]" : "bg-[#fdeceb] text-red border border-[#f5c2bd]"
+        m.tone === "ok" ? "bg-[#e9f7ee] text-[#0a7a3d] border border-[#b8e6c8] msg-blink-fade" : "bg-[#fdeceb] text-red border border-[#f5c2bd]"
       }`}
     >
       {m.text}
@@ -148,6 +148,24 @@ export default async function AdminContentPagesPage({
           <input type="hidden" name="id" value={editingImage?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목 (선택)</label>
+            <input
+              name="caption"
+              placeholder="예: 제품명"
+              defaultValue={editingImage?.caption ?? ""}
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">내용 (선택, 2줄 이내 권장)</label>
+            <textarea
+              name="content"
+              rows={2}
+              defaultValue={editingImage?.content ?? ""}
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
+            />
+          </div>
           <FileUploadField
             name="url"
             label="이미지"
@@ -155,12 +173,6 @@ export default async function AdminContentPagesPage({
             accept="image/*"
             preview="image"
             required
-          />
-          <input
-            name="caption"
-            placeholder="설명 (예: 제품명, 선택)"
-            defaultValue={editingImage?.caption ?? ""}
-            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
           <div className="flex items-center gap-3">
             <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
@@ -179,10 +191,14 @@ export default async function AdminContentPagesPage({
         {images.length === 0 ? (
           <p className="p-4 text-[13px] text-ink-soft">등록된 사진이 없습니다.</p>
         ) : (
-          images.map((img) => (
+          images.map((img, i) => (
             <div key={img.id} className="flex items-start justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
               <div className="flex-1">
-                {img.caption && <p className="font-bold">{img.caption}</p>}
+                <p className="font-bold">
+                  <span className="font-mono text-ink-faint">이미지{i + 1}</span>
+                  {img.caption && <> — {img.caption}</>}
+                </p>
+                {img.content && <p className="mt-1 text-ink-soft whitespace-pre-wrap">{img.content}</p>}
                 <p className="mt-1 text-[11.5px] text-ink-faint break-all">{img.url}</p>
               </div>
               <div className="flex gap-3 flex-none">
@@ -221,14 +237,24 @@ export default async function AdminContentPagesPage({
           <input type="hidden" name="id" value={editingVideo?.id ?? ""} />
           <input type="hidden" name="group" value={group} />
           <input type="hidden" name="key" value={key} />
-          <FileUploadField
-            name="url"
-            label="동영상"
-            defaultValue={editingVideo?.url ?? ""}
-            accept="video/*"
-            preview="video"
-            required
-          />
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">제목 (선택)</label>
+            <input
+              name="caption"
+              placeholder="예: 적용 영상 제목"
+              defaultValue={editingVideo?.caption ?? ""}
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">내용 (선택, 2줄 이내 권장)</label>
+            <textarea
+              name="content"
+              rows={2}
+              defaultValue={editingVideo?.content ?? ""}
+              className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
+            />
+          </div>
           <FileUploadField
             name="thumbnailUrl"
             label="동영상 미리보기 이미지 (선택)"
@@ -236,11 +262,13 @@ export default async function AdminContentPagesPage({
             accept="image/*"
             preview="image"
           />
-          <input
-            name="caption"
-            placeholder="제목 (선택)"
-            defaultValue={editingVideo?.caption ?? ""}
-            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+          <FileUploadField
+            name="url"
+            label="동영상"
+            defaultValue={editingVideo?.url ?? ""}
+            accept="video/*"
+            preview="video"
+            required
           />
           <div className="flex items-center gap-3">
             <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
@@ -259,10 +287,14 @@ export default async function AdminContentPagesPage({
         {videos.length === 0 ? (
           <p className="p-4 text-[13px] text-ink-soft">등록된 동영상이 없습니다.</p>
         ) : (
-          videos.map((v) => (
+          videos.map((v, i) => (
             <div key={v.id} className="flex items-start justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
               <div className="flex-1">
-                {v.caption && <p className="font-bold">{v.caption}</p>}
+                <p className="font-bold">
+                  <span className="font-mono text-ink-faint">동영상{i + 1}</span>
+                  {v.caption && <> — {v.caption}</>}
+                </p>
+                {v.content && <p className="mt-1 text-ink-soft whitespace-pre-wrap">{v.content}</p>}
                 <p className="mt-1 text-[11.5px] text-ink-faint break-all">{v.url}</p>
               </div>
               <div className="flex gap-3 flex-none">

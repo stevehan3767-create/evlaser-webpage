@@ -37,19 +37,20 @@ export async function saveContentImage(formData: FormData) {
   const key = String(formData.get("key") ?? "");
   const url = String(formData.get("url") ?? "").trim();
   const caption = String(formData.get("caption") ?? "").trim();
+  const content = String(formData.get("content") ?? "").trim();
   if (!isValid(group, key) || !url) {
     if (isValid(group, key)) redirect(backTo(group, key, "image_error"));
     return;
   }
 
   if (id) {
-    await contentImageRepo.update(id, { url, caption: caption || undefined });
+    await contentImageRepo.update(id, { url, caption: caption || undefined, content: content || undefined });
     revalidatePath("/admin/content-pages");
     revalidatePath(`/products/${group}/${key}`);
     redirect(backTo(group, key, "image_saved"));
   } else {
     if ((await contentImageRepo.count(group, key)) >= MAX_IMAGES) redirect(backTo(group, key, "image_max"));
-    await contentImageRepo.create({ groupKey: group, itemKey: key, url, caption: caption || undefined });
+    await contentImageRepo.create({ groupKey: group, itemKey: key, url, caption: caption || undefined, content: content || undefined });
     revalidatePath("/admin/content-pages");
     revalidatePath(`/products/${group}/${key}`);
     redirect(backTo(group, key, "image_added"));
@@ -73,12 +74,13 @@ export async function saveContentVideo(formData: FormData) {
   const url = String(formData.get("url") ?? "").trim();
   const thumbnailUrl = String(formData.get("thumbnailUrl") ?? "").trim();
   const caption = String(formData.get("caption") ?? "").trim();
+  const content = String(formData.get("content") ?? "").trim();
   if (!isValid(group, key) || !url) {
     if (isValid(group, key)) redirect(backTo(group, key, "video_error"));
     return;
   }
 
-  const input = { url, thumbnailUrl: thumbnailUrl || undefined, caption: caption || undefined };
+  const input = { url, thumbnailUrl: thumbnailUrl || undefined, caption: caption || undefined, content: content || undefined };
   if (id) {
     await contentVideoRepo.update(id, input);
     revalidatePath("/admin/content-pages");

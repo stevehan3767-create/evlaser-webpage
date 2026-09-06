@@ -158,7 +158,7 @@ function createSchema(): Promise<void> {
     // older deployments pick them up too.
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS image_url TEXT`;
 
-    // 적용사례 photos (max 10, enforced in the admin action).
+    // 적용사례 photos (max 5, enforced in the admin action).
     await sql`
       CREATE TABLE IF NOT EXISTS content_images (
         id TEXT PRIMARY KEY,
@@ -166,10 +166,12 @@ function createSchema(): Promise<void> {
         item_key TEXT NOT NULL,
         url TEXT NOT NULL,
         caption TEXT,
+        content TEXT,
         sort_order INT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    await sql`ALTER TABLE content_images ADD COLUMN IF NOT EXISTS content TEXT`;
 
     // 적용사례 videos (max 5, enforced in the admin action).
     await sql`
@@ -180,10 +182,12 @@ function createSchema(): Promise<void> {
         url TEXT NOT NULL,
         thumbnail_url TEXT,
         caption TEXT,
+        content TEXT,
         sort_order INT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    await sql`ALTER TABLE content_videos ADD COLUMN IF NOT EXISTS content TEXT`;
   })();
 }
 

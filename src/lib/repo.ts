@@ -141,6 +141,7 @@ export interface ContentImageRow {
   itemKey: string;
   url: string;
   caption: string | null;
+  content: string | null;
   sortOrder: number;
   createdAt: string;
 }
@@ -152,6 +153,7 @@ function rowToContentImage(r: Record<string, unknown>): ContentImageRow {
     itemKey: r.item_key as string,
     url: r.url as string,
     caption: (r.caption as string) ?? null,
+    content: (r.content as string) ?? null,
     sortOrder: Number(r.sort_order ?? 0),
     createdAt: r.created_at as string,
   };
@@ -164,6 +166,7 @@ export interface ContentVideoRow {
   url: string;
   thumbnailUrl: string | null;
   caption: string | null;
+  content: string | null;
   sortOrder: number;
   createdAt: string;
 }
@@ -176,6 +179,7 @@ function rowToContentVideo(r: Record<string, unknown>): ContentVideoRow {
     url: r.url as string,
     thumbnailUrl: (r.thumbnail_url as string) ?? null,
     caption: (r.caption as string) ?? null,
+    content: (r.content as string) ?? null,
     sortOrder: Number(r.sort_order ?? 0),
     createdAt: r.created_at as string,
   };
@@ -527,20 +531,20 @@ export const contentImageRepo = {
     await ensureSchema();
     const rows = await sql`
       SELECT * FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}
-      ORDER BY sort_order ASC, created_at ASC
+      ORDER BY created_at DESC
     `;
     return (rows as Record<string, unknown>[]).map(rowToContentImage);
   },
-  async create(input: { groupKey: string; itemKey: string; url: string; caption?: string; sortOrder?: number }): Promise<void> {
+  async create(input: { groupKey: string; itemKey: string; url: string; caption?: string; content?: string; sortOrder?: number }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at)
-      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.caption ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+      INSERT INTO content_images (id, group_key, item_key, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.caption ?? null}, ${input.content ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
     `;
   },
-  async update(id: string, input: { url: string; caption?: string }): Promise<void> {
+  async update(id: string, input: { url: string; caption?: string; content?: string }): Promise<void> {
     await ensureSchema();
-    await sql`UPDATE content_images SET url = ${input.url}, caption = ${input.caption ?? null} WHERE id = ${id}`;
+    await sql`UPDATE content_images SET url = ${input.url}, caption = ${input.caption ?? null}, content = ${input.content ?? null} WHERE id = ${id}`;
   },
   async remove(id: string): Promise<void> {
     await ensureSchema();
@@ -558,7 +562,7 @@ export const contentVideoRepo = {
     await ensureSchema();
     const rows = await sql`
       SELECT * FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}
-      ORDER BY sort_order ASC, created_at ASC
+      ORDER BY created_at DESC
     `;
     return (rows as Record<string, unknown>[]).map(rowToContentVideo);
   },
@@ -568,18 +572,19 @@ export const contentVideoRepo = {
     url: string;
     thumbnailUrl?: string;
     caption?: string;
+    content?: string;
     sortOrder?: number;
   }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_videos (id, group_key, item_key, url, thumbnail_url, caption, sort_order, created_at)
-      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.thumbnailUrl ?? null}, ${input.caption ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+      INSERT INTO content_videos (id, group_key, item_key, url, thumbnail_url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${input.groupKey}, ${input.itemKey}, ${input.url}, ${input.thumbnailUrl ?? null}, ${input.caption ?? null}, ${input.content ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
     `;
   },
-  async update(id: string, input: { url: string; thumbnailUrl?: string; caption?: string }): Promise<void> {
+  async update(id: string, input: { url: string; thumbnailUrl?: string; caption?: string; content?: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      UPDATE content_videos SET url = ${input.url}, thumbnail_url = ${input.thumbnailUrl ?? null}, caption = ${input.caption ?? null}
+      UPDATE content_videos SET url = ${input.url}, thumbnail_url = ${input.thumbnailUrl ?? null}, caption = ${input.caption ?? null}, content = ${input.content ?? null}
       WHERE id = ${id}
     `;
   },

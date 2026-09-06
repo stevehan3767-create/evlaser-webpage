@@ -80,3 +80,24 @@ body {
   background: var(--red);
   flex: none;
 }
+
+@keyframes msgBlinkFade {
+  0%,
+  20%,
+  40% {
+    opacity: 1;
+  }
+  10%,
+  30% {
+    opacity: 0.15;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.msg-blink-fade {
+  animation: msgBlinkFade 5s ease-out forwards;
+}
