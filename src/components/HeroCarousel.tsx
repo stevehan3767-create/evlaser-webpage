@@ -33,12 +33,12 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative border border-line bg-surface shadow-xl">
-      <div className="relative aspect-[4/3] overflow-hidden" onMouseEnter={stop} onMouseLeave={start}>
+    <div className="relative border border-line bg-surface shadow-xl max-w-[700px] mx-auto md:mx-0">
+      <div className="relative aspect-[7/5] overflow-hidden" onMouseEnter={stop} onMouseLeave={start}>
         {slides.map((s, i) => (
           <div key={s.id} className="absolute inset-0 transition-opacity" style={{ opacity: i === slide ? 1 : 0, transitionDuration: "600ms" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={s.imageUrl} alt={s.title} className="absolute inset-0 w-full h-full object-cover" />
+            <img src={s.imageUrl} alt={s.title} className="absolute inset-0 w-full h-full object-cover object-center" />
             <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.05) 55%, transparent 75%)" }} />
             <div className="absolute inset-x-0 bottom-0 p-[22px]">
               <h3 className="text-[19px] font-bold text-white text-balance">{s.title}</h3>
