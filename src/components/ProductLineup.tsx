@@ -27,15 +27,15 @@ export default async function ProductLineup() {
               <Link
                 key={item.key}
                 href={`/products/lineup/${item.key}`}
-                className="group bg-surface flex flex-col min-h-[110px] hover:bg-surface-alt transition-colors"
+                className="group bg-surface flex flex-col hover:bg-surface-alt transition-colors"
               >
                 {imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={imageUrl} alt="" className="w-full h-[72px] object-cover bg-surface-alt border-b border-line" />
                 )}
-                <div className="p-5 flex flex-col gap-2.5">
-                  <Icon name={item.icon} className="w-7 h-7 text-red" strokeWidth={1.5} />
-                  <h3 className="text-[14px] font-semibold leading-snug mt-0.5">{item.name}</h3>
+                <div className="flex-1 px-3 py-2.5 flex items-center justify-center gap-2">
+                  <Icon name={item.icon} className="w-5 h-5 text-red flex-none" strokeWidth={1.5} />
+                  <h3 className="text-[13.5px] font-semibold leading-snug text-center">{item.name}</h3>
                 </div>
               </Link>
             );
