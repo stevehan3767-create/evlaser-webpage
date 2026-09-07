@@ -628,8 +628,11 @@ export const contentItemRepo = {
     await sql`DELETE FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     await sql`DELETE FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     await sql`DELETE FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
-    if (groupKey === "lineup") await sql`DELETE FROM lineup_tech_links WHERE item_key = ${itemKey}`;
-    if (groupKey === "tech") await sql`DELETE FROM lineup_tech_links WHERE tech_key = ${itemKey}`;
+    if (groupKey === "lineup") {
+      await sql`DELETE FROM lineup_category_links WHERE item_key = ${itemKey}`;
+    } else {
+      await sql`DELETE FROM lineup_category_links WHERE category_group = ${groupKey} AND category_key = ${itemKey}`;
+    }
   },
   async count(groupKey: string): Promise<number> {
     await ensureSchema();
@@ -638,30 +641,40 @@ export const contentItemRepo = {
   },
 };
 
-// Which 기술종류별 categories a given 설비 라인업 item applies (many-to-many),
-// so a tech's detail page can list the equipment that uses it.
-export const lineupTechLinkRepo = {
-  async techKeysForItem(itemKey: string): Promise<string[]> {
+// Which 기술종류별/산업분야별/재료별 categories a given 설비 라인업 item
+// belongs to (many-to-many per category group), so each category's detail
+// page can list the equipment tagged with it, and 설비 라인업 can filter by
+// category.
+export const lineupCategoryLinkRepo = {
+  async categoryKeysForItem(itemKey: string, categoryGroup: string): Promise<string[]> {
     await ensureSchema();
-    const rows = await sql`SELECT tech_key FROM lineup_tech_links WHERE item_key = ${itemKey}`;
-    return (rows as { tech_key: string }[]).map((r) => r.tech_key);
+    const rows = await sql`
+      SELECT category_key FROM lineup_category_links WHERE item_key = ${itemKey} AND category_group = ${categoryGroup}
+    `;
+    return (rows as { category_key: string }[]).map((r) => r.category_key);
   },
-  async itemKeysForTech(techKey: string): Promise<string[]> {
+  async itemKeysForCategory(categoryGroup: string, categoryKey: string): Promise<string[]> {
     await ensureSchema();
-    const rows = await sql`SELECT item_key FROM lineup_tech_links WHERE tech_key = ${techKey}`;
+    const rows = await sql`
+      SELECT item_key FROM lineup_category_links WHERE category_group = ${categoryGroup} AND category_key = ${categoryKey}
+    `;
     return (rows as { item_key: string }[]).map((r) => r.item_key);
   },
-  async setForItem(itemKey: string, techKeys: string[]): Promise<void> {
+  async setForItem(itemKey: string, categoryGroup: string, categoryKeys: string[]): Promise<void> {
     await ensureSchema();
-    await sql`DELETE FROM lineup_tech_links WHERE item_key = ${itemKey}`;
-    for (const techKey of techKeys) {
-      await sql`INSERT INTO lineup_tech_links (item_key, tech_key) VALUES (${itemKey}, ${techKey}) ON CONFLICT DO NOTHING`;
+    await sql`DELETE FROM lineup_category_links WHERE item_key = ${itemKey} AND category_group = ${categoryGroup}`;
+    for (const categoryKey of categoryKeys) {
+      await sql`
+        INSERT INTO lineup_category_links (item_key, category_group, category_key)
+        VALUES (${itemKey}, ${categoryGroup}, ${categoryKey})
+        ON CONFLICT DO NOTHING
+      `;
     }
   },
-  async listAll(): Promise<{ itemKey: string; techKey: string }[]> {
+  async listAll(categoryGroup: string): Promise<{ itemKey: string; categoryKey: string }[]> {
     await ensureSchema();
-    const rows = await sql`SELECT item_key, tech_key FROM lineup_tech_links`;
-    return (rows as { item_key: string; tech_key: string }[]).map((r) => ({ itemKey: r.item_key, techKey: r.tech_key }));
+    const rows = await sql`SELECT item_key, category_key FROM lineup_category_links WHERE category_group = ${categoryGroup}`;
+    return (rows as { item_key: string; category_key: string }[]).map((r) => ({ itemKey: r.item_key, categoryKey: r.category_key }));
   },
 };
 

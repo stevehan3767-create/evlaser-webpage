@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { contentGroups, iconNames } from "@/lib/data";
-import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo, lineupTechLinkRepo } from "@/lib/repo";
+import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo, lineupCategoryLinkRepo } from "@/lib/repo";
+
+const LINEUP_CATEGORY_GROUPS = ["tech", "industry", "material"] as const;
 
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 5;
@@ -42,11 +44,14 @@ export async function saveContentAll(formData: FormData) {
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   await contentPageRepo.upsert(group, key, { title, description, imageUrl: imageUrl || undefined });
 
-  // 설비 라인업 항목은 어떤 기술종류별 카테고리에 쓰이는지 다중 선택으로 저장 —
-  // 해당 기술의 상세페이지에 "관련 설비" 목록으로 표시된다.
+  // 설비 라인업 항목은 기술종류별/산업분야별/재료별 카테고리에 각각 다중
+  // 선택으로 연결할 수 있다 — 해당 카테고리의 상세페이지에 "관련 설비"
+  // 목록으로 표시되고, 설비 라인업 섹션에서 카테고리별로 필터링된다.
   if (group === "lineup") {
-    const techKeys = formData.getAll("techKeys").map(String).filter(Boolean);
-    await lineupTechLinkRepo.setForItem(key, techKeys);
+    for (const categoryGroup of LINEUP_CATEGORY_GROUPS) {
+      const keys = formData.getAll(`${categoryGroup}Keys`).map(String).filter(Boolean);
+      await lineupCategoryLinkRepo.setForItem(key, categoryGroup, keys);
+    }
   }
 
   // Editing one existing photo/video is a direct, immediate update.

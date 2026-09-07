@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { contentGroups } from "@/lib/data";
-import { contentItemRepo, contentPageRepo, lineupTechLinkRepo, seedContentItemsIfEmpty } from "@/lib/repo";
+import { contentItemRepo, contentPageRepo, lineupCategoryLinkRepo, seedContentItemsIfEmpty } from "@/lib/repo";
 import LineupTechBrowser from "./LineupTechBrowser";
 
 export default async function ProductLineup() {
@@ -14,14 +14,14 @@ export default async function ProductLineup() {
     contentItemRepo.listByGroup("lineup"),
     contentItemRepo.listByGroup("tech"),
     contentPageRepo.listAll().catch(() => []),
-    lineupTechLinkRepo.listAll(),
+    lineupCategoryLinkRepo.listAll("tech"),
   ]);
   const imageByKey = new Map(
     pages.filter((p) => p.groupKey === "lineup" && p.imageUrl).map((p) => [p.itemKey, p.imageUrl as string])
   );
   const techKeysByItem = new Map<string, string[]>();
   for (const link of links) {
-    techKeysByItem.set(link.itemKey, [...(techKeysByItem.get(link.itemKey) ?? []), link.techKey]);
+    techKeysByItem.set(link.itemKey, [...(techKeysByItem.get(link.itemKey) ?? []), link.categoryKey]);
   }
 
   const lineupCards = lineupItems.map((item) => ({

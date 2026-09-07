@@ -5,7 +5,7 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
-  lineupTechLinkRepo,
+  lineupCategoryLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
@@ -20,6 +20,11 @@ import type { IconName } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
+const LINEUP_CATEGORY_GROUPS = [
+  { groupKey: "tech", label: "관련 기술 카테고리" },
+  { groupKey: "industry", label: "관련 산업분야" },
+  { groupKey: "material", label: "관련 재료" },
+] as const;
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 5;
 
@@ -73,10 +78,17 @@ export default async function AdminContentPagesPage({
   const editingImage = editImage ? images.find((i) => i.id === editImage) : undefined;
   const editingVideo = editVideo ? videos.find((v) => v.id === editVideo) : undefined;
   const baseHref = `/admin/content-pages?group=${group}&key=${key}`;
-  const [techItemsForLineup, linkedTechKeys] =
+  const lineupCategoryGroups =
     group === "lineup" && key
-      ? await Promise.all([contentItemRepo.listByGroup("tech"), lineupTechLinkRepo.techKeysForItem(key)])
-      : [[], []];
+      ? await Promise.all(
+          LINEUP_CATEGORY_GROUPS.map(async ({ groupKey, label }) => ({
+            groupKey,
+            label,
+            items: await contentItemRepo.listByGroup(groupKey),
+            linkedKeys: await lineupCategoryLinkRepo.categoryKeysForItem(key, groupKey),
+          }))
+        )
+      : [];
   const currentItem = items.find((i) => i.itemKey === key);
 
   return (
@@ -202,25 +214,25 @@ export default async function AdminContentPagesPage({
               className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y font-mono"
             />
           </div>
-          {group === "lineup" && (
-            <div>
+          {lineupCategoryGroups.map(({ groupKey, label, items: catItems, linkedKeys }) => (
+            <div key={groupKey}>
               <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
-                관련 기술 카테고리 (선택 — 기술종류별 상세페이지의 &quot;관련 설비&quot; 목록에 표시됩니다)
+                {label} (선택 — 해당 카테고리 상세페이지의 &quot;관련 설비&quot; 목록 및 설비 라인업 필터에 반영됩니다)
               </label>
               <div className="flex flex-wrap gap-x-4 gap-y-2 border border-line-strong rounded-sm p-3">
-                {techItemsForLineup.length === 0 ? (
-                  <span className="text-[12.5px] text-ink-faint">등록된 기술종류별 항목이 없습니다.</span>
+                {catItems.length === 0 ? (
+                  <span className="text-[12.5px] text-ink-faint">등록된 {contentGroups[groupKey].labelKo} 항목이 없습니다.</span>
                 ) : (
-                  techItemsForLineup.map((t) => (
+                  catItems.map((t) => (
                     <label key={t.id} className="inline-flex items-center gap-1.5 text-[12.5px]">
-                      <input type="checkbox" name="techKeys" value={t.itemKey} defaultChecked={linkedTechKeys.includes(t.itemKey)} />
+                      <input type="checkbox" name={`${groupKey}Keys`} value={t.itemKey} defaultChecked={linkedKeys.includes(t.itemKey)} />
                       {t.name}
                     </label>
                   ))
                 )}
               </div>
             </div>
-          )}
+          ))}
         </div>
 
         {/* 4. 적용사례 - 사진 */}

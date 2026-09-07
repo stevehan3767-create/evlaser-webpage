@@ -206,13 +206,16 @@ function createSchema(): Promise<void> {
       )
     `;
 
-    // Many-to-many: which 기술종류별 categories a given 설비 라인업 item uses,
-    // so a tech's detail page can list the equipment that applies it.
+    // Many-to-many: which 기술종류별/산업분야별/재료별 categories a given 설비
+    // 라인업 item belongs to (an item can have several in each), so each
+    // category's detail page can list the equipment tagged with it, and the
+    // 설비 라인업 section can filter by category.
     await sql`
-      CREATE TABLE IF NOT EXISTS lineup_tech_links (
+      CREATE TABLE IF NOT EXISTS lineup_category_links (
         item_key TEXT NOT NULL,
-        tech_key TEXT NOT NULL,
-        PRIMARY KEY (item_key, tech_key)
+        category_group TEXT NOT NULL,
+        category_key TEXT NOT NULL,
+        PRIMARY KEY (item_key, category_group, category_key)
       )
     `;
 

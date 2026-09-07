@@ -10,10 +10,12 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
-  lineupTechLinkRepo,
+  lineupCategoryLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
+
+const LINEUP_CATEGORY_GROUPS = new Set(["tech", "industry", "material"]);
 
 export const dynamic = "force-dynamic";
 
@@ -48,10 +50,11 @@ export default async function ContentDetailPage({
   const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
 
-  // 기술종류별 상세페이지에는 그 기술이 등록된 설비 라인업 목록을 함께 보여준다.
+  // 기술종류별/산업분야별/재료별 상세페이지에는 그 카테고리가 등록된
+  // 설비 라인업 목록을 함께 보여준다.
   let relatedLineupItems: { itemKey: string; name: string; icon: string }[] = [];
-  if (group === "tech") {
-    const relatedKeys = await lineupTechLinkRepo.itemKeysForTech(key);
+  if (LINEUP_CATEGORY_GROUPS.has(group)) {
+    const relatedKeys = await lineupCategoryLinkRepo.itemKeysForCategory(group, key);
     if (relatedKeys.length > 0) {
       const lineupItems = await contentItemRepo.listByGroup("lineup");
       relatedLineupItems = lineupItems.filter((li) => relatedKeys.includes(li.itemKey));
