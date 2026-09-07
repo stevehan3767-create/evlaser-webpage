@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import Icon from "./Icon";
-import { industries } from "@/lib/data";
+import GroupItemGrid from "./GroupItemGrid";
 
 export default function Industries() {
   const t = useTranslations("industries");
@@ -15,18 +13,7 @@ export default function Industries() {
             {t("title")}
           </h2>
         </div>
-        <div className="grid gap-px bg-line border border-line" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
-          {industries.map((ind) => (
-            <Link
-              key={ind.key}
-              href={`/products/industry/${ind.key}`}
-              className="group bg-surface p-6 flex flex-col gap-3 items-start min-h-[100px] hover:bg-surface-alt transition-colors"
-            >
-              <Icon name={ind.icon} className="w-7 h-7 text-blue" />
-              <span className="font-semibold text-[13px] leading-snug">{t(ind.key)}</span>
-            </Link>
-          ))}
-        </div>
+        <GroupItemGrid group="industry" minColWidth="150px" iconColorClass="text-blue" />
       </div>
     </section>
   );

@@ -1,7 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { contentGroups, sitemap, ceoCards, jobs, patents, certifications } from "@/lib/data";
-import { contentPageRepo, newsRepo, faqRepo, resourceRepo, officeRepo, distributorRepo } from "@/lib/repo";
+import {
+  contentPageRepo,
+  contentItemRepo,
+  seedContentItemsIfEmpty,
+  newsRepo,
+  faqRepo,
+  resourceRepo,
+  officeRepo,
+  distributorRepo,
+} from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
@@ -88,16 +97,16 @@ async function buildDocs(): Promise<SearchDoc[]> {
     ]);
   const pageMap = new Map(pages.map((p) => [`${p.groupKey}::${p.itemKey}`, p]));
 
-  // 1. 제품·기술·산업·재료 상세페이지 (관리자 등록 내용 + 시드 데이터)
+  // 1. 제품·기술·산업·재료 상세페이지 (관리자 등록 항목/내용 + 시드 데이터)
   for (const [group, meta] of Object.entries(contentGroups)) {
-    const tLabel = meta.i18nNamespace ? await getTranslations(meta.i18nNamespace) : null;
-    for (const item of meta.items) {
-      const saved = pageMap.get(`${group}::${item.key}`);
-      const seed = meta.seeds.find((s) => s.key === item.key);
-      const label = tLabel ? safeT(tLabel, item.key) : meta.labelsKo[item.key];
-      const title = saved?.title || seed?.title || label || item.key;
+    await seedContentItemsIfEmpty(group, meta.itemSeeds);
+    const groupItems = await contentItemRepo.listByGroup(group);
+    for (const item of groupItems) {
+      const saved = pageMap.get(`${group}::${item.itemKey}`);
+      const seed = meta.seeds.find((s) => s.key === item.itemKey);
+      const title = saved?.title || seed?.title || item.name;
       const description = saved?.description || seed?.description || "";
-      docs.push({ title, snippet: description, category: meta.labelKo, href: `/products/${group}/${item.key}` });
+      docs.push({ title, snippet: description, category: meta.labelKo, href: `/products/${group}/${item.itemKey}` });
     }
   }
 

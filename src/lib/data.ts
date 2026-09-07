@@ -7,6 +7,17 @@ export type IconName =
   | "flag" | "people" | "shield" | "star" | "alert" | "handshake" | "briefcase"
   | "metal" | "plastic" | "glass" | "ceramic" | "wood" | "fabric" | "leather" | "rubber" | "gem" | "pcb";
 
+// Every icon name, for the admin's "새 항목 추가" icon picker.
+export const iconNames: IconName[] = [
+  "car", "battery", "semi", "bio", "home", "ship", "aero", "machine",
+  "steel", "display", "defense", "precision", "etc",
+  "weld", "cut", "mark", "clean", "drill", "heat", "clad", "print3d",
+  "medical", "safety", "measure",
+  "doc", "play", "case", "pin", "globe", "bell", "lock", "build",
+  "flag", "people", "shield", "star", "alert", "handshake", "briefcase",
+  "metal", "plastic", "glass", "ceramic", "wood", "fabric", "leather", "rubber", "gem", "pcb",
+];
+
 export interface Industry {
   icon: IconName;
   key: string;
@@ -397,9 +408,11 @@ if (tsSeriesSeed) {
 }
 
 export interface ContentGroupMeta {
-  items: { icon: IconName; key: string }[];
-  labelsKo: Record<string, string>;
-  i18nNamespace?: string;
+  // Initial item list, seeded into the content_items table once on first
+  // load. After that, the DB (admin-managed) is the source of truth — the
+  // admin can add/remove items from here on, so this list is never read
+  // again once a group has at least one row.
+  itemSeeds: { key: string; name: string; icon: IconName }[];
   seeds: { key: string; title: string; description: string; imageUrl?: string }[];
   backHref: string;
   labelKo: string;
@@ -411,32 +424,25 @@ export interface ContentGroupMeta {
 // (product name / equipment image / video / product image).
 export const contentGroups: Record<string, ContentGroupMeta> = {
   lineup: {
-    items: lineupItems,
-    labelsKo: lineupLabelsKo,
+    itemSeeds: lineupItems.map((i) => ({ key: i.key, name: i.name, icon: i.icon })),
     seeds: lineupPageSeeds,
     backHref: "/products#lineup",
     labelKo: "설비 라인업",
   },
   tech: {
-    items: techItems,
-    labelsKo: techLabelsKo,
-    i18nNamespace: "tech",
+    itemSeeds: techItems.map((i) => ({ key: i.key, name: techLabelsKo[i.key], icon: i.icon })),
     seeds: techPageSeeds,
     backHref: "/products#tech",
     labelKo: "기술종류별",
   },
   industry: {
-    items: industries,
-    labelsKo: industryLabelsKo,
-    i18nNamespace: "industries",
+    itemSeeds: industries.map((i) => ({ key: i.key, name: industryLabelsKo[i.key], icon: i.icon })),
     seeds: [],
     backHref: "/products#industries",
     labelKo: "산업분야별",
   },
   material: {
-    items: materialItems,
-    labelsKo: materialLabelsKo,
-    i18nNamespace: "materials",
+    itemSeeds: materialItems.map((i) => ({ key: i.key, name: materialLabelsKo[i.key], icon: i.icon })),
     seeds: [],
     backHref: "/products#material",
     labelKo: "재료별",

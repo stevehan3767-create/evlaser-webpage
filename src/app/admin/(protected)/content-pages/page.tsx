@@ -1,10 +1,19 @@
 import Link from "next/link";
-import { contentGroups } from "@/lib/data";
-import { contentPageRepo, contentImageRepo, contentVideoRepo, seedContentIfEmpty } from "@/lib/repo";
-import { saveContentAll, deleteContentImage, deleteContentVideo } from "./actions";
+import { contentGroups, iconNames } from "@/lib/data";
+import {
+  contentPageRepo,
+  contentImageRepo,
+  contentVideoRepo,
+  contentItemRepo,
+  seedContentIfEmpty,
+  seedContentItemsIfEmpty,
+} from "@/lib/repo";
+import { saveContentAll, deleteContentImage, deleteContentVideo, addContentItem, deleteContentItem } from "./actions";
 import FileUploadField from "@/components/FileUploadField";
 import CaseImageStager from "@/components/CaseImageStager";
 import CaseVideoStager from "@/components/CaseVideoStager";
+import Icon from "@/components/Icon";
+import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +29,8 @@ const MESSAGES: Record<string, { text: string; tone: "ok" | "error" }> = {
   video_added: { text: "저장되었습니다. (동영상 추가됨)", tone: "ok" },
   video_saved: { text: "저장되었습니다. (동영상 수정됨)", tone: "ok" },
   video_max: { text: `저장되었습니다. 단, 적용사례 동영상은 최대 ${MAX_VIDEOS}개까지라 일부 동영상은 추가되지 않았습니다.`, tone: "error" },
+  item_added: { text: "새 항목이 추가되었습니다.", tone: "ok" },
+  item_deleted: { text: "항목이 삭제되었습니다.", tone: "ok" },
 };
 
 function MessageBanner({ msg }: { msg?: string }) {
@@ -45,17 +56,22 @@ export default async function AdminContentPagesPage({
   const { group: rawGroup, key: rawKey, editImage, editVideo, msg } = await searchParams;
   const group = GROUP_ORDER.includes(rawGroup ?? "") ? (rawGroup as string) : GROUP_ORDER[0];
   const meta = contentGroups[group];
-  const key = meta.items.some((i) => i.key === rawKey) ? (rawKey as string) : meta.items[0].key;
+  await seedContentItemsIfEmpty(group, meta.itemSeeds);
+  const items = await contentItemRepo.listByGroup(group);
+  const key = items.some((i) => i.itemKey === rawKey) ? (rawKey as string) : items[0]?.itemKey;
 
   await seedContentIfEmpty(group, meta.seeds);
-  const [page, images, videos] = await Promise.all([
-    contentPageRepo.get(group, key),
-    contentImageRepo.listByKey(group, key),
-    contentVideoRepo.listByKey(group, key),
-  ]);
+  const [page, images, videos] = key
+    ? await Promise.all([
+        contentPageRepo.get(group, key),
+        contentImageRepo.listByKey(group, key),
+        contentVideoRepo.listByKey(group, key),
+      ])
+    : [null, [], []];
   const editingImage = editImage ? images.find((i) => i.id === editImage) : undefined;
   const editingVideo = editVideo ? videos.find((v) => v.id === editVideo) : undefined;
   const baseHref = `/admin/content-pages?group=${group}&key=${key}`;
+  const currentItem = items.find((i) => i.itemKey === key);
 
   return (
     <div>
@@ -75,20 +91,71 @@ export default async function AdminContentPagesPage({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-8 pb-8 border-b border-line">
-        {meta.items.map((t, i) => (
-          <Link
-            key={t.key}
-            href={`/admin/content-pages?group=${group}&key=${t.key}`}
-            className={`px-3 py-1.5 text-[12.5px] border rounded-sm ${
-              t.key === key ? "bg-red text-white border-red font-bold" : "border-line-strong text-ink-soft hover:border-blue"
-            }`}
-          >
-            {String(i + 1).padStart(2, "0")}. {meta.labelsKo[t.key] ?? t.key}
-          </Link>
+      <div className="flex flex-wrap gap-1.5 mb-3">
+        {items.map((t, i) => (
+          <span key={t.id} className="inline-flex items-stretch">
+            <Link
+              href={`/admin/content-pages?group=${group}&key=${t.itemKey}`}
+              className={`flex items-center gap-1.5 pl-3 pr-2 py-1.5 text-[12.5px] border rounded-l-sm ${
+                t.itemKey === key ? "bg-red text-white border-red font-bold" : "border-line-strong text-ink-soft hover:border-blue"
+              }`}
+            >
+              <Icon name={t.icon as IconName} className="w-3.5 h-3.5 flex-none" strokeWidth={1.6} />
+              {String(i + 1).padStart(2, "0")}. {t.name}
+            </Link>
+            <form action={deleteContentItem}>
+              <input type="hidden" name="id" value={t.id} />
+              <input type="hidden" name="group" value={group} />
+              <input type="hidden" name="key" value={t.itemKey} />
+              <button
+                type="submit"
+                title="이 항목과 등록된 내용을 모두 삭제합니다"
+                className={`px-2 py-1.5 text-[12.5px] border border-l-0 rounded-r-sm font-bold ${
+                  t.itemKey === key ? "bg-red text-white border-red" : "border-line-strong text-ink-faint hover:text-red hover:border-red"
+                }`}
+              >
+                ×
+              </button>
+            </form>
+          </span>
         ))}
       </div>
 
+      <details className="mb-8 pb-8 border-b border-line">
+        <summary className="cursor-pointer text-[12.5px] font-bold text-blue select-none">+ 새 항목 추가</summary>
+        <form action={addContentItem} className="mt-3 flex flex-wrap items-end gap-3">
+          <input type="hidden" name="group" value={group} />
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">항목 이름</label>
+            <input
+              name="name"
+              required
+              placeholder="예: ELPW-NEW Series"
+              className="border border-line-strong px-3 py-2 text-[13px] rounded-sm"
+            />
+          </div>
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">아이콘</label>
+            <select name="icon" defaultValue="etc" className="border border-line-strong px-3 py-2 text-[13px] rounded-sm">
+              {iconNames.map((icon) => (
+                <option key={icon} value={icon}>
+                  {icon}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="px-4 py-2 bg-ink text-white font-bold text-[12.5px] rounded-sm">
+            추가
+          </button>
+        </form>
+      </details>
+
+      {!currentItem ? (
+        <p className="border border-line p-5 mb-10 text-[13px] text-ink-soft">
+          등록된 항목이 없습니다. 위에서 새 항목을 먼저 추가해 주세요.
+        </p>
+      ) : (
+      <>
       <p className="text-[12.5px] text-ink-soft mb-4">
         아래 내용은 <b>하나의 저장 버튼</b>으로 한 번에 저장됩니다 — 제목·대표이미지·내용을 채우고, 적용사례 사진·동영상은 하나씩{" "}
         <b>+ 추가</b> 버튼으로 원하는 만큼 쌓아둔 뒤, 맨 아래 <b>저장</b> 버튼을 한 번만 누르면 전부 저장됩니다.
@@ -106,7 +173,7 @@ export default async function AdminContentPagesPage({
             <input
               name="title"
               defaultValue={page?.title ?? ""}
-              placeholder={meta.labelsKo[key] ?? key}
+              placeholder={currentItem.name}
               className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
             />
           </div>
@@ -305,6 +372,8 @@ export default async function AdminContentPagesPage({
           ))
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

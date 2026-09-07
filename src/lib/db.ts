@@ -189,6 +189,23 @@ function createSchema(): Promise<void> {
     `;
     await sql`ALTER TABLE content_videos ADD COLUMN IF NOT EXISTS content TEXT`;
 
+    // Admin-managed item list for each /products/[group] group (설비 라인업 /
+    // 기술종류별 / 산업분야별 / 재료별) — lets the admin add or remove items,
+    // not just edit an existing one's content. Seeded once per group from
+    // the built-in defaults in data.ts; after that the DB is authoritative.
+    await sql`
+      CREATE TABLE IF NOT EXISTS content_items (
+        id TEXT PRIMARY KEY,
+        group_key TEXT NOT NULL,
+        item_key TEXT NOT NULL,
+        name TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        UNIQUE (group_key, item_key)
+      )
+    `;
+
     // Main-page "주요 고객사" logo strip.
     await sql`
       CREATE TABLE IF NOT EXISTS client_logos (

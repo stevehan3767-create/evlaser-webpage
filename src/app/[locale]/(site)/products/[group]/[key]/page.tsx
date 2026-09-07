@@ -4,8 +4,15 @@ import { Link } from "@/i18n/navigation";
 import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
-import { contentGroups } from "@/lib/data";
-import { contentPageRepo, contentImageRepo, contentVideoRepo, seedContentIfEmpty } from "@/lib/repo";
+import { contentGroups, type IconName } from "@/lib/data";
+import {
+  contentPageRepo,
+  contentImageRepo,
+  contentVideoRepo,
+  contentItemRepo,
+  seedContentIfEmpty,
+  seedContentItemsIfEmpty,
+} from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
 
@@ -23,20 +30,21 @@ export default async function ContentDetailPage({
 }) {
   const { group, key } = await params;
   const meta = contentGroups[group];
-  const item = meta?.items.find((i) => i.key === key);
-  if (!meta || !item) notFound();
+  if (!meta) notFound();
 
-  await seedContentIfEmpty(group, meta.seeds);
-  const [page, images, videos, tp, tLabel] = await Promise.all([
+  await Promise.all([seedContentIfEmpty(group, meta.seeds), seedContentItemsIfEmpty(group, meta.itemSeeds)]);
+  const items = await contentItemRepo.listByGroup(group);
+  const item = items.find((i) => i.itemKey === key);
+  if (!item) notFound();
+
+  const [page, images, videos, tp] = await Promise.all([
     contentPageRepo.get(group, key),
     contentImageRepo.listByKey(group, key),
     contentVideoRepo.listByKey(group, key),
     getTranslations("contentPage"),
-    meta.i18nNamespace ? getTranslations(meta.i18nNamespace) : Promise.resolve(null),
   ]);
 
-  const label = tLabel ? tLabel(key) : meta.labelsKo[key];
-  const title = page?.title || label;
+  const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
 
   return (
@@ -49,19 +57,18 @@ export default async function ContentDetailPage({
         {/* 1. 제목 */}
         <span className="eyebrow">{GROUP_EYEBROWS[group]}</span>
         <div className="flex items-center gap-3 mt-2.5">
-          <Icon name={item.icon} className="w-8 h-8 text-red flex-none" strokeWidth={1.5} />
+          <Icon name={item.icon as IconName} className="w-8 h-8 text-red flex-none" strokeWidth={1.5} />
           <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>
         </div>
 
         {/* 같은 그룹의 다른 항목으로 바로 이동 */}
         <div className="flex flex-wrap gap-2 mt-6">
-          {meta.items.map((it) => {
-            const active = it.key === key;
-            const itemLabel = tLabel ? tLabel(it.key) : meta.labelsKo[it.key] ?? it.key;
+          {items.map((it) => {
+            const active = it.itemKey === key;
             return (
               <Link
-                key={it.key}
-                href={`/products/${group}/${it.key}`}
+                key={it.id}
+                href={`/products/${group}/${it.itemKey}`}
                 aria-current={active ? "page" : undefined}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 border rounded-sm text-[12.5px] font-semibold whitespace-nowrap transition-colors ${
                   active
@@ -69,8 +76,8 @@ export default async function ContentDetailPage({
                     : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
                 }`}
               >
-                <Icon name={it.icon} className="w-4 h-4 flex-none" strokeWidth={1.6} />
-                {itemLabel}
+                <Icon name={it.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
+                {it.name}
               </Link>
             );
           })}

@@ -2,15 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { contentGroups } from "@/lib/data";
-import { contentPageRepo, contentImageRepo, contentVideoRepo } from "@/lib/repo";
+import { contentGroups, iconNames } from "@/lib/data";
+import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo } from "@/lib/repo";
 
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 5;
 
-function isValid(group: string, key: string): boolean {
-  const meta = contentGroups[group];
-  return !!meta && meta.items.some((i) => i.key === key);
+async function isValid(group: string, key: string): Promise<boolean> {
+  if (!contentGroups[group]) return false;
+  const items = await contentItemRepo.listByGroup(group);
+  return items.some((i) => i.itemKey === key);
 }
 
 function backTo(group: string, key: string, msg: string): string {
@@ -34,7 +35,7 @@ function parseStagedList<T>(raw: FormDataEntryValue | null): T[] {
 export async function saveContentAll(formData: FormData) {
   const group = String(formData.get("group") ?? "");
   const key = String(formData.get("key") ?? "");
-  if (!isValid(group, key)) return;
+  if (!(await isValid(group, key))) return;
 
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
@@ -135,4 +136,29 @@ export async function deleteContentVideo(formData: FormData) {
   await contentVideoRepo.remove(id);
   revalidatePath("/admin/content-pages");
   if (group && key) revalidatePath(`/products/${group}/${key}`);
+}
+
+export async function addContentItem(formData: FormData) {
+  const group = String(formData.get("group") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const icon = String(formData.get("icon") ?? "").trim();
+  if (!contentGroups[group] || !name || !(iconNames as string[]).includes(icon)) return;
+
+  const item = await contentItemRepo.create({ groupKey: group, name, icon });
+  revalidatePath("/admin/content-pages");
+  revalidatePath("/products");
+  redirect(`/admin/content-pages?group=${group}&key=${item.itemKey}&msg=item_added`);
+}
+
+export async function deleteContentItem(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const group = String(formData.get("group") ?? "");
+  const key = String(formData.get("key") ?? "");
+  if (!id || !group || !key) return;
+
+  await contentItemRepo.remove(id, group, key);
+  revalidatePath("/admin/content-pages");
+  revalidatePath("/products");
+  revalidatePath(`/products/${group}/${key}`);
+  redirect(`/admin/content-pages?group=${group}&msg=item_deleted`);
 }

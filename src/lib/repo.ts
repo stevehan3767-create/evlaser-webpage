@@ -566,6 +566,92 @@ export async function seedIfEmpty(seedNews: { tag: string; title: string; date: 
   }
 }
 
+export interface ContentItemRow {
+  id: string;
+  groupKey: string;
+  itemKey: string;
+  name: string;
+  icon: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToContentItem(r: Record<string, unknown>): ContentItemRow {
+  return {
+    id: r.id as string,
+    groupKey: r.group_key as string,
+    itemKey: r.item_key as string,
+    name: r.name as string,
+    icon: r.icon as string,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+function slugify(name: string): string {
+  const base = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return (base || "item") + "-" + Math.random().toString(36).slice(2, 7);
+}
+
+export const contentItemRepo = {
+  async listByGroup(groupKey: string): Promise<ContentItemRow[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT * FROM content_items WHERE group_key = ${groupKey} ORDER BY sort_order ASC, created_at ASC
+    `;
+    return (rows as Record<string, unknown>[]).map(rowToContentItem);
+  },
+  async create(input: { groupKey: string; name: string; icon: string; sortOrder?: number }): Promise<ContentItemRow> {
+    await ensureSchema();
+    const id = newId();
+    const itemKey = slugify(input.name);
+    const createdAt = new Date().toISOString();
+    // Default to the end of the list, not sort_order 0 — otherwise a new
+    // item ties with (and sorts ahead of, on equal timestamps) the first seeded item.
+    const sortOrder = input.sortOrder ?? (await contentItemRepo.count(input.groupKey));
+    await sql`
+      INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
+      VALUES (${id}, ${input.groupKey}, ${itemKey}, ${input.name}, ${input.icon}, ${sortOrder}, ${createdAt})
+    `;
+    return { id, groupKey: input.groupKey, itemKey, name: input.name, icon: input.icon, sortOrder, createdAt };
+  },
+  // Removes the item and every piece of content registered under it
+  // (본문/적용사례 사진·동영상), since nothing else can reach that group+key
+  // combination once the item itself is gone.
+  async remove(id: string, groupKey: string, itemKey: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM content_items WHERE id = ${id}`;
+    await sql`DELETE FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+    await sql`DELETE FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+    await sql`DELETE FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
+  },
+  async count(groupKey: string): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM content_items WHERE group_key = ${groupKey}`;
+    return (rows[0] as { c: number }).c;
+  },
+};
+
+export async function seedContentItemsIfEmpty(
+  groupKey: string,
+  seeds: { key: string; name: string; icon: string }[]
+): Promise<void> {
+  await ensureSchema();
+  if ((await contentItemRepo.count(groupKey)) > 0) return;
+  for (let i = 0; i < seeds.length; i++) {
+    const s = seeds[i];
+    await sql`
+      INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
+      VALUES (${newId()}, ${groupKey}, ${s.key}, ${s.name}, ${s.icon}, ${i}, ${new Date().toISOString()})
+      ON CONFLICT (group_key, item_key) DO NOTHING
+    `;
+  }
+}
+
 export const contentPageRepo = {
   async get(groupKey: string, itemKey: string): Promise<ContentPageRow | null> {
     await ensureSchema();
