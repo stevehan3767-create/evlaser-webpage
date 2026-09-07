@@ -605,19 +605,33 @@ export const contentItemRepo = {
     `;
     return (rows as Record<string, unknown>[]).map(rowToContentItem);
   },
-  async create(input: { groupKey: string; name: string; icon: string; sortOrder?: number }): Promise<ContentItemRow> {
+  // insertBeforeItemKey lets the admin place the new item at a specific spot
+  // (e.g. "레이저드릴링과 레이저열처리 사이에") instead of always at the end —
+  // every item from that point on is renumbered to keep sort_order contiguous.
+  async create(input: { groupKey: string; name: string; icon: string; insertBeforeItemKey?: string }): Promise<ContentItemRow> {
     await ensureSchema();
     const id = newId();
     const itemKey = slugify(input.name);
     const createdAt = new Date().toISOString();
-    // Default to the end of the list, not sort_order 0 — otherwise a new
-    // item ties with (and sorts ahead of, on equal timestamps) the first seeded item.
-    const sortOrder = input.sortOrder ?? (await contentItemRepo.count(input.groupKey));
+
+    const existing = await contentItemRepo.listByGroup(input.groupKey);
+    let insertIndex = existing.length;
+    if (input.insertBeforeItemKey) {
+      const idx = existing.findIndex((i) => i.itemKey === input.insertBeforeItemKey);
+      if (idx !== -1) insertIndex = idx;
+    }
+
     await sql`
       INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
-      VALUES (${id}, ${input.groupKey}, ${itemKey}, ${input.name}, ${input.icon}, ${sortOrder}, ${createdAt})
+      VALUES (${id}, ${input.groupKey}, ${itemKey}, ${input.name}, ${input.icon}, ${insertIndex}, ${createdAt})
     `;
-    return { id, groupKey: input.groupKey, itemKey, name: input.name, icon: input.icon, sortOrder, createdAt };
+
+    const orderedIds = [...existing.slice(0, insertIndex).map((i) => i.id), id, ...existing.slice(insertIndex).map((i) => i.id)];
+    for (let i = 0; i < orderedIds.length; i++) {
+      if (i !== insertIndex) await sql`UPDATE content_items SET sort_order = ${i} WHERE id = ${orderedIds[i]}`;
+    }
+
+    return { id, groupKey: input.groupKey, itemKey, name: input.name, icon: input.icon, sortOrder: insertIndex, createdAt };
   },
   // Removes the item and every piece of content registered under it
   // (본문/적용사례 사진·동영상), since nothing else can reach that group+key

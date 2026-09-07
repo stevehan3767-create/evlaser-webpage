@@ -162,6 +162,17 @@ export default async function AdminContentPagesPage({
               ))}
             </select>
           </div>
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">삽입 위치</label>
+            <select name="insertBefore" defaultValue="" className="border border-line-strong px-3 py-2 text-[13px] rounded-sm">
+              <option value="">맨 뒤에 추가</option>
+              {items.map((t, i) => (
+                <option key={t.id} value={t.itemKey}>
+                  {String(i + 1).padStart(2, "0")}. {t.name} 앞에 삽입
+                </option>
+              ))}
+            </select>
+          </div>
           <button type="submit" className="px-4 py-2 bg-ink text-white font-bold text-[12.5px] rounded-sm">
             추가
           </button>

@@ -154,9 +154,10 @@ export async function addContentItem(formData: FormData) {
   const group = String(formData.get("group") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const icon = String(formData.get("icon") ?? "").trim();
+  const insertBeforeItemKey = String(formData.get("insertBefore") ?? "").trim() || undefined;
   if (!contentGroups[group] || !name || !(iconNames as string[]).includes(icon)) return;
 
-  const item = await contentItemRepo.create({ groupKey: group, name, icon });
+  const item = await contentItemRepo.create({ groupKey: group, name, icon, insertBeforeItemKey });
   revalidatePath("/admin/content-pages");
   revalidatePath("/products");
   redirect(`/admin/content-pages?group=${group}&key=${item.itemKey}&msg=item_added`);
