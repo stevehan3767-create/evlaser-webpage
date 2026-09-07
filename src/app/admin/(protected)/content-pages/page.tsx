@@ -5,6 +5,7 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
+  lineupTechLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
@@ -13,6 +14,7 @@ import FileUploadField from "@/components/FileUploadField";
 import CaseImageStager from "@/components/CaseImageStager";
 import CaseVideoStager from "@/components/CaseVideoStager";
 import Icon from "@/components/Icon";
+import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -71,6 +73,10 @@ export default async function AdminContentPagesPage({
   const editingImage = editImage ? images.find((i) => i.id === editImage) : undefined;
   const editingVideo = editVideo ? videos.find((v) => v.id === editVideo) : undefined;
   const baseHref = `/admin/content-pages?group=${group}&key=${key}`;
+  const [techItemsForLineup, linkedTechKeys] =
+    group === "lineup" && key
+      ? await Promise.all([contentItemRepo.listByGroup("tech"), lineupTechLinkRepo.techKeysForItem(key)])
+      : [[], []];
   const currentItem = items.find((i) => i.itemKey === key);
 
   return (
@@ -107,15 +113,15 @@ export default async function AdminContentPagesPage({
               <input type="hidden" name="id" value={t.id} />
               <input type="hidden" name="group" value={group} />
               <input type="hidden" name="key" value={t.itemKey} />
-              <button
-                type="submit"
+              <ConfirmSubmitButton
+                confirmMessage="정말로 삭제하시겠습니까? 삭제된 자료는 복구할 수 없습니다."
                 title="이 항목과 등록된 내용을 모두 삭제합니다"
                 className={`px-2 py-1.5 text-[12.5px] border border-l-0 rounded-r-sm font-bold ${
                   t.itemKey === key ? "bg-red text-white border-red" : "border-line-strong text-ink-faint hover:text-red hover:border-red"
                 }`}
               >
                 ×
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </span>
         ))}
@@ -196,6 +202,25 @@ export default async function AdminContentPagesPage({
               className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y font-mono"
             />
           </div>
+          {group === "lineup" && (
+            <div>
+              <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
+                관련 기술 카테고리 (선택 — 기술종류별 상세페이지의 &quot;관련 설비&quot; 목록에 표시됩니다)
+              </label>
+              <div className="flex flex-wrap gap-x-4 gap-y-2 border border-line-strong rounded-sm p-3">
+                {techItemsForLineup.length === 0 ? (
+                  <span className="text-[12.5px] text-ink-faint">등록된 기술종류별 항목이 없습니다.</span>
+                ) : (
+                  techItemsForLineup.map((t) => (
+                    <label key={t.id} className="inline-flex items-center gap-1.5 text-[12.5px]">
+                      <input type="checkbox" name="techKeys" value={t.itemKey} defaultChecked={linkedTechKeys.includes(t.itemKey)} />
+                      {t.name}
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 4. 적용사례 - 사진 */}

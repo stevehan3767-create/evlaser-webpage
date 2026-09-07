@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import Industries from "@/components/Industries";
 import TechSolutions from "@/components/TechSolutions";
 import ProductLineup from "@/components/ProductLineup";
-import Materials from "@/components/Materials";
 
 export const metadata: Metadata = {
   title: "제품·기술 | EV Laser",
-  description: "설비 라인업, 레이저 절단·용접·마킹·클리닝 등 15종 레이저 기술, 13개 적용 산업분야, 13개 재료분야를 소개합니다.",
+  description: "설비 라인업과 레이저 절단·용접·마킹·클리닝 등 레이저 기술을 소개합니다.",
 };
 
 export default function ProductsPage() {
@@ -20,8 +18,6 @@ export default function ProductsPage() {
       </div>
       <ProductLineup />
       <TechSolutions />
-      <Industries />
-      <Materials />
     </>
   );
 }

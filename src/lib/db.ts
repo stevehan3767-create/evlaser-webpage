@@ -206,6 +206,16 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // Many-to-many: which 기술종류별 categories a given 설비 라인업 item uses,
+    // so a tech's detail page can list the equipment that applies it.
+    await sql`
+      CREATE TABLE IF NOT EXISTS lineup_tech_links (
+        item_key TEXT NOT NULL,
+        tech_key TEXT NOT NULL,
+        PRIMARY KEY (item_key, tech_key)
+      )
+    `;
+
     // Main-page "주요 고객사" logo strip.
     await sql`
       CREATE TABLE IF NOT EXISTS client_logos (

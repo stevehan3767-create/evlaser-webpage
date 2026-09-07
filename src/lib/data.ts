@@ -117,12 +117,17 @@ export const techItems: TechItem[] = [
   { icon: "print3d", key: "print3d" },
   { icon: "medical", key: "medical" },
   { icon: "safety", key: "safety" },
+  { icon: "machine", key: "laserOscillator" },
+  { icon: "precision", key: "beamDelivery" },
+  { icon: "measure", key: "measurementDevice" },
+  { icon: "case", key: "auxiliaryDevice" },
   { icon: "etc", key: "other" },
 ];
 
-// Korean labels for techItems, used only in the admin UI (which has no
-// next-intl context — it lives outside the [locale] segment). The public
-// site uses the translated `tech.<key>` messages instead.
+// Korean labels for techItems, used as the seed `name` for the DB-backed
+// content_items row on first load (see contentGroups.tech.itemSeeds below) —
+// after that, the admin can rename/add/remove items from /admin/content-pages
+// and this list is no longer read.
 export const techLabelsKo: Record<string, string> = {
   plasticWelding: "플라스틱 용접",
   metalWelding: "금속·알루미늄·동 용접",
@@ -138,6 +143,10 @@ export const techLabelsKo: Record<string, string> = {
   print3d: "3D프린팅",
   medical: "의료기기",
   safety: "레이저안전",
+  laserOscillator: "레이저발진기",
+  beamDelivery: "빔전송장치",
+  measurementDevice: "측정장치",
+  auxiliaryDevice: "기타보조장치",
   other: "기타",
 };
 
@@ -224,8 +233,8 @@ export const companyNav: NavItem[] = [
 export const productsNav: NavItem[] = [
   { key: "lineup", href: "/products#lineup" },
   { key: "byTech", href: "/products#tech" },
-  { key: "byIndustry", href: "/products#industries" },
-  { key: "byMaterial", href: "/products#material" },
+  { key: "byIndustry", href: "/products/industries" },
+  { key: "byMaterial", href: "/products/materials" },
 ];
 
 export const resourcesNav: NavItem[] = [
@@ -438,13 +447,13 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
   industry: {
     itemSeeds: industries.map((i) => ({ key: i.key, name: industryLabelsKo[i.key], icon: i.icon })),
     seeds: [],
-    backHref: "/products#industries",
+    backHref: "/products/industries",
     labelKo: "산업분야별",
   },
   material: {
     itemSeeds: materialItems.map((i) => ({ key: i.key, name: materialLabelsKo[i.key], icon: i.icon })),
     seeds: [],
-    backHref: "/products#material",
+    backHref: "/products/materials",
     labelKo: "재료별",
   },
 };

@@ -10,6 +10,7 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
+  lineupTechLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
@@ -46,6 +47,16 @@ export default async function ContentDetailPage({
 
   const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
+
+  // 기술종류별 상세페이지에는 그 기술이 등록된 설비 라인업 목록을 함께 보여준다.
+  let relatedLineupItems: { itemKey: string; name: string; icon: string }[] = [];
+  if (group === "tech") {
+    const relatedKeys = await lineupTechLinkRepo.itemKeysForTech(key);
+    if (relatedKeys.length > 0) {
+      const lineupItems = await contentItemRepo.listByGroup("lineup");
+      relatedLineupItems = lineupItems.filter((li) => relatedKeys.includes(li.itemKey));
+    }
+  }
 
   return (
     <div className="py-16 sm:py-22">
@@ -99,6 +110,25 @@ export default async function ContentDetailPage({
             <p className="text-ink-faint text-[13.5px]">{tp("descriptionEmpty")}</p>
           )}
         </div>
+
+        {/* 이 기술이 적용된 설비 라인업 (기술종류별 상세페이지에서만) */}
+        {relatedLineupItems.length > 0 && (
+          <div className="mt-14 pt-10 border-t border-line">
+            <h2 className="text-[18px] font-bold mb-6">관련 설비</h2>
+            <div className="flex flex-wrap gap-2">
+              {relatedLineupItems.map((li) => (
+                <Link
+                  key={li.itemKey}
+                  href={`/products/lineup/${li.itemKey}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 border border-line-strong rounded-sm text-[12.5px] font-semibold text-ink-soft whitespace-nowrap hover:border-blue hover:text-blue transition-colors"
+                >
+                  <Icon name={li.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
+                  {li.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 4. 적용사례 (사진 최대 10 + 동영상 최대 5) */}
         <div className="mt-14 pt-10 border-t border-line">
