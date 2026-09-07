@@ -81,12 +81,17 @@ export default async function AdminContentPagesPage({
   const lineupCategoryGroups =
     group === "lineup" && key
       ? await Promise.all(
-          LINEUP_CATEGORY_GROUPS.map(async ({ groupKey, label }) => ({
-            groupKey,
-            label,
-            items: await contentItemRepo.listByGroup(groupKey),
-            linkedKeys: await lineupCategoryLinkRepo.categoryKeysForItem(key, groupKey),
-          }))
+          LINEUP_CATEGORY_GROUPS.map(async ({ groupKey, label }) => {
+            // Other groups' items are normally seeded when their own /products
+            // page is first visited — but a lineup item can be edited before
+            // that ever happens, so ensure it here too.
+            await seedContentItemsIfEmpty(groupKey, contentGroups[groupKey].itemSeeds);
+            const [catItems, linkedKeys] = await Promise.all([
+              contentItemRepo.listByGroup(groupKey),
+              lineupCategoryLinkRepo.categoryKeysForItem(key, groupKey),
+            ]);
+            return { groupKey, label, items: catItems, linkedKeys };
+          })
         )
       : [];
   const currentItem = items.find((i) => i.itemKey === key);
