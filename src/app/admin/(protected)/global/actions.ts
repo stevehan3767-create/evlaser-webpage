@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { officeRepo, distributorRepo } from "@/lib/repo";
+import { officeRepo, distributorRepo, type MapProvider } from "@/lib/repo";
 
 export async function saveOffice(formData: FormData) {
   const id = String(formData.get("id") ?? "").trim();
@@ -9,9 +9,10 @@ export async function saveOffice(formData: FormData) {
   const address = String(formData.get("address") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const mapProvider: MapProvider = formData.get("mapProvider") === "google" ? "google" : "naver";
   if (!name || !address) return;
 
-  const input = { name, address, phone: phone || undefined, email: email || undefined };
+  const input = { name, address, phone: phone || undefined, email: email || undefined, mapProvider };
   if (id) {
     await officeRepo.update(id, input);
   } else {

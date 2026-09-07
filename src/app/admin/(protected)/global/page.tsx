@@ -57,6 +57,19 @@ export default async function AdminGlobalPage({
             className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
+            찾아오시는 길 지도 (국내 지사는 네이버, 해외 법인은 구글 추천)
+          </label>
+          <select
+            name="mapProvider"
+            defaultValue={officeBeingEdited?.mapProvider ?? "naver"}
+            className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm bg-surface"
+          >
+            <option value="naver">네이버 지도</option>
+            <option value="google">Google 지도</option>
+          </select>
+        </div>
         <div className="flex gap-3">
           <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {officeBeingEdited ? "저장" : "추가"}
@@ -76,7 +89,12 @@ export default async function AdminGlobalPage({
           offices.map((o) => (
             <div key={o.id} className="flex items-start justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
               <div className="flex-1">
-                <p className="font-bold">{o.name}</p>
+                <p className="font-bold">
+                  {o.name}{" "}
+                  <span className="ml-1 font-normal text-[10.5px] text-ink-faint border border-line-strong rounded-sm px-1.5 py-0.5">
+                    {o.mapProvider === "google" ? "Google 지도" : "네이버 지도"}
+                  </span>
+                </p>
                 <p className="mt-1 text-[12px] text-ink-soft">{o.address}</p>
                 <p className="mt-1 text-[11.5px] text-ink-faint">
                   {o.phone && <span>{o.phone}</span>}

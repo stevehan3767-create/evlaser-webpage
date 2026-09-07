@@ -1,16 +1,25 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import Icon from "./Icon";
 import { officeSeeds } from "@/lib/data";
-import { officeRepo, distributorRepo, seedOfficesIfEmpty } from "@/lib/repo";
+import { officeRepo, distributorRepo, seedOfficesIfEmpty, type OfficeRow, type DistributorRow } from "@/lib/repo";
 import { countryFlag, countryName, isCountryCode } from "@/lib/countries";
+import { mapSearchUrl } from "@/lib/maps";
 
-function OfficeTable({
-  headers,
-  rows,
-}: {
-  headers: [string, string, string, string];
-  rows: { id: string; name: string; address: string; phone: string | null; email: string | null }[];
-}) {
+function MapLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-[12px] font-bold text-blue whitespace-nowrap hover:underline"
+    >
+      <Icon name="pin" className="w-3.5 h-3.5 flex-none" />
+      {label}
+    </a>
+  );
+}
+
+function OfficeTable({ headers, rows }: { headers: [string, string, string, string]; rows: OfficeRow[] }) {
   return (
     <div className="overflow-x-auto border border-line bg-surface">
       <table className="w-full border-collapse min-w-[640px]">
@@ -33,7 +42,13 @@ function OfficeTable({
                 <Icon name="pin" className="w-4 h-4 text-red flex-none" />
                 {r.name}
               </td>
-              <td className="px-3.5 py-4 border-b border-line text-[13.5px] align-top">{r.address}</td>
+              <td className="px-3.5 py-4 border-b border-line text-[13.5px] align-top">
+                <p>{r.address}</p>
+                <MapLink
+                  href={mapSearchUrl(r.mapProvider, `${r.name} ${r.address}`)}
+                  label={r.mapProvider === "google" ? "Google 지도에서 보기" : "네이버 지도에서 보기"}
+                />
+              </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] font-mono align-top">{r.phone}</td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] font-mono align-top">{r.email}</td>
             </tr>
@@ -50,7 +65,7 @@ function DistributorTable({
   locale,
 }: {
   headers: [string, string, string, string];
-  rows: { id: string; country: string; partner: string; contact: string | null; phone: string | null }[];
+  rows: DistributorRow[];
   locale: string;
 }) {
   return (
@@ -84,7 +99,13 @@ function DistributorTable({
                   </>
                 )}
               </td>
-              <td className="px-3.5 py-4 border-b border-line text-[13.5px]">{r.partner}</td>
+              <td className="px-3.5 py-4 border-b border-line text-[13.5px]">
+                <p>{r.partner}</p>
+                <MapLink
+                  href={mapSearchUrl("google", [r.partner, r.country, r.contact, r.phone].filter(Boolean).join(" "))}
+                  label="Google 지도에서 보기"
+                />
+              </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px]">{r.contact}</td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] font-mono">{r.phone}</td>
             </tr>

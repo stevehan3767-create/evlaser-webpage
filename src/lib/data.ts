@@ -316,18 +316,21 @@ export const officeSeeds = [
     address: "경기도 군포시 고산로 148번길 17 군포IT밸리 B동 313호 (15850)",
     phone: "+82 31 452 9860",
     email: "info@evlaser.co.kr",
+    mapProvider: "naver" as const,
   },
   {
     name: "레이저기술센터",
     address: "경기도 군포시 농심로2 삼보 스카이비즈 706-709호 (15845)",
     phone: "+82 31 452 9860",
     email: "info@evlaser.co.kr",
+    mapProvider: "naver" as const,
   },
   {
     name: "중국 쑤저우법인 (欧威激光科技（苏州）有限公司)",
     address: "Room 106, Zone C, Building 2, Dongshahu Fund Town, No. 345 Fengli Street, Industrial Park, Suzhou City, Jiangsu Province, China (215127)",
     phone: "+86 512 6515 8026",
     email: "info@evlaser.cn",
+    mapProvider: "google" as const,
   },
 ];
 

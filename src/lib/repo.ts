@@ -86,12 +86,15 @@ function rowToFaq(r: Record<string, unknown>): FaqRow {
   };
 }
 
+export type MapProvider = "naver" | "google";
+
 export interface OfficeRow {
   id: string;
   name: string;
   address: string;
   phone: string | null;
   email: string | null;
+  mapProvider: MapProvider;
   createdAt: string;
 }
 
@@ -102,6 +105,7 @@ function rowToOffice(r: Record<string, unknown>): OfficeRow {
     address: r.address as string,
     phone: (r.phone as string) ?? null,
     email: (r.email as string) ?? null,
+    mapProvider: (r.map_provider as MapProvider) === "google" ? "google" : "naver",
     createdAt: r.created_at as string,
   };
 }
@@ -499,17 +503,20 @@ export const officeRepo = {
     const rows = await sql`SELECT * FROM offices ORDER BY created_at ASC`;
     return (rows as Record<string, unknown>[]).map(rowToOffice);
   },
-  async create(input: { name: string; address: string; phone?: string; email?: string }): Promise<void> {
+  async create(input: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO offices (id, name, address, phone, email, created_at)
-      VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${new Date().toISOString()})
+      INSERT INTO offices (id, name, address, phone, email, map_provider, created_at)
+      VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${input.mapProvider ?? "naver"}, ${new Date().toISOString()})
     `;
   },
-  async update(id: string, input: { name: string; address: string; phone?: string; email?: string }): Promise<void> {
+  async update(
+    id: string,
+    input: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }
+  ): Promise<void> {
     await ensureSchema();
     await sql`
-      UPDATE offices SET name = ${input.name}, address = ${input.address}, phone = ${input.phone ?? null}, email = ${input.email ?? null}
+      UPDATE offices SET name = ${input.name}, address = ${input.address}, phone = ${input.phone ?? null}, email = ${input.email ?? null}, map_provider = ${input.mapProvider ?? "naver"}
       WHERE id = ${id}
     `;
   },
@@ -550,7 +557,9 @@ export const distributorRepo = {
   },
 };
 
-export async function seedOfficesIfEmpty(seeds: { name: string; address: string; phone?: string; email?: string }[]) {
+export async function seedOfficesIfEmpty(
+  seeds: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }[]
+) {
   if ((await officeRepo.count()) === 0) {
     for (const s of seeds) {
       await officeRepo.create(s);

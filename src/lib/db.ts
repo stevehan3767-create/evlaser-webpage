@@ -99,9 +99,13 @@ function createSchema(): Promise<void> {
         address TEXT NOT NULL,
         phone TEXT,
         email TEXT,
+        map_provider TEXT NOT NULL DEFAULT 'naver',
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    // 국내 지사(본사/레이저기술센터)는 네이버지도, 해외 법인은 구글지도로
+    // "찾아오시는 길" 링크를 연결하기 위한 지도 제공자 선택.
+    await sql`ALTER TABLE offices ADD COLUMN IF NOT EXISTS map_provider TEXT NOT NULL DEFAULT 'naver'`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS distributors (
