@@ -93,11 +93,14 @@ function ContactFormInner() {
           const form = e.currentTarget;
           const data = new FormData(form);
           const payload = buildPayload(channel, data, anonymous);
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
           try {
             const res = await fetch("/api/contact", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
+              signal: controller.signal,
             });
             const json = await res.json();
             if (!res.ok) {
@@ -111,6 +114,8 @@ function ContactFormInner() {
           } catch {
             setErrorMsg(t("form.errorNetwork"));
             setStatus("error");
+          } finally {
+            clearTimeout(timeout);
           }
         }}
       >

@@ -26,6 +26,13 @@ function getTransporter() {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+    // Nodemailer's own defaults (2 min connection/socket timeouts) leave the
+    // request hanging well past Vercel's function limit when SMTP_HOST is
+    // wrong or unreachable — fail fast instead so the visitor gets an actual
+    // error rather than "전송 중..." forever.
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 8000,
   });
 }
 
