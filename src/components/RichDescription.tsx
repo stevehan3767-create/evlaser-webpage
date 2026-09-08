@@ -136,7 +136,7 @@ export default function RichDescription({ text }: { text: string }) {
             key={i}
             className={
               isLeadCaption
-                ? "text-ink font-bold text-center text-[16px] leading-relaxed whitespace-pre-wrap"
+                ? "text-ink font-bold text-left text-[16px] leading-relaxed whitespace-pre-wrap"
                 : "text-ink-soft text-[14.5px] leading-relaxed whitespace-pre-wrap"
             }
           >
