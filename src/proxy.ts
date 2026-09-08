@@ -9,7 +9,7 @@ export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/admin")) {
-    if (pathname === "/admin/login") {
+    if (pathname === "/admin/login" || pathname === "/admin/reset-password") {
       return NextResponse.next();
     }
     const token = req.cookies.get(ADMIN_SESSION_COOKIE)?.value;

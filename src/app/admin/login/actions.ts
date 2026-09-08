@@ -8,11 +8,11 @@ export async function login(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const next = String(formData.get("next") ?? "/admin");
 
-  if (!isAdminConfigured()) {
+  if (!(await isAdminConfigured())) {
     redirect(`/admin/login?error=not_configured`);
   }
 
-  if (!checkPassword(password)) {
+  if (!(await checkPassword(password))) {
     redirect(`/admin/login?error=invalid&next=${encodeURIComponent(next)}`);
   }
 

@@ -12,10 +12,11 @@ const ERROR_MESSAGES: Record<string, string> = {
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; reset?: string }>;
 }) {
   const params = await searchParams;
   const error = params.error ? ERROR_MESSAGES[params.error] ?? "로그인에 실패했습니다." : null;
+  const adminConfigured = await isAdminConfigured();
 
   return (
     <div className="w-full mx-auto max-w-[420px] px-7 py-24">
@@ -25,9 +26,14 @@ export default async function AdminLoginPage({
       <h1 className="text-[24px] font-[family-name:var(--font-display)] tracking-tight mb-2">관리자 로그인</h1>
       <p className="text-ink-soft text-[13.5px] mb-8">EV Laser 홈페이지 관리자 모드입니다.</p>
 
-      {!isAdminConfigured() && (
+      {!adminConfigured && (
         <div className="mb-6 p-4 bg-red-soft border border-red text-[13px] text-ink">
           ADMIN_PASSWORD 환경변수가 설정되어 있지 않아 로그인할 수 없습니다. 배포 환경에 환경변수를 추가해 주세요.
+        </div>
+      )}
+      {params.reset === "done" && (
+        <div className="mb-6 p-4 bg-[#e9f7ee] border border-[#b8e6c8] text-[13px] text-ink">
+          비밀번호가 재설정되었습니다. 새 비밀번호로 로그인해 주세요.
         </div>
       )}
 
@@ -51,6 +57,10 @@ export default async function AdminLoginPage({
           로그인
         </button>
       </form>
+
+      <Link href="/admin/reset-password" className="mt-5 inline-block text-[12.5px] text-ink-soft hover:text-blue">
+        비밀번호를 잊으셨나요?
+      </Link>
     </div>
   );
 }
