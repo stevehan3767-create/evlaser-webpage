@@ -28,11 +28,37 @@ function getTransporter() {
     },
     // Nodemailer's own defaults (2 min connection/socket timeouts) leave the
     // request hanging well past Vercel's function limit when SMTP_HOST is
-    // wrong or unreachable — fail fast instead so the visitor gets an actual
-    // error rather than "전송 중..." forever.
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 8000,
+    // wrong or unreachable. These per-phase timeouts help, but a wrong host
+    // can still fail slowly enough across phases to blow past Vercel's ~10s
+    // Hobby-plan function limit — see withTimeout() below for the hard cap
+    // that actually prevents that.
+    connectionTimeout: 5000,
+    greetingTimeout: 5000,
+    socketTimeout: 5000,
+  });
+}
+
+// A wrong/unreachable SMTP host can fail slowly enough — across DNS, TCP
+// connect, and TLS/greeting phases — to exceed Vercel's function time limit
+// before nodemailer's own per-phase timeouts trigger. When that happens,
+// Vercel kills the function outright (a raw 504, not JSON), which the
+// client's `res.json()` then fails to parse — surfacing as a generic
+// "network error" with no indication it was actually an SMTP problem. This
+// hard deadline guarantees sendMail always settles in time for the route to
+// return a proper JSON response instead.
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`메일 발송 시간 초과 (${ms / 1000}초)`)), ms);
+    promise.then(
+      (v) => {
+        clearTimeout(timer);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(timer);
+        reject(e);
+      }
+    );
   });
 }
 
@@ -52,7 +78,8 @@ export async function sendJobApplicationEmail(input: {
   }
 
   try {
-    await getTransporter().sendMail({
+    await withTimeout(
+      getTransporter().sendMail({
       from: process.env.MAIL_FROM || process.env.SMTP_USER,
       to: input.to,
       replyTo: input.email,
@@ -73,7 +100,9 @@ export async function sendJobApplicationEmail(input: {
         .filter((line) => line !== null)
         .join("\n"),
       attachments: input.attachments,
-    });
+      }),
+      7000
+    );
     return { sent: true };
   } catch (err) {
     return { sent: false, error: err instanceof Error ? err.message : "unknown error" };
@@ -103,25 +132,28 @@ export async function sendInquiryEmail(input: {
   };
 
   try {
-    await transporter.sendMail({
-      from: process.env.MAIL_FROM || process.env.SMTP_USER,
-      to,
-      replyTo: input.email,
-      subject: `[EV Laser 홈페이지] ${channelLabel[input.channel] ?? "문의"} - ${input.name}`,
-      text: [
-        `채널: ${channelLabel[input.channel] ?? input.channel}`,
-        `이름: ${input.name}`,
-        input.company ? `회사명: ${input.company}` : null,
-        `이메일: ${input.email}`,
-        input.phone ? `연락처: ${input.phone}` : null,
-        input.industry ? `관심 산업분야: ${input.industry}` : null,
-        "",
-        "문의 내용:",
-        input.message,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-    });
+    await withTimeout(
+      transporter.sendMail({
+        from: process.env.MAIL_FROM || process.env.SMTP_USER,
+        to,
+        replyTo: input.email,
+        subject: `[EV Laser 홈페이지] ${channelLabel[input.channel] ?? "문의"} - ${input.name}`,
+        text: [
+          `채널: ${channelLabel[input.channel] ?? input.channel}`,
+          `이름: ${input.name}`,
+          input.company ? `회사명: ${input.company}` : null,
+          `이메일: ${input.email}`,
+          input.phone ? `연락처: ${input.phone}` : null,
+          input.industry ? `관심 산업분야: ${input.industry}` : null,
+          "",
+          "문의 내용:",
+          input.message,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      }),
+      7000
+    );
     return { sent: true };
   } catch (err) {
     return { sent: false, error: err instanceof Error ? err.message : "unknown error" };

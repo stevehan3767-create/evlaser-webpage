@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { jobApplicationRepo, settingsRepo } from "@/lib/repo";
 import { sendJobApplicationEmail, DEFAULT_CAREERS_EMAIL } from "@/lib/mail";
 
+// sendJobApplicationEmail is internally capped at 7s, well under this — set
+// explicitly so a misconfigured SMTP host can never make Vercel kill the
+// function with a raw (non-JSON) 504 before our own error handling runs.
+export const maxDuration = 20;
+
 const MAX_TOTAL_BYTES = 4 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {

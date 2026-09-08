@@ -94,7 +94,7 @@ function ContactFormInner() {
           const data = new FormData(form);
           const payload = buildPayload(channel, data, anonymous);
           const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 15000);
+          const timeout = setTimeout(() => controller.abort(), 20000);
           try {
             const res = await fetch("/api/contact", {
               method: "POST",

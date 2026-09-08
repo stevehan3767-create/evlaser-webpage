@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { inquiryRepo } from "@/lib/repo";
 import { sendInquiryEmail } from "@/lib/mail";
 
+// sendInquiryEmail is internally capped at 7s, well under this — set
+// explicitly so a misconfigured SMTP host can never make Vercel kill the
+// function with a raw (non-JSON) 504 before our own error handling runs.
+export const maxDuration = 20;
+
 const VALID_CHANNELS = new Set(["general", "ethics", "praise", "complaint"]);
 
 export async function POST(req: NextRequest) {

@@ -7,13 +7,17 @@ function getSecret(): string {
 }
 
 export function isAdminConfigured(): boolean {
-  return Boolean(process.env.ADMIN_PASSWORD);
+  return Boolean(process.env.ADMIN_PASSWORD?.trim());
 }
 
+// Trimmed on both sides — Vercel's env var UI (and copy/paste in general)
+// easily introduces a stray trailing space or newline, which would otherwise
+// make every correctly-typed password fail with no visible cause (the same
+// class of bug BLOB_READ_WRITE_TOKEN had earlier in this project).
 export function checkPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
+  const expected = process.env.ADMIN_PASSWORD?.trim();
   if (!expected) return false;
-  const a = Buffer.from(password);
+  const a = Buffer.from(password.trim());
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
