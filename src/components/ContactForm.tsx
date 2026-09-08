@@ -68,7 +68,7 @@ function ContactFormInner() {
   const channelParam = params.get("channel") ?? "general";
   const channel = ((CHANNEL_KEYS as readonly string[]).includes(channelParam) ? channelParam : "general") as Channel;
 
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "sentNoEmail" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [anonymous, setAnonymous] = useState(false);
 
@@ -105,7 +105,7 @@ function ContactFormInner() {
               setStatus("error");
               return;
             }
-            setStatus("sent");
+            setStatus(json.emailSent ? "sent" : "sentNoEmail");
             form.reset();
             setAnonymous(false);
           } catch {
@@ -236,6 +236,9 @@ function ContactFormInner() {
         </button>
         {status === "sent" && (
           <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{t("form.success")}</p>
+        )}
+        {status === "sentNoEmail" && (
+          <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{t("form.successNoEmail")}</p>
         )}
         {status === "error" && <p className="mt-4 p-3.5 bg-red-soft border border-red text-[13px] text-ink">{errorMsg}</p>}
       </form>
