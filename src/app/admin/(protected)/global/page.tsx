@@ -70,6 +70,29 @@ export default async function AdminGlobalPage({
             <option value="google">Google 지도</option>
           </select>
         </div>
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
+            네이버 지도 좌표 (선택 — 입력 시 확대/축소 가능한 지도가 표시됩니다. 구글 지도는 좌표 없이도 자동 표시됩니다)
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <input
+              name="lat"
+              type="text"
+              inputMode="decimal"
+              placeholder="위도 (예: 37.3487)"
+              defaultValue={officeBeingEdited?.lat ?? ""}
+              className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+            <input
+              name="lng"
+              type="text"
+              inputMode="decimal"
+              placeholder="경도 (예: 126.9352)"
+              defaultValue={officeBeingEdited?.lng ?? ""}
+              className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
+            />
+          </div>
+        </div>
         <div className="flex gap-3">
           <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {officeBeingEdited ? "저장" : "추가"}

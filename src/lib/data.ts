@@ -108,11 +108,11 @@ export const techItems: TechItem[] = [
   { icon: "weld", key: "glassWelding" },
   { icon: "cut", key: "cutting" },
   { icon: "mark", key: "marking" },
+  { icon: "weld", key: "soldering" },
   { icon: "mark", key: "etching" },
   { icon: "clean", key: "cleaning" },
   { icon: "precision", key: "precisionMachining" },
   { icon: "drill", key: "drilling" },
-  { icon: "weld", key: "soldering" },
   { icon: "heat", key: "heatTreatment" },
   { icon: "clad", key: "cladding" },
   { icon: "print3d", key: "print3d" },
@@ -198,6 +198,11 @@ export const techPageSeeds: { key: string; title: string; description: string }[
     "key": "marking",
     "title": "레이저 마킹 (Laser Marking)",
     "description": "레이저 마킹(Laser Marking)은 레이저 광을 사용하여 재료의 표면을 변경하여 로고, 제품명, 시리얼 번호 등을 새기는 기술입니다. 표면을 변형하거나 카본화하여 선명하고 내구성 높은 마킹을 구현할 수 있습니다. 잉크나 화학 물질 없이 다양한 재질에 적용할 수 있어 친환경적입니다. 다양한 재료에 적용 가능하며, 특히 정밀하고 지속성이 높은 마킹이 필요한 산업에서 많이 사용됩니다.\n\n[기술특징]\n- 고정도 마킹: 정확한 위치에 정밀한 패턴 또는 문자 인쇄 가능\n- 반영구적: 지워지지 않고 내구성이 뛰어나 장기적 사용에 적합\n- 다양한 재료 적용 가능: 금속, 플라스틱, 목재 등 다양한 소재에 적용\n- 고속 처리: 빠른 마킹 속도로 생산 효율 극대화\n\n[적용분야]\n- 자동차 부품 가공(일련번호 마킹)\n- 전자부품 식별 코드 마킹\n- 의료기기 로고 인쇄\n- 산업용 부품, 소비재 등 제품 식별 마킹\n\n[주요 변수]\n파장(Fiber/CO₂/UV), 조사 시간, 빔 직경, 조사 속도, 초점 위치"
+  },
+  {
+    "key": "soldering",
+    "title": "레이저 솔더링 (Laser Soldering)",
+    "description": "레이저 솔더링(Laser Soldering)은 국부적으로 집중된 레이저 빔의 열을 이용하여 솔더(납)를 용융시켜 전자부품과 기판(PCB) 등의 리드를 접합하는 비접촉식 납땜 기술입니다. 인두 납땜이나 리플로우(Reflow) 방식과 달리 레이저는 원하는 지점에만 정확하게 열을 전달할 수 있어, 인접 부품에 대한 열 영향을 최소화하면서 접합부의 품질과 재현성을 높일 수 있습니다.\n\n레이저 솔더링은 접합 온도와 시간을 정밀하게 제어할 수 있어 미세피치(Fine-Pitch) 커넥터, 카메라 모듈, 센서 등 열에 민감한 소형·정밀 부품의 접합에 적합하며, 비접촉 가공이기 때문에 인두 팁의 마모나 오염에 따른 품질 편차 문제에서도 자유롭습니다.\n\n[기술특징]\n- 비접촉 가공: 인두 팁 마모·오염이 없어 접합 품질이 균일함\n- 국부 가열: 레이저 스폿 크기만큼만 열이 가해져 주변 부품·기판에 대한 열 영향 최소화\n- 정밀 온도·시간 제어: 실시간 온도 피드백과 연동해 재현성 높은 접합부 형성 가능\n- 고속 처리: 짧은 조사 시간으로 리플로우 대비 사이클타임 단축 가능\n- 플럭스 비산 및 과열로 인한 부품 손상 위험 감소\n\n[적용분야]\n- 커넥터, FPC(연성회로기판) 등 미세피치 부품 접합\n- 카메라 모듈, 센서 등 열에 민감한 정밀 전자부품\n- 자동차 전장(ECU, 배터리 관련 모듈) 부품 접합\n\n[주요 변수]\n레이저 출력, 조사 시간, 빔 스폿 크기, 솔더 종류 및 융점, 실시간 온도 피드백 제어"
   },
   {
     "key": "heatTreatment",

@@ -4,6 +4,8 @@ import { officeSeeds } from "@/lib/data";
 import { officeRepo, distributorRepo, seedOfficesIfEmpty, type OfficeRow, type DistributorRow } from "@/lib/repo";
 import { countryFlag, countryName, isCountryCode } from "@/lib/countries";
 import { mapSearchUrl } from "@/lib/maps";
+import GoogleMapEmbed from "./GoogleMapEmbed";
+import NaverMapEmbed from "./NaverMapEmbed";
 
 function MapLink({ href, label }: { href: string; label: string }) {
   return (
@@ -44,6 +46,15 @@ function OfficeTable({ headers, rows }: { headers: [string, string, string, stri
               </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] align-top">
                 <p>{r.address}</p>
+                {r.mapProvider === "google" ? (
+                  <div className="mt-2.5 mb-1.5 border border-line-strong overflow-hidden rounded-sm">
+                    <GoogleMapEmbed query={`${r.name} ${r.address}`} title={`${r.name} 지도`} />
+                  </div>
+                ) : r.lat !== null && r.lng !== null ? (
+                  <div className="mt-2.5 mb-1.5 border border-line-strong overflow-hidden rounded-sm">
+                    <NaverMapEmbed lat={r.lat} lng={r.lng} title={`${r.name} 지도`} />
+                  </div>
+                ) : null}
                 <MapLink
                   href={mapSearchUrl(r.mapProvider, `${r.name} ${r.address}`)}
                   label={r.mapProvider === "google" ? "Google 지도에서 보기" : "네이버 지도에서 보기"}

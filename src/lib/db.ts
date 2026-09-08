@@ -1,4 +1,5 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
+import { techPageSeeds } from "./data";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -110,6 +111,10 @@ function createSchema(): Promise<void> {
     // 국내 지사(본사/레이저기술센터)는 네이버지도, 해외 법인은 구글지도로
     // "찾아오시는 길" 링크를 연결하기 위한 지도 제공자 선택.
     await sql`ALTER TABLE offices ADD COLUMN IF NOT EXISTS map_provider TEXT NOT NULL DEFAULT 'naver'`;
+    // 네이버 지도를 확대/축소 가능한 임베드 지도로 보여주려면 좌표가 필요
+    // (네이버는 주소만으로 임베드가 되지 않음). 관리자가 선택적으로 입력.
+    await sql`ALTER TABLE offices ADD COLUMN IF NOT EXISTS lat DOUBLE PRECISION`;
+    await sql`ALTER TABLE offices ADD COLUMN IF NOT EXISTS lng DOUBLE PRECISION`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS distributors (
@@ -238,7 +243,47 @@ function createSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+
+    // 해외 법인은 구글지도를 써야 하는데, map_provider 컬럼이 추가되기 전에
+    // 이미 시딩된 환경에서는 기본값인 'naver'로 남아있을 수 있어 바로잡는다.
+    await sql`UPDATE offices SET map_provider = 'google' WHERE name LIKE '%쑤저우%' AND map_provider <> 'google'`;
+
+    await ensureLaserSolderingTechItem();
   })();
+}
+
+// 기술종류별 항목이 이미 시딩된 환경(빈 그룹에만 적용되는 seedContentItemsIfEmpty
+// 로는 반영되지 않음)에도 "레이저마킹"과 "레이저에칭" 사이에 "레이저솔더링(납땜)"
+// 항목과 그 소개 내용을 한 번만 끼워 넣기 위한 보정. 이미 있으면 아무 것도 하지 않는다.
+async function ensureLaserSolderingTechItem(): Promise<void> {
+  const already = await sql`SELECT 1 FROM content_items WHERE group_key = 'tech' AND item_key = 'soldering' LIMIT 1`;
+  if (already.length > 0) return;
+
+  const rows = (await sql`
+    SELECT id, item_key, sort_order FROM content_items WHERE group_key = 'tech' ORDER BY sort_order ASC, created_at ASC
+  `) as { id: string; item_key: string; sort_order: number }[];
+  // 그룹이 아직 비어 있으면 seedContentItemsIfEmpty(techItems)가 알아서
+  // (이미 올바른 순서로 재배치된) 전체 목록을 시딩하므로 여기서는 건드리지 않는다.
+  if (rows.length === 0) return;
+
+  const etchingIdx = rows.findIndex((r) => r.item_key === "etching");
+  const insertIndex = etchingIdx === -1 ? rows.length : etchingIdx;
+
+  await sql`UPDATE content_items SET sort_order = sort_order + 1 WHERE group_key = 'tech' AND sort_order >= ${insertIndex}`;
+  await sql`
+    INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
+    VALUES (${newId()}, 'tech', 'soldering', '레이저솔더링(납땜)', 'weld', ${insertIndex}, ${new Date().toISOString()})
+    ON CONFLICT (group_key, item_key) DO NOTHING
+  `;
+
+  const solderingSeed = techPageSeeds.find((s) => s.key === "soldering");
+  if (solderingSeed) {
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, updated_at)
+      VALUES ('tech', 'soldering', ${solderingSeed.title}, ${solderingSeed.description}, ${new Date().toISOString()})
+      ON CONFLICT (group_key, item_key) DO NOTHING
+    `;
+  }
 }
 
 export function ensureSchema(): Promise<void> {

@@ -97,6 +97,8 @@ export interface OfficeRow {
   phone: string | null;
   email: string | null;
   mapProvider: MapProvider;
+  lat: number | null;
+  lng: number | null;
   createdAt: string;
 }
 
@@ -108,6 +110,8 @@ function rowToOffice(r: Record<string, unknown>): OfficeRow {
     phone: (r.phone as string) ?? null,
     email: (r.email as string) ?? null,
     mapProvider: (r.map_provider as MapProvider) === "google" ? "google" : "naver",
+    lat: r.lat === null || r.lat === undefined ? null : Number(r.lat),
+    lng: r.lng === null || r.lng === undefined ? null : Number(r.lng),
     createdAt: r.created_at as string,
   };
 }
@@ -507,20 +511,36 @@ export const officeRepo = {
     const rows = await sql`SELECT * FROM offices ORDER BY created_at ASC`;
     return (rows as Record<string, unknown>[]).map(rowToOffice);
   },
-  async create(input: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }): Promise<void> {
+  async create(input: {
+    name: string;
+    address: string;
+    phone?: string;
+    email?: string;
+    mapProvider?: MapProvider;
+    lat?: number;
+    lng?: number;
+  }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO offices (id, name, address, phone, email, map_provider, created_at)
-      VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${input.mapProvider ?? "naver"}, ${new Date().toISOString()})
+      INSERT INTO offices (id, name, address, phone, email, map_provider, lat, lng, created_at)
+      VALUES (${newId()}, ${input.name}, ${input.address}, ${input.phone ?? null}, ${input.email ?? null}, ${input.mapProvider ?? "naver"}, ${input.lat ?? null}, ${input.lng ?? null}, ${new Date().toISOString()})
     `;
   },
   async update(
     id: string,
-    input: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }
+    input: {
+      name: string;
+      address: string;
+      phone?: string;
+      email?: string;
+      mapProvider?: MapProvider;
+      lat?: number;
+      lng?: number;
+    }
   ): Promise<void> {
     await ensureSchema();
     await sql`
-      UPDATE offices SET name = ${input.name}, address = ${input.address}, phone = ${input.phone ?? null}, email = ${input.email ?? null}, map_provider = ${input.mapProvider ?? "naver"}
+      UPDATE offices SET name = ${input.name}, address = ${input.address}, phone = ${input.phone ?? null}, email = ${input.email ?? null}, map_provider = ${input.mapProvider ?? "naver"}, lat = ${input.lat ?? null}, lng = ${input.lng ?? null}
       WHERE id = ${id}
     `;
   },
@@ -562,7 +582,15 @@ export const distributorRepo = {
 };
 
 export async function seedOfficesIfEmpty(
-  seeds: { name: string; address: string; phone?: string; email?: string; mapProvider?: MapProvider }[]
+  seeds: {
+    name: string;
+    address: string;
+    phone?: string;
+    email?: string;
+    mapProvider?: MapProvider;
+    lat?: number;
+    lng?: number;
+  }[]
 ) {
   if ((await officeRepo.count()) === 0) {
     for (const s of seeds) {

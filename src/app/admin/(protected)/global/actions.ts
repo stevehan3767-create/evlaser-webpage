@@ -10,9 +10,13 @@ export async function saveOffice(formData: FormData) {
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const mapProvider: MapProvider = formData.get("mapProvider") === "google" ? "google" : "naver";
+  const latRaw = String(formData.get("lat") ?? "").trim();
+  const lngRaw = String(formData.get("lng") ?? "").trim();
+  const lat = latRaw && !Number.isNaN(Number(latRaw)) ? Number(latRaw) : undefined;
+  const lng = lngRaw && !Number.isNaN(Number(lngRaw)) ? Number(lngRaw) : undefined;
   if (!name || !address) return;
 
-  const input = { name, address, phone: phone || undefined, email: email || undefined, mapProvider };
+  const input = { name, address, phone: phone || undefined, email: email || undefined, mapProvider, lat, lng };
   if (id) {
     await officeRepo.update(id, input);
   } else {
