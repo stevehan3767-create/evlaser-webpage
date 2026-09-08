@@ -10,7 +10,7 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
-  lineupCategoryLinkRepo,
+  contentLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
@@ -54,10 +54,32 @@ export default async function ContentDetailPage({
   // 설비 라인업 목록을 함께 보여준다.
   let relatedLineupItems: { itemKey: string; name: string; icon: string }[] = [];
   if (LINEUP_CATEGORY_GROUPS.has(group)) {
-    const relatedKeys = await lineupCategoryLinkRepo.itemKeysForCategory(group, key);
+    const relatedKeys = await contentLinkRepo.fromKeysFor(group, key, "lineup");
     if (relatedKeys.length > 0) {
       const lineupItems = await contentItemRepo.listByGroup("lineup");
       relatedLineupItems = lineupItems.filter((li) => relatedKeys.includes(li.itemKey));
+    }
+  }
+
+  // 재료별 상세페이지에는 그 재료에 적용 가능하다고 등록된 기술종류별
+  // 목록을, 기술종류별 상세페이지에는 반대로 그 기술이 적용 가능한
+  // 재료별 목록을 함께 보여준다.
+  let applicableTechItems: { itemKey: string; name: string; icon: string }[] = [];
+  if (group === "material") {
+    await seedContentItemsIfEmpty("tech", contentGroups.tech.itemSeeds);
+    const techKeys = await contentLinkRepo.toKeysFor("material", key, "tech");
+    if (techKeys.length > 0) {
+      const techItems = await contentItemRepo.listByGroup("tech");
+      applicableTechItems = techItems.filter((t) => techKeys.includes(t.itemKey));
+    }
+  }
+  let applicableMaterialItems: { itemKey: string; name: string; icon: string }[] = [];
+  if (group === "tech") {
+    await seedContentItemsIfEmpty("material", contentGroups.material.itemSeeds);
+    const materialKeys = await contentLinkRepo.fromKeysFor("tech", key, "material");
+    if (materialKeys.length > 0) {
+      const materialItemsList = await contentItemRepo.listByGroup("material");
+      applicableMaterialItems = materialItemsList.filter((m) => materialKeys.includes(m.itemKey));
     }
   }
 
@@ -127,6 +149,44 @@ export default async function ContentDetailPage({
                 >
                   <Icon name={li.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
                   {li.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 재료별 상세페이지: 적용 가능 레이저가공기술 */}
+        {applicableTechItems.length > 0 && (
+          <div className="mt-14 pt-10 border-t border-line">
+            <h2 className="text-[18px] font-bold mb-6">적용 가능 레이저가공기술</h2>
+            <div className="flex flex-wrap gap-2">
+              {applicableTechItems.map((ti) => (
+                <Link
+                  key={ti.itemKey}
+                  href={`/products/tech/${ti.itemKey}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 border border-line-strong rounded-sm text-[12.5px] font-semibold text-ink-soft whitespace-nowrap hover:border-blue hover:text-blue transition-colors"
+                >
+                  <Icon name={ti.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
+                  {ti.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 기술종류별 상세페이지: 적용 가능 재료 */}
+        {applicableMaterialItems.length > 0 && (
+          <div className="mt-14 pt-10 border-t border-line">
+            <h2 className="text-[18px] font-bold mb-6">적용 가능 재료</h2>
+            <div className="flex flex-wrap gap-2">
+              {applicableMaterialItems.map((mi) => (
+                <Link
+                  key={mi.itemKey}
+                  href={`/products/material/${mi.itemKey}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 border border-line-strong rounded-sm text-[12.5px] font-semibold text-ink-soft whitespace-nowrap hover:border-blue hover:text-blue transition-colors"
+                >
+                  <Icon name={mi.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
+                  {mi.name}
                 </Link>
               ))}
             </div>

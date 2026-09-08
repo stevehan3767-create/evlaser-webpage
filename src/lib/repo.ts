@@ -655,11 +655,10 @@ export const contentItemRepo = {
     await sql`DELETE FROM content_pages WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     await sql`DELETE FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
     await sql`DELETE FROM content_videos WHERE group_key = ${groupKey} AND item_key = ${itemKey}`;
-    if (groupKey === "lineup") {
-      await sql`DELETE FROM lineup_category_links WHERE item_key = ${itemKey}`;
-    } else {
-      await sql`DELETE FROM lineup_category_links WHERE category_group = ${groupKey} AND category_key = ${itemKey}`;
-    }
+    await sql`
+      DELETE FROM content_item_links
+      WHERE (from_group = ${groupKey} AND from_key = ${itemKey}) OR (to_group = ${groupKey} AND to_key = ${itemKey})
+    `;
   },
   async count(groupKey: string): Promise<number> {
     await ensureSchema();
@@ -668,40 +667,42 @@ export const contentItemRepo = {
   },
 };
 
-// Which 기술종류별/산업분야별/재료별 categories a given 설비 라인업 item
-// belongs to (many-to-many per category group), so each category's detail
-// page can list the equipment tagged with it, and 설비 라인업 can filter by
-// category.
-export const lineupCategoryLinkRepo = {
-  async categoryKeysForItem(itemKey: string, categoryGroup: string): Promise<string[]> {
+// Generic many-to-many link between two content_items groups — e.g. which
+// 기술/산업/재료 categories a given 설비 라인업 item belongs to, or which 기술
+// a given 재료 can be processed with. (fromGroup, fromKey) is the item being
+// edited; (toGroup, toKey) is what it's linked to.
+export const contentLinkRepo = {
+  async toKeysFor(fromGroup: string, fromKey: string, toGroup: string): Promise<string[]> {
     await ensureSchema();
     const rows = await sql`
-      SELECT category_key FROM lineup_category_links WHERE item_key = ${itemKey} AND category_group = ${categoryGroup}
+      SELECT to_key FROM content_item_links WHERE from_group = ${fromGroup} AND from_key = ${fromKey} AND to_group = ${toGroup}
     `;
-    return (rows as { category_key: string }[]).map((r) => r.category_key);
+    return (rows as { to_key: string }[]).map((r) => r.to_key);
   },
-  async itemKeysForCategory(categoryGroup: string, categoryKey: string): Promise<string[]> {
+  async fromKeysFor(toGroup: string, toKey: string, fromGroup: string): Promise<string[]> {
     await ensureSchema();
     const rows = await sql`
-      SELECT item_key FROM lineup_category_links WHERE category_group = ${categoryGroup} AND category_key = ${categoryKey}
+      SELECT from_key FROM content_item_links WHERE to_group = ${toGroup} AND to_key = ${toKey} AND from_group = ${fromGroup}
     `;
-    return (rows as { item_key: string }[]).map((r) => r.item_key);
+    return (rows as { from_key: string }[]).map((r) => r.from_key);
   },
-  async setForItem(itemKey: string, categoryGroup: string, categoryKeys: string[]): Promise<void> {
+  async setLinks(fromGroup: string, fromKey: string, toGroup: string, toKeys: string[]): Promise<void> {
     await ensureSchema();
-    await sql`DELETE FROM lineup_category_links WHERE item_key = ${itemKey} AND category_group = ${categoryGroup}`;
-    for (const categoryKey of categoryKeys) {
+    await sql`DELETE FROM content_item_links WHERE from_group = ${fromGroup} AND from_key = ${fromKey} AND to_group = ${toGroup}`;
+    for (const toKey of toKeys) {
       await sql`
-        INSERT INTO lineup_category_links (item_key, category_group, category_key)
-        VALUES (${itemKey}, ${categoryGroup}, ${categoryKey})
+        INSERT INTO content_item_links (from_group, from_key, to_group, to_key)
+        VALUES (${fromGroup}, ${fromKey}, ${toGroup}, ${toKey})
         ON CONFLICT DO NOTHING
       `;
     }
   },
-  async listAll(categoryGroup: string): Promise<{ itemKey: string; categoryKey: string }[]> {
+  async listAll(fromGroup: string, toGroup: string): Promise<{ fromKey: string; toKey: string }[]> {
     await ensureSchema();
-    const rows = await sql`SELECT item_key, category_key FROM lineup_category_links WHERE category_group = ${categoryGroup}`;
-    return (rows as { item_key: string; category_key: string }[]).map((r) => ({ itemKey: r.item_key, categoryKey: r.category_key }));
+    const rows = await sql`
+      SELECT from_key, to_key FROM content_item_links WHERE from_group = ${fromGroup} AND to_group = ${toGroup}
+    `;
+    return (rows as { from_key: string; to_key: string }[]).map((r) => ({ fromKey: r.from_key, toKey: r.to_key }));
   },
 };
 

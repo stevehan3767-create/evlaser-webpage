@@ -5,7 +5,7 @@ import {
   contentImageRepo,
   contentVideoRepo,
   contentItemRepo,
-  lineupCategoryLinkRepo,
+  contentLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
@@ -20,11 +20,17 @@ import type { IconName } from "@/lib/data";
 export const dynamic = "force-dynamic";
 
 const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
-const LINEUP_CATEGORY_GROUPS = [
-  { groupKey: "tech", label: "관련 기술 카테고리" },
-  { groupKey: "industry", label: "관련 산업분야" },
-  { groupKey: "material", label: "관련 재료" },
-] as const;
+// 어떤 그룹의 항목 편집 화면에 어떤 상대 그룹 다중선택 체크박스를 보여줄지 —
+// 설비 라인업 → 기술/산업/재료, 재료 → 기술. src/app/admin/(protected)/content-pages/actions.ts의
+// LINK_TARGET_GROUPS와 짝을 이룬다.
+const LINK_TARGETS: Record<string, { groupKey: string; label: string }[]> = {
+  lineup: [
+    { groupKey: "tech", label: "관련 기술 카테고리" },
+    { groupKey: "industry", label: "관련 산업분야" },
+    { groupKey: "material", label: "관련 재료" },
+  ],
+  material: [{ groupKey: "tech", label: "적용 가능 레이저가공기술" }],
+};
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 5;
 
@@ -78,22 +84,21 @@ export default async function AdminContentPagesPage({
   const editingImage = editImage ? images.find((i) => i.id === editImage) : undefined;
   const editingVideo = editVideo ? videos.find((v) => v.id === editVideo) : undefined;
   const baseHref = `/admin/content-pages?group=${group}&key=${key}`;
-  const lineupCategoryGroups =
-    group === "lineup" && key
-      ? await Promise.all(
-          LINEUP_CATEGORY_GROUPS.map(async ({ groupKey, label }) => {
-            // Other groups' items are normally seeded when their own /products
-            // page is first visited — but a lineup item can be edited before
-            // that ever happens, so ensure it here too.
-            await seedContentItemsIfEmpty(groupKey, contentGroups[groupKey].itemSeeds);
-            const [catItems, linkedKeys] = await Promise.all([
-              contentItemRepo.listByGroup(groupKey),
-              lineupCategoryLinkRepo.categoryKeysForItem(key, groupKey),
-            ]);
-            return { groupKey, label, items: catItems, linkedKeys };
-          })
-        )
-      : [];
+  const lineupCategoryGroups = key
+    ? await Promise.all(
+        (LINK_TARGETS[group] ?? []).map(async ({ groupKey, label }) => {
+          // Other groups' items are normally seeded when their own /products
+          // page is first visited — but an item can be edited before that
+          // ever happens, so ensure it here too.
+          await seedContentItemsIfEmpty(groupKey, contentGroups[groupKey].itemSeeds);
+          const [catItems, linkedKeys] = await Promise.all([
+            contentItemRepo.listByGroup(groupKey),
+            contentLinkRepo.toKeysFor(group, key, groupKey),
+          ]);
+          return { groupKey, label, items: catItems, linkedKeys };
+        })
+      )
+    : [];
   const currentItem = items.find((i) => i.itemKey === key);
 
   return (
@@ -220,7 +225,7 @@ export default async function AdminContentPagesPage({
           />
           <div>
             <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
-              내용 (A4 1장 분량 권장) — 첫 줄은 이미지 아래 캡션(굵게·가운데정렬)으로, <code>[소제목]</code> 줄은 소제목으로,{" "}
+              내용 (A4 1장 분량 권장) — 첫 줄은 이미지 아래 캡션(굵게·좌측정렬)으로, <code>[소제목]</code> 줄은 소제목으로,{" "}
               <code>- 항목</code> 줄은 목록으로, <code>| 항목 | 내용 |</code> 형식의 줄은 표(사양서)로 자동 변환됩니다
             </label>
             <textarea
@@ -233,7 +238,7 @@ export default async function AdminContentPagesPage({
           {lineupCategoryGroups.map(({ groupKey, label, items: catItems, linkedKeys }) => (
             <div key={groupKey}>
               <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
-                {label} (선택 — 해당 카테고리 상세페이지의 &quot;관련 설비&quot; 목록 및 설비 라인업 필터에 반영됩니다)
+                {label} (선택 — 상대 항목 상세페이지의 관련 목록에 반영{group === "lineup" && groupKey === "tech" ? " 및 설비 라인업 필터에 사용" : ""}됩니다)
               </label>
               <div className="flex flex-wrap gap-x-4 gap-y-2 border border-line-strong rounded-sm p-3">
                 {catItems.length === 0 ? (

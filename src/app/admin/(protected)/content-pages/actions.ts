@@ -3,9 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { contentGroups, iconNames } from "@/lib/data";
-import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo, lineupCategoryLinkRepo } from "@/lib/repo";
+import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo, contentLinkRepo } from "@/lib/repo";
 
-const LINEUP_CATEGORY_GROUPS = ["tech", "industry", "material"] as const;
+// Which other groups a given group's item can be linked to (multi-select
+// checkboxes on its edit form): 설비 라인업 → 기술/산업/재료 it applies to,
+// 재료 → 기술 it can be processed with.
+const LINK_TARGET_GROUPS: Record<string, string[]> = {
+  lineup: ["tech", "industry", "material"],
+  material: ["tech"],
+};
 
 const MAX_IMAGES = 5;
 const MAX_VIDEOS = 5;
@@ -44,14 +50,12 @@ export async function saveContentAll(formData: FormData) {
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   await contentPageRepo.upsert(group, key, { title, description, imageUrl: imageUrl || undefined });
 
-  // 설비 라인업 항목은 기술종류별/산업분야별/재료별 카테고리에 각각 다중
-  // 선택으로 연결할 수 있다 — 해당 카테고리의 상세페이지에 "관련 설비"
-  // 목록으로 표시되고, 설비 라인업 섹션에서 카테고리별로 필터링된다.
-  if (group === "lineup") {
-    for (const categoryGroup of LINEUP_CATEGORY_GROUPS) {
-      const keys = formData.getAll(`${categoryGroup}Keys`).map(String).filter(Boolean);
-      await lineupCategoryLinkRepo.setForItem(key, categoryGroup, keys);
-    }
+  // 설비 라인업 항목은 기술/산업/재료에, 재료 항목은 기술에 각각 다중 선택으로
+  // 연결할 수 있다 — 상대 항목의 상세페이지에 "관련 설비"/"적용 가능 기술"
+  // 목록으로 표시되고, 설비 라인업 섹션에서는 카테고리별 필터링에도 쓰인다.
+  for (const toGroup of LINK_TARGET_GROUPS[group] ?? []) {
+    const keys = formData.getAll(`${toGroup}Keys`).map(String).filter(Boolean);
+    await contentLinkRepo.setLinks(group, key, toGroup, keys);
   }
 
   // Editing one existing photo/video is a direct, immediate update.

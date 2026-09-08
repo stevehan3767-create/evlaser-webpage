@@ -214,16 +214,17 @@ function createSchema(): Promise<void> {
       )
     `;
 
-    // Many-to-many: which 기술종류별/산업분야별/재료별 categories a given 설비
-    // 라인업 item belongs to (an item can have several in each), so each
-    // category's detail page can list the equipment tagged with it, and the
-    // 설비 라인업 section can filter by category.
+    // Generic many-to-many link between any two content_items rows — e.g.
+    // which 기술/산업/재료 categories a given 설비 라인업 item belongs to, or
+    // which 기술 a given 재료 can be processed with. (from_group, from_key) is
+    // the item being edited; (to_group, to_key) is what it's linked to.
     await sql`
-      CREATE TABLE IF NOT EXISTS lineup_category_links (
-        item_key TEXT NOT NULL,
-        category_group TEXT NOT NULL,
-        category_key TEXT NOT NULL,
-        PRIMARY KEY (item_key, category_group, category_key)
+      CREATE TABLE IF NOT EXISTS content_item_links (
+        from_group TEXT NOT NULL,
+        from_key TEXT NOT NULL,
+        to_group TEXT NOT NULL,
+        to_key TEXT NOT NULL,
+        PRIMARY KEY (from_group, from_key, to_group, to_key)
       )
     `;
 
