@@ -444,7 +444,7 @@
       "submit": "Send Message",
       "sending": "Sending...",
       "success": "Your message has been received. Our team will be in touch shortly.",
-  "successNoEmail": "Your message was received, but email delivery isn't configured yet, so it wasn't forwarded automatically — please use another contact method if this is urgent.",
+  "successNoEmail": "Your message was received, but it wasn't forwarded to our team by email — please use another contact method if this is urgent.",
       "errorGeneric": "Something went wrong while submitting your message.",
       "errorNetwork": "A network error prevented submission. Please try again shortly.",
       "categoryOptions": [

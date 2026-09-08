@@ -77,7 +77,7 @@ export default async function AdminInquiriesPage() {
               </p>
               <p className="mt-2 whitespace-pre-wrap">{i.message}</p>
               <p className="mt-2 text-[11px] font-mono text-ink-faint">
-                {i.emailSent ? "이메일 발송됨" : "이메일 미발송 (SMTP 미설정 또는 오류)"}
+                {i.emailSent ? "이메일 발송됨" : `이메일 미발송 — 오류: ${i.emailError ?? "알 수 없음"}`}
               </p>
             </div>
           ))

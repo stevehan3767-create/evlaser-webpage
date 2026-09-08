@@ -10,6 +10,7 @@ export interface Inquiry {
   industry: string | null;
   message: string;
   emailSent: boolean;
+  emailError: string | null;
   createdAt: string;
 }
 
@@ -43,6 +44,7 @@ function rowToInquiry(r: Record<string, unknown>): Inquiry {
     industry: (r.industry as string) ?? null,
     message: r.message as string,
     emailSent: Boolean(r.email_sent),
+    emailError: (r.email_error as string) ?? null,
     createdAt: r.created_at as string,
   };
 }
@@ -318,13 +320,14 @@ export const inquiryRepo = {
     industry?: string;
     message: string;
     emailSent: boolean;
+    emailError?: string;
   }): Promise<Inquiry> {
     await ensureSchema();
     const id = newId();
     const createdAt = new Date().toISOString();
     await sql`
-      INSERT INTO inquiries (id, channel, name, company, email, phone, industry, message, email_sent, created_at)
-      VALUES (${id}, ${input.channel}, ${input.name}, ${input.company ?? null}, ${input.email}, ${input.phone ?? null}, ${input.industry ?? null}, ${input.message}, ${input.emailSent}, ${createdAt})
+      INSERT INTO inquiries (id, channel, name, company, email, phone, industry, message, email_sent, email_error, created_at)
+      VALUES (${id}, ${input.channel}, ${input.name}, ${input.company ?? null}, ${input.email}, ${input.phone ?? null}, ${input.industry ?? null}, ${input.message}, ${input.emailSent}, ${input.emailError ?? null}, ${createdAt})
     `;
     return {
       id,
@@ -337,6 +340,7 @@ export const inquiryRepo = {
       industry: input.industry ?? null,
       message: input.message,
       emailSent: input.emailSent,
+      emailError: input.emailError ?? null,
     };
   },
   async list(): Promise<Inquiry[]> {

@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
     industry,
     message,
     emailSent: mailResult.sent,
+    emailError: mailResult.sent ? undefined : mailResult.error,
   });
 
   return NextResponse.json({

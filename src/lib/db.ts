@@ -54,9 +54,13 @@ function createSchema(): Promise<void> {
         industry TEXT,
         message TEXT NOT NULL,
         email_sent BOOLEAN NOT NULL DEFAULT false,
+        email_error TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    // 메일 발송이 실패한 이유(설정 누락 vs 인증/연결 오류 등)를 관리자가
+    // Vercel 로그 없이도 /admin/inquiries에서 바로 확인할 수 있도록 저장.
+    await sql`ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS email_error TEXT`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS resources (
