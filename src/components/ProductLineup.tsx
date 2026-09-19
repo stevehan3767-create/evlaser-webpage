@@ -9,9 +9,6 @@ const FACET_GROUPS: { group: string; label: string }[] = [
   { group: "tech", label: "기술종류" },
   { group: "material", label: "재료" },
   { group: "industry", label: "산업분야" },
-  { group: "oscType", label: "발진방식" },
-  { group: "wavelength", label: "파장" },
-  { group: "pulse", label: "펄스" },
 ];
 
 export default async function ProductLineup() {

@@ -426,27 +426,6 @@ if (tsSeriesSeed) {
   ].join("\n");
 }
 
-// 레이저 파인더(설비 찾기)의 발진기 관련 3개 필터 축. 고정 목록으로 시작하지만
-// 다른 카테고리와 똑같이 관리자모드에서 추가·수정·삭제할 수 있고, 각 설비에
-// 복수 태그로 연결된다. 방문객은 모르면 선택하지 않으면(=전체) 된다.
-export const oscTypeItems: { key: string; name: string; icon: IconName }[] = [
-  { key: "fiber", name: "Fiber", icon: "machine" },
-  { key: "co2", name: "CO₂", icon: "machine" },
-  { key: "diode", name: "Diode", icon: "machine" },
-  { key: "ndyag", name: "Nd:YAG", icon: "machine" },
-];
-export const wavelengthItems: { key: string; name: string; icon: IconName }[] = [
-  { key: "ir", name: "IR (적외선)", icon: "star" },
-  { key: "green", name: "Green (녹색)", icon: "star" },
-  { key: "uv", name: "UV (자외선)", icon: "star" },
-];
-export const pulseItems: { key: string; name: string; icon: IconName }[] = [
-  { key: "cw", name: "CW (연속파)", icon: "measure" },
-  { key: "ns", name: "ns (나노초)", icon: "measure" },
-  { key: "ps", name: "ps (피코초)", icon: "measure" },
-  { key: "fs", name: "fs (펨토초)", icon: "measure" },
-];
-
 export interface ContentGroupMeta {
   // Initial item list, seeded into the content_items table once on first
   // load. After that, the DB (admin-managed) is the source of truth — the
@@ -486,24 +465,6 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
     seeds: [],
     backHref: "/products/materials",
     labelKo: "재료별",
-  },
-  oscType: {
-    itemSeeds: oscTypeItems,
-    seeds: [],
-    backHref: "/products#lineup",
-    labelKo: "발진방식",
-  },
-  wavelength: {
-    itemSeeds: wavelengthItems,
-    seeds: [],
-    backHref: "/products#lineup",
-    labelKo: "파장",
-  },
-  pulse: {
-    itemSeeds: pulseItems,
-    seeds: [],
-    backHref: "/products#lineup",
-    labelKo: "펄스(펄스폭)",
   },
 };
 

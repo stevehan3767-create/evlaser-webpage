@@ -15,7 +15,7 @@ import {
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
 
-const LINEUP_CATEGORY_GROUPS = new Set(["tech", "industry", "material", "oscType", "wavelength", "pulse"]);
+const LINEUP_CATEGORY_GROUPS = new Set(["tech", "industry", "material"]);
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +24,6 @@ const GROUP_EYEBROWS: Record<string, string> = {
   tech: "TECHNOLOGY",
   industry: "INDUSTRY",
   material: "MATERIAL",
-  oscType: "LASER SOURCE",
-  wavelength: "WAVELENGTH",
-  pulse: "PULSE",
 };
 
 export default async function ContentDetailPage({
