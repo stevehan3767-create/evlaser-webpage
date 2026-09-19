@@ -30,13 +30,16 @@ function smtpConfig(): { port: number; secure: boolean } {
 function getTransporter() {
   const { port, secure } = smtpConfig();
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host: process.env.SMTP_HOST?.trim(),
     port,
     secure,
     requireTLS: !secure,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      // Vercel 환경변수 붙여넣기 시 딸려오는 앞뒤 공백/줄바꿈이 그대로
+      // 인증에 쓰이면 서버가 535(로그인 실패)로 거부한다 — ADMIN_PASSWORD와
+      // 같은 계열의 버그라 여기서도 잘라낸다.
+      user: process.env.SMTP_USER?.trim(),
+      pass: process.env.SMTP_PASS?.trim(),
     },
     // Nodemailer's own defaults (2 min connection/socket timeouts) leave the
     // request hanging well past the platform's function limit. The API routes
