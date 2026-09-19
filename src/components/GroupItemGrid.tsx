@@ -5,8 +5,8 @@ import ItemCardsGrid from "./ItemCardsGrid";
 // Shared card grid for every static /products/[group] listing (기술종류별 /
 // 산업분야별 / 재료별): a small representative-image thumbnail on top (when
 // the admin has registered one) with a centered icon + name row below.
-// (설비 라인업 has its own interactive, tech-category-filtered browser —
-// see LineupTechBrowser — since it needs client-side filtering.)
+// (설비 라인업 has its own interactive, multi-axis faceted browser —
+// see LineupFinder — since it needs client-side filtering.)
 export default async function GroupItemGrid({
   group,
   minColWidth = "190px",

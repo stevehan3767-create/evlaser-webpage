@@ -10,7 +10,7 @@ export interface ItemCard {
 }
 
 // Presentational-only (no data fetching), so it can be rendered from either a
-// Server Component (GroupItemGrid) or a Client Component (LineupTechBrowser).
+// Server Component (GroupItemGrid) or a Client Component (LineupFinder).
 export default function ItemCardsGrid({
   items,
   hrefFor,
