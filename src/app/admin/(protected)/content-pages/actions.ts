@@ -167,6 +167,34 @@ export async function addContentItem(formData: FormData) {
   redirect(`/admin/content-pages?group=${group}&key=${item.itemKey}&msg=item_added`);
 }
 
+export async function updateContentItem(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
+  const group = String(formData.get("group") ?? "");
+  const key = String(formData.get("key") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const icon = String(formData.get("icon") ?? "").trim();
+  if (!id || !contentGroups[group] || !name || !(iconNames as string[]).includes(icon)) return;
+
+  await contentItemRepo.update(id, { name, icon });
+  revalidatePath("/admin/content-pages");
+  revalidatePath("/products");
+  if (key) revalidatePath(`/products/${group}/${key}`);
+  redirect(backTo(group, key, "item_updated"));
+}
+
+export async function moveContentItem(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
+  const group = String(formData.get("group") ?? "");
+  const key = String(formData.get("key") ?? "");
+  const direction = String(formData.get("direction") ?? "");
+  if (!id || !contentGroups[group] || (direction !== "up" && direction !== "down")) return;
+
+  await contentItemRepo.move(id, group, direction as "up" | "down");
+  revalidatePath("/admin/content-pages");
+  revalidatePath("/products");
+  redirect(backTo(group, key, "item_moved"));
+}
+
 export async function deleteContentItem(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   const group = String(formData.get("group") ?? "");

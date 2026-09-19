@@ -674,6 +674,27 @@ export const contentItemRepo = {
 
     return { id, groupKey: input.groupKey, itemKey, name: input.name, icon: input.icon, sortOrder: insertIndex, createdAt };
   },
+  // 항목의 표시 이름/아이콘만 바꾼다. item_key(URL·연결에 쓰이는 안정적 식별자)는
+  // 그대로 두어 기존 링크·연결이 깨지지 않게 한다.
+  async update(id: string, input: { name: string; icon: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE content_items SET name = ${input.name}, icon = ${input.icon} WHERE id = ${id}`;
+  },
+  // 항목을 그룹 내에서 한 칸 앞/뒤로 이동(정렬 순서 교환). 전체를 다시
+  // 번호매김하여 sort_order가 항상 0..n-1로 연속되게 유지한다.
+  async move(id: string, groupKey: string, direction: "up" | "down"): Promise<void> {
+    await ensureSchema();
+    const items = await contentItemRepo.listByGroup(groupKey);
+    const idx = items.findIndex((i) => i.id === id);
+    if (idx === -1) return;
+    const swapWith = direction === "up" ? idx - 1 : idx + 1;
+    if (swapWith < 0 || swapWith >= items.length) return;
+    const reordered = [...items];
+    [reordered[idx], reordered[swapWith]] = [reordered[swapWith], reordered[idx]];
+    for (let i = 0; i < reordered.length; i++) {
+      await sql`UPDATE content_items SET sort_order = ${i} WHERE id = ${reordered[i].id}`;
+    }
+  },
   // Removes the item and every piece of content registered under it
   // (본문/적용사례 사진·동영상), since nothing else can reach that group+key
   // combination once the item itself is gone.

@@ -9,7 +9,15 @@ import {
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
 } from "@/lib/repo";
-import { saveContentAll, deleteContentImage, deleteContentVideo, addContentItem, deleteContentItem } from "./actions";
+import {
+  saveContentAll,
+  deleteContentImage,
+  deleteContentVideo,
+  addContentItem,
+  updateContentItem,
+  moveContentItem,
+  deleteContentItem,
+} from "./actions";
 import FileUploadField from "@/components/FileUploadField";
 import CaseImageStager from "@/components/CaseImageStager";
 import CaseVideoStager from "@/components/CaseVideoStager";
@@ -43,6 +51,8 @@ const MESSAGES: Record<string, { text: string; tone: "ok" | "error" }> = {
   video_saved: { text: "저장되었습니다. (동영상 수정됨)", tone: "ok" },
   video_max: { text: `저장되었습니다. 단, 적용사례 동영상은 최대 ${MAX_VIDEOS}개까지라 일부 동영상은 추가되지 않았습니다.`, tone: "error" },
   item_added: { text: "새 항목이 추가되었습니다.", tone: "ok" },
+  item_updated: { text: "항목 이름·아이콘이 수정되었습니다.", tone: "ok" },
+  item_moved: { text: "항목 순서가 변경되었습니다.", tone: "ok" },
   item_deleted: { text: "항목이 삭제되었습니다.", tone: "ok" },
 };
 
@@ -188,6 +198,74 @@ export default async function AdminContentPagesPage({
           </button>
         </form>
       </details>
+
+      {currentItem && (
+        <details className="mb-8 pb-8 border-b border-line">
+          <summary className="cursor-pointer text-[12.5px] font-bold text-blue select-none">
+            ⚙ 현재 선택 항목 관리 — 이름·아이콘 수정 / 순서 이동
+          </summary>
+          <div className="mt-3 flex flex-wrap items-end gap-3">
+            <form key={`edit-${currentItem.id}`} action={updateContentItem} className="flex flex-wrap items-end gap-3">
+              <input type="hidden" name="id" value={currentItem.id} />
+              <input type="hidden" name="group" value={group} />
+              <input type="hidden" name="key" value={key} />
+              <div>
+                <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">항목 이름</label>
+                <input
+                  name="name"
+                  required
+                  defaultValue={currentItem.name}
+                  className="border border-line-strong px-3 py-2 text-[13px] rounded-sm"
+                />
+              </div>
+              <div>
+                <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">아이콘</label>
+                <select name="icon" defaultValue={currentItem.icon} className="border border-line-strong px-3 py-2 text-[13px] rounded-sm">
+                  {iconNames.map((icon) => (
+                    <option key={icon} value={icon}>
+                      {icon}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button type="submit" className="px-4 py-2 bg-ink text-white font-bold text-[12.5px] rounded-sm">
+                수정 저장
+              </button>
+            </form>
+            <div className="flex items-end gap-2">
+              <form action={moveContentItem}>
+                <input type="hidden" name="id" value={currentItem.id} />
+                <input type="hidden" name="group" value={group} />
+                <input type="hidden" name="key" value={key} />
+                <input type="hidden" name="direction" value="up" />
+                <button
+                  type="submit"
+                  disabled={items.findIndex((i) => i.itemKey === key) <= 0}
+                  className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
+                >
+                  ◀ 앞으로
+                </button>
+              </form>
+              <form action={moveContentItem}>
+                <input type="hidden" name="id" value={currentItem.id} />
+                <input type="hidden" name="group" value={group} />
+                <input type="hidden" name="key" value={key} />
+                <input type="hidden" name="direction" value="down" />
+                <button
+                  type="submit"
+                  disabled={items.findIndex((i) => i.itemKey === key) >= items.length - 1}
+                  className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
+                >
+                  뒤로 ▶
+                </button>
+              </form>
+            </div>
+          </div>
+          <p className="mt-2.5 text-[11.5px] text-ink-faint">
+            이름·아이콘을 바꿔도 상세페이지 주소와 다른 항목과의 연결은 그대로 유지됩니다.
+          </p>
+        </details>
+      )}
 
       {!currentItem ? (
         <p className="border border-line p-5 mb-10 text-[13px] text-ink-soft">
