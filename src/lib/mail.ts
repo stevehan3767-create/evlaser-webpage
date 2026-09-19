@@ -109,6 +109,33 @@ export async function sendJobApplicationEmail(input: {
   }
 }
 
+export async function sendPasswordResetEmail(input: { to: string; code: string }): Promise<{ sent: boolean; error?: string }> {
+  if (!isMailConfigured()) {
+    return { sent: false, error: "SMTP not configured (SMTP_HOST/SMTP_USER/SMTP_PASS missing)" };
+  }
+  try {
+    await withTimeout(
+      getTransporter().sendMail({
+        from: process.env.MAIL_FROM || process.env.SMTP_USER,
+        to: input.to,
+        subject: "[EV Laser 관리자] 비밀번호 재설정 인증 코드",
+        text: [
+          "관리자 로그인 비밀번호 재설정을 위한 인증 코드입니다.",
+          "",
+          `인증 코드: ${input.code}`,
+          "",
+          "이 코드는 10분간 유효합니다.",
+          "본인이 요청하지 않았다면 이 메일을 무시하세요.",
+        ].join("\n"),
+      }),
+      7000
+    );
+    return { sent: true };
+  } catch (err) {
+    return { sent: false, error: err instanceof Error ? err.message : "unknown error" };
+  }
+}
+
 export async function sendInquiryEmail(input: {
   channel: string;
   name: string;

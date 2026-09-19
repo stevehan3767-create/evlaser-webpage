@@ -67,6 +67,41 @@ export async function setPassword(newPassword: string): Promise<void> {
   await settingsRepo.set(PASSWORD_HASH_KEY, hashPassword(newPassword.trim()));
 }
 
+// --- 이메일 인증 코드 기반 비밀번호 재설정 -------------------------------
+// 복구 키(ADMIN_RECOVERY_KEY)를 모르는 경우에도, 등록된 관리자 메일로 받은
+// 6자리 코드로 비밀번호를 새로 설정할 수 있게 한다. 코드는 해시로 저장되고
+// 10분 뒤 만료되며, 한 번 사용하면 즉시 폐기된다.
+const RESET_CODE_KEY = "adminResetCode";
+const RESET_CODE_EXPIRY_KEY = "adminResetCodeExpiry";
+const RESET_CODE_TTL_MS = 10 * 60 * 1000;
+
+// 비밀번호 재설정 코드를 받을 관리자 메일. 잠금 상태에서도 서버에 미리
+// 설정돼 있어야 하므로 환경변수로 지정하고, 없으면 문의 수신 주소로 대체.
+export function recoveryEmail(): string | null {
+  const e = (process.env.ADMIN_RECOVERY_EMAIL || process.env.MAIL_TO_CEO || process.env.MAIL_TO_GENERAL || "").trim();
+  return e || null;
+}
+
+export async function createResetCode(): Promise<string> {
+  const code = crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
+  await settingsRepo.set(RESET_CODE_KEY, hashPassword(code));
+  await settingsRepo.set(RESET_CODE_EXPIRY_KEY, String(Date.now() + RESET_CODE_TTL_MS));
+  return code;
+}
+
+export async function checkResetCode(code: string): Promise<boolean> {
+  const stored = await settingsRepo.get(RESET_CODE_KEY);
+  const expiry = await settingsRepo.get(RESET_CODE_EXPIRY_KEY);
+  if (!stored || !expiry) return false;
+  if (Date.now() > Number(expiry)) return false;
+  return verifyPasswordHash(code.trim(), stored);
+}
+
+export async function clearResetCode(): Promise<void> {
+  await settingsRepo.set(RESET_CODE_KEY, "");
+  await settingsRepo.set(RESET_CODE_EXPIRY_KEY, "");
+}
+
 export function createSessionToken(): string {
   return crypto.createHmac("sha256", getSecret()).update("evlaser-admin").digest("hex");
 }
