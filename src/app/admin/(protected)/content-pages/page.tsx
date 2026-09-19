@@ -301,6 +301,16 @@ export default async function AdminContentPagesPage({
             accept="image/*"
             preview="image"
           />
+          <FileUploadField
+            name="specFileUrl"
+            fileNameFieldName="specFileName"
+            label="사양서 첨부파일 (선택 — PDF·이미지·문서, 상세페이지에서 다운로드 제공)"
+            defaultValue={page?.specFileUrl ?? ""}
+            defaultFileName={page?.specFileName ?? ""}
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*"
+            preview="none"
+            placeholder="사양서 파일을 업로드하세요 (PDF 등, 4MB 이하)"
+          />
           <div>
             <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
               내용 (A4 1장 분량 권장) — 첫 줄은 이미지 아래 캡션(굵게·좌측정렬)으로, <code>[소제목]</code> 줄은 소제목으로,{" "}

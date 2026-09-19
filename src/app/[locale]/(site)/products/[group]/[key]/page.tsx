@@ -136,6 +136,22 @@ export default async function ContentDetailPage({
           )}
         </div>
 
+        {/* 사양서 다운로드 (관리자가 첨부파일을 등록한 경우) */}
+        {page?.specFileUrl && (
+          <div className="mt-8">
+            <a
+              href={page.specFileUrl}
+              download={page.specFileName || undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 border border-line-strong rounded-sm text-[13px] font-bold text-blue hover:border-blue hover:bg-surface-alt transition-colors"
+            >
+              <Icon name="doc" className="w-4 h-4 flex-none" strokeWidth={1.6} />
+              사양서 다운로드{page.specFileName ? ` (${page.specFileName})` : ""}
+            </a>
+          </div>
+        )}
+
         {/* 이 기술이 적용된 설비 라인업 (기술종류별 상세페이지에서만) */}
         {relatedLineupItems.length > 0 && (
           <div className="mt-14 pt-10 border-t border-line">

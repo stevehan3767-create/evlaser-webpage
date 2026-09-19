@@ -48,7 +48,15 @@ export async function saveContentAll(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
-  await contentPageRepo.upsert(group, key, { title, description, imageUrl: imageUrl || undefined });
+  const specFileUrl = String(formData.get("specFileUrl") ?? "").trim();
+  const specFileName = String(formData.get("specFileName") ?? "").trim();
+  await contentPageRepo.upsert(group, key, {
+    title,
+    description,
+    imageUrl: imageUrl || undefined,
+    specFileUrl: specFileUrl || undefined,
+    specFileName: specFileName || undefined,
+  });
 
   // 설비 라인업 항목은 기술/산업/재료에, 재료 항목은 기술에 각각 다중 선택으로
   // 연결할 수 있다 — 상대 항목의 상세페이지에 "관련 설비"/"적용 가능 기술"

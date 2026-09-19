@@ -170,6 +170,10 @@ function createSchema(): Promise<void> {
     // content_pages existed before these columns were added; make sure
     // older deployments pick them up too.
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS image_url TEXT`;
+    // 사양서(카탈로그) 첨부파일 — 설비 라인업 등 각 항목에 PDF/이미지 등을 올려
+    // 상세페이지에서 다운로드할 수 있게 한다. URL과 원본 파일명을 함께 저장.
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_file_url TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_file_name TEXT`;
 
     // 적용사례 photos (max 5, enforced in the admin action).
     await sql`
@@ -249,7 +253,23 @@ function createSchema(): Promise<void> {
     await sql`UPDATE offices SET map_provider = 'google' WHERE name LIKE '%쑤저우%' AND map_provider <> 'google'`;
 
     await ensureLaserSolderingTechItem();
+    await ensureElectronics3cIndustry();
   })();
+}
+
+// 이미 시딩된 환경의 산업분야별 목록에 "전자·3C" 항목을 한 번만 추가한다
+// (FPC/PCB 등 3C 전자 산업 분류용). 이미 있으면 아무 것도 하지 않는다.
+async function ensureElectronics3cIndustry(): Promise<void> {
+  const already = await sql`SELECT 1 FROM content_items WHERE group_key = 'industry' AND item_key = 'electronics3c' LIMIT 1`;
+  if (already.length > 0) return;
+  const rows = (await sql`SELECT COUNT(*)::int AS c FROM content_items WHERE group_key = 'industry'`) as { c: number }[];
+  // 그룹이 비어 있으면 seedContentItemsIfEmpty(industries)가 전체를 시딩하므로 건드리지 않는다.
+  if (rows[0].c === 0) return;
+  await sql`
+    INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
+    VALUES (${newId()}, 'industry', 'electronics3c', '전자·3C', 'pcb', ${rows[0].c}, ${new Date().toISOString()})
+    ON CONFLICT (group_key, item_key) DO NOTHING
+  `;
 }
 
 // 기술종류별 항목이 이미 시딩된 환경(빈 그룹에만 적용되는 seedContentItemsIfEmpty

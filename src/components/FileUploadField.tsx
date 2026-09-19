@@ -11,6 +11,8 @@ export default function FileUploadField({
   placeholder,
   required,
   onValueChange,
+  fileNameFieldName,
+  defaultFileName,
 }: {
   name: string;
   label: string;
@@ -20,8 +22,13 @@ export default function FileUploadField({
   placeholder?: string;
   required?: boolean;
   onValueChange?: (url: string) => void;
+  // 업로드한 원본 파일명을 함께 제출하고 싶을 때 그 hidden input의 name.
+  // (예: 사양서 다운로드 시 보여줄 파일 이름)
+  fileNameFieldName?: string;
+  defaultFileName?: string;
 }) {
   const [url, setUrlState] = useState(defaultValue ?? "");
+  const [fileName, setFileName] = useState(defaultFileName ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,6 +47,7 @@ export default function FileUploadField({
     setUploading(true);
     setError("");
     try {
+      setFileName(file.name);
       const formData = new FormData();
       formData.set("file", file);
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
@@ -70,6 +78,7 @@ export default function FileUploadField({
           placeholder={uploading ? "업로드 중입니다. 잠시만 기다려 주세요..." : placeholder ?? "파일을 업로드하거나 URL을 입력하세요"}
           className="flex-1 min-w-0 border border-line-strong px-3 py-2.5 text-[13px] rounded-sm"
         />
+        {fileNameFieldName && <input type="hidden" name={fileNameFieldName} value={fileName} />}
         <input
           ref={inputRef}
           type="file"
