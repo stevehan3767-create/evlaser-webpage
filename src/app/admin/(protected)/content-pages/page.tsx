@@ -19,6 +19,7 @@ import {
   deleteContentItem,
 } from "./actions";
 import FileUploadField from "@/components/FileUploadField";
+import SpecTablePresets from "@/components/SpecTablePresets";
 import CaseImageStager from "@/components/CaseImageStager";
 import CaseVideoStager from "@/components/CaseVideoStager";
 import Icon from "@/components/Icon";
@@ -322,6 +323,56 @@ export default async function AdminContentPagesPage({
               rows={16}
               className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y font-mono"
             />
+          </div>
+
+          {/* 표준 사양서 (자체/해외 OEM 공통) */}
+          <div className="border border-line-strong rounded-sm p-4 grid gap-3.5 bg-surface-alt">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h3 className="text-[13.5px] font-bold">표준 사양서 (자동 생성)</h3>
+              <a
+                href={`/spec/${group}/${key}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[12px] font-bold text-blue hover:underline"
+              >
+                사양서 미리보기·인쇄 →
+              </a>
+            </div>
+            <p className="text-[11.5px] text-ink-faint -mt-1.5">
+              아래 값만 채우면 로고·연락처가 포함된 표준 사양서가 자동 생성됩니다. 자체 제작·해외 OEM 모두 동일합니다.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">영문 장비명 (선택)</label>
+                <input name="nameEn" defaultValue={page?.nameEn ?? ""} className="w-full border border-line-strong px-3 py-2 text-[13px] rounded-sm" />
+              </div>
+              <div>
+                <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">모델명 (선택)</label>
+                <input name="model" defaultValue={page?.model ?? ""} className="w-full border border-line-strong px-3 py-2 text-[13px] rounded-sm" />
+              </div>
+            </div>
+            <label className="inline-flex items-center gap-2 text-[12.5px] font-bold text-ink-soft">
+              <input type="checkbox" name="isOem" defaultChecked={page?.isOem ?? false} />
+              해외 OEM 생산 (체크 시 사양서에 &quot;해외 OEM&quot; 표시)
+            </label>
+            <div>
+              <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">OEM 원문 출처 링크 (선택 — OEM 공급사 페이지 URL)</label>
+              <input name="oemSource" defaultValue={page?.oemSource ?? ""} placeholder="https://..." className="w-full border border-line-strong px-3 py-2 text-[13px] rounded-sm" />
+            </div>
+            <div>
+              <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
+                사양 표 — 한 줄에 <code>항목 | 값</code> 형식으로 입력
+              </label>
+              <SpecTablePresets targetId="specTable" />
+              <textarea
+                id="specTable"
+                name="specTable"
+                defaultValue={page?.specTable ?? ""}
+                rows={10}
+                placeholder={"레이저 종류 (Laser type) | 피코초(Picosecond) 10–30 W\n가공 영역 (Working area) | 400 × 300 mm"}
+                className="w-full border border-line-strong px-3 py-2.5 text-[13px] rounded-sm resize-y font-mono"
+              />
+            </div>
           </div>
           {lineupCategoryGroups.map(({ groupKey, label, items: catItems, linkedKeys }) => (
             <div key={groupKey}>

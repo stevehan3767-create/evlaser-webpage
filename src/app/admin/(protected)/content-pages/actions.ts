@@ -50,12 +50,22 @@ export async function saveContentAll(formData: FormData) {
   const imageUrl = String(formData.get("imageUrl") ?? "").trim();
   const specFileUrl = String(formData.get("specFileUrl") ?? "").trim();
   const specFileName = String(formData.get("specFileName") ?? "").trim();
+  const nameEn = String(formData.get("nameEn") ?? "").trim();
+  const model = String(formData.get("model") ?? "").trim();
+  const isOem = formData.get("isOem") === "on";
+  const oemSource = String(formData.get("oemSource") ?? "").trim();
+  const specTable = String(formData.get("specTable") ?? "").trim();
   await contentPageRepo.upsert(group, key, {
     title,
     description,
     imageUrl: imageUrl || undefined,
     specFileUrl: specFileUrl || undefined,
     specFileName: specFileName || undefined,
+    nameEn: nameEn || undefined,
+    model: model || undefined,
+    isOem,
+    oemSource: oemSource || undefined,
+    specTable: specTable || undefined,
   });
 
   // 설비 라인업 항목은 기술/산업/재료에, 재료 항목은 기술에 각각 다중 선택으로

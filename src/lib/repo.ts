@@ -144,6 +144,11 @@ export interface ContentPageRow {
   imageUrl: string | null;
   specFileUrl: string | null;
   specFileName: string | null;
+  nameEn: string | null;
+  model: string | null;
+  isOem: boolean;
+  oemSource: string | null;
+  specTable: string | null;
   updatedAt: string;
 }
 
@@ -206,6 +211,11 @@ function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
     imageUrl: (r.image_url as string) ?? null,
     specFileUrl: (r.spec_file_url as string) ?? null,
     specFileName: (r.spec_file_name as string) ?? null,
+    nameEn: (r.name_en as string) ?? null,
+    model: (r.model as string) ?? null,
+    isOem: Boolean(r.is_oem),
+    oemSource: (r.oem_source as string) ?? null,
+    specTable: (r.spec_table as string) ?? null,
     updatedAt: r.updated_at as string,
   };
 }
@@ -784,15 +794,28 @@ export const contentPageRepo = {
   async upsert(
     groupKey: string,
     itemKey: string,
-    input: { title: string; description: string; imageUrl?: string; specFileUrl?: string; specFileName?: string }
+    input: {
+      title: string;
+      description: string;
+      imageUrl?: string;
+      specFileUrl?: string;
+      specFileName?: string;
+      nameEn?: string;
+      model?: string;
+      isOem?: boolean;
+      oemSource?: string;
+      specTable?: string;
+    }
   ): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_pages (group_key, item_key, title, description, image_url, spec_file_url, spec_file_name, updated_at)
-      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.specFileUrl ?? null}, ${input.specFileName ?? null}, ${new Date().toISOString()})
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, spec_file_url, spec_file_name, name_en, model, is_oem, oem_source, spec_table, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.specFileUrl ?? null}, ${input.specFileName ?? null}, ${input.nameEn ?? null}, ${input.model ?? null}, ${input.isOem ?? false}, ${input.oemSource ?? null}, ${input.specTable ?? null}, ${new Date().toISOString()})
       ON CONFLICT (group_key, item_key) DO UPDATE SET
         title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url,
-        spec_file_url = EXCLUDED.spec_file_url, spec_file_name = EXCLUDED.spec_file_name, updated_at = EXCLUDED.updated_at
+        spec_file_url = EXCLUDED.spec_file_url, spec_file_name = EXCLUDED.spec_file_name,
+        name_en = EXCLUDED.name_en, model = EXCLUDED.model, is_oem = EXCLUDED.is_oem,
+        oem_source = EXCLUDED.oem_source, spec_table = EXCLUDED.spec_table, updated_at = EXCLUDED.updated_at
     `;
   },
   async count(groupKey: string): Promise<number> {

@@ -174,6 +174,13 @@ function createSchema(): Promise<void> {
     // 상세페이지에서 다운로드할 수 있게 한다. URL과 원본 파일명을 함께 저장.
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_file_url TEXT`;
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_file_name TEXT`;
+    // 표준 사양서 자동 생성용 필드 — 자체 설비/해외 OEM 모두 동일하게 입력.
+    // spec_table: "항목 | 값" 형식의 여러 줄. oem_source: OEM 원문 링크/출처.
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS name_en TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS model TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS is_oem BOOLEAN NOT NULL DEFAULT false`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS oem_source TEXT`;
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_table TEXT`;
 
     // 적용사례 photos (max 5, enforced in the admin action).
     await sql`
