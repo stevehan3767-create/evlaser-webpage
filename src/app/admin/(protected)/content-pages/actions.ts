@@ -9,7 +9,7 @@ import { contentPageRepo, contentImageRepo, contentVideoRepo, contentItemRepo, c
 // checkboxes on its edit form): 설비 라인업 → 기술/산업/재료 it applies to,
 // 재료 → 기술 it can be processed with.
 const LINK_TARGET_GROUPS: Record<string, string[]> = {
-  lineup: ["tech", "industry", "material"],
+  lineup: ["tech", "industry", "material", "oscType", "wavelength", "pulse"],
   material: ["tech"],
 };
 

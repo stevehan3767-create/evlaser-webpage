@@ -27,15 +27,18 @@ import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
+const GROUP_ORDER = ["lineup", "tech", "industry", "material", "oscType", "wavelength", "pulse"];
 // 어떤 그룹의 항목 편집 화면에 어떤 상대 그룹 다중선택 체크박스를 보여줄지 —
-// 설비 라인업 → 기술/산업/재료, 재료 → 기술. src/app/admin/(protected)/content-pages/actions.ts의
-// LINK_TARGET_GROUPS와 짝을 이룬다.
+// 설비 라인업 → 기술/산업/재료/발진방식/파장/펄스, 재료 → 기술.
+// src/app/admin/(protected)/content-pages/actions.ts의 LINK_TARGET_GROUPS와 짝을 이룬다.
 const LINK_TARGETS: Record<string, { groupKey: string; label: string }[]> = {
   lineup: [
     { groupKey: "tech", label: "관련 기술 카테고리" },
     { groupKey: "industry", label: "관련 산업분야" },
     { groupKey: "material", label: "관련 재료" },
+    { groupKey: "oscType", label: "발진방식" },
+    { groupKey: "wavelength", label: "파장" },
+    { groupKey: "pulse", label: "펄스(펄스폭)" },
   ],
   material: [{ groupKey: "tech", label: "적용 가능 레이저가공기술" }],
 };
