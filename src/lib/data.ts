@@ -439,6 +439,7 @@ export const standardSpecRows: string[] = [
   "펄스 폭 (Pulse width)",
   "발진 모드 (Oscillation mode)",
   "빔전송장치 (Beam delivery)",
+  "광케이블 (Optical fiber cable)",
   "스캔 범위 (Scan range)",
   "가공 영역 (Working area)",
   "가공 정밀도 (Processing accuracy)",
