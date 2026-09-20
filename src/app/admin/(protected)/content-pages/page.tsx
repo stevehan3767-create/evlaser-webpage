@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { contentGroups, iconNames } from "@/lib/data";
+import { contentGroups, iconNames, standardSpecTable } from "@/lib/data";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -367,11 +367,14 @@ export default async function AdminContentPagesPage({
               <textarea
                 id="specTable"
                 name="specTable"
-                defaultValue={page?.specTable ?? ""}
-                rows={10}
+                defaultValue={page?.specTable && page.specTable.trim() ? page.specTable : standardSpecTable}
+                rows={20}
                 placeholder={"레이저 종류 (Laser type) | 피코초(Picosecond) 10–30 W\n가공 영역 (Working area) | 400 × 300 mm"}
                 className="w-full border border-line-strong px-3 py-2.5 text-[13px] rounded-sm resize-y font-mono"
               />
+              <p className="text-[11px] text-ink-faint mt-1.5">
+                표준 항목이 기본으로 채워져 있습니다. 값이 없으면 빈칸으로 두고(사양서에 공란 표시), 필요 없는 행은 삭제, 새 항목은 <code>항목 | 값</code> 형식으로 추가하세요.
+              </p>
             </div>
           </div>
           {lineupCategoryGroups.map(({ groupKey, label, items: catItems, linkedKeys }) => (

@@ -428,6 +428,32 @@ if (tsSeriesSeed) {
   ].join("\n");
 }
 
+// 표준 사양서 기본 항목 (자체/해외 OEM 공통). 값이 없으면 공란으로 두고,
+// 관리자가 설비별로 행을 삭제·추가·편집할 수 있다. 사양 표 입력칸의 기본값과
+// 사양서 페이지의 기본 골격으로 함께 쓰인다.
+export const standardSpecRows: string[] = [
+  "모델명 (Model)",
+  "레이저 종류 (Laser type)",
+  "출력 (Output power)",
+  "파장 (Wavelength)",
+  "발진 모드 (Oscillation mode)",
+  "빔전송장치 (Beam delivery)",
+  "가공 영역 (Working area)",
+  "가공 정밀도 (Processing accuracy)",
+  "반복 정밀도 (Repeatability)",
+  "가공 속도 (Processing speed)",
+  "소프트웨어 (Software)",
+  "냉각 방식 (Cooling)",
+  "옵션 (Options)",
+  "가공 재료 (Processable materials)",
+  "장비 크기 (Dimensions)",
+  "장비 무게 (Weight)",
+  "유틸리티 사양 (Utility)",
+  "전원 사양 (Power supply)",
+  "보증 기간 (Warranty)",
+];
+export const standardSpecTable: string = standardSpecRows.map((r) => `${r} | `).join("\n");
+
 export interface ContentGroupMeta {
   // Initial item list, seeded into the content_items table once on first
   // load. After that, the DB (admin-managed) is the source of truth — the

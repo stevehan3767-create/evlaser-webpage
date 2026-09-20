@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { contentGroups } from "@/lib/data";
+import { contentGroups, standardSpecTable } from "@/lib/data";
 import { contentPageRepo, contentImageRepo, contentItemRepo, seedContentItemsIfEmpty } from "@/lib/repo";
 import PrintButton from "@/components/PrintButton";
 
@@ -39,7 +39,8 @@ export default async function SpecSheetPage({
   ]);
 
   const title = page?.title || item.name;
-  const rows = parseSpecRows(page?.specTable ?? null);
+  // 사양 표 미입력 시에도 표준 항목 골격을 공란으로 표시한다.
+  const rows = parseSpecRows(page?.specTable && page.specTable.trim() ? page.specTable : standardSpecTable);
   const samples = images.slice(0, 3);
   const isOem = page?.isOem ?? false;
 
