@@ -652,13 +652,22 @@ function slugify(name: string): string {
   return (base || "item") + "-" + Math.random().toString(36).slice(2, 7);
 }
 
+// 이름순(가나다·ABC)으로 자동 정렬하는 그룹 — 설비 라인업만. 이 그룹은
+// 수동 순서 이동/삽입 위치가 무시되고 항상 이름순으로 표시된다. 다른 그룹은
+// sort_order(수동 순서)를 유지한다.
+export const AUTO_SORT_GROUPS = new Set(["lineup"]);
+
 export const contentItemRepo = {
   async listByGroup(groupKey: string): Promise<ContentItemRow[]> {
     await ensureSchema();
     const rows = await sql`
       SELECT * FROM content_items WHERE group_key = ${groupKey} ORDER BY sort_order ASC, created_at ASC
     `;
-    return (rows as Record<string, unknown>[]).map(rowToContentItem);
+    const items = (rows as Record<string, unknown>[]).map(rowToContentItem);
+    if (AUTO_SORT_GROUPS.has(groupKey)) {
+      items.sort((a, b) => a.name.localeCompare(b.name, "ko", { numeric: true, sensitivity: "base" }));
+    }
+    return items;
   },
   // insertBeforeItemKey lets the admin place the new item at a specific spot
   // (e.g. "레이저드릴링과 레이저열처리 사이에") instead of always at the end —

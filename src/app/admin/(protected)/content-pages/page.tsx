@@ -8,6 +8,7 @@ import {
   contentLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
+  AUTO_SORT_GROUPS,
 } from "@/lib/repo";
 import {
   saveContentAll,
@@ -80,6 +81,7 @@ export default async function AdminContentPagesPage({
   const { group: rawGroup, key: rawKey, editImage, editVideo, msg } = await searchParams;
   const group = GROUP_ORDER.includes(rawGroup ?? "") ? (rawGroup as string) : GROUP_ORDER[0];
   const meta = contentGroups[group];
+  const autoSorted = AUTO_SORT_GROUPS.has(group);
   await seedContentItemsIfEmpty(group, meta.itemSeeds);
   const items = await contentItemRepo.listByGroup(group);
   const key = items.some((i) => i.itemKey === rawKey) ? (rawKey as string) : items[0]?.itemKey;
@@ -183,21 +185,28 @@ export default async function AdminContentPagesPage({
               ))}
             </select>
           </div>
-          <div>
-            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">삽입 위치</label>
-            <select name="insertBefore" defaultValue="" className="border border-line-strong px-3 py-2 text-[13px] rounded-sm">
-              <option value="">맨 뒤에 추가</option>
-              {items.map((t, i) => (
-                <option key={t.id} value={t.itemKey}>
-                  {String(i + 1).padStart(2, "0")}. {t.name} 앞에 삽입
-                </option>
-              ))}
-            </select>
-          </div>
+          {!autoSorted && (
+            <div>
+              <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">삽입 위치</label>
+              <select name="insertBefore" defaultValue="" className="border border-line-strong px-3 py-2 text-[13px] rounded-sm">
+                <option value="">맨 뒤에 추가</option>
+                {items.map((t, i) => (
+                  <option key={t.id} value={t.itemKey}>
+                    {String(i + 1).padStart(2, "0")}. {t.name} 앞에 삽입
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <button type="submit" className="px-4 py-2 bg-ink text-white font-bold text-[12.5px] rounded-sm">
             추가
           </button>
         </form>
+        {autoSorted && (
+          <p className="mt-2.5 text-[11.5px] text-ink-faint">
+            이 그룹은 이름순(가나다·ABC)으로 <b>자동 정렬</b>됩니다. 추가한 항목은 이름 순서에 맞춰 자동으로 배치됩니다.
+          </p>
+        )}
       </details>
 
       {currentItem && (
@@ -233,34 +242,36 @@ export default async function AdminContentPagesPage({
                 수정 저장
               </button>
             </form>
-            <div className="flex items-end gap-2">
-              <form action={moveContentItem}>
-                <input type="hidden" name="id" value={currentItem.id} />
-                <input type="hidden" name="group" value={group} />
-                <input type="hidden" name="key" value={key} />
-                <input type="hidden" name="direction" value="up" />
-                <button
-                  type="submit"
-                  disabled={items.findIndex((i) => i.itemKey === key) <= 0}
-                  className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
-                >
-                  ◀ 앞으로
-                </button>
-              </form>
-              <form action={moveContentItem}>
-                <input type="hidden" name="id" value={currentItem.id} />
-                <input type="hidden" name="group" value={group} />
-                <input type="hidden" name="key" value={key} />
-                <input type="hidden" name="direction" value="down" />
-                <button
-                  type="submit"
-                  disabled={items.findIndex((i) => i.itemKey === key) >= items.length - 1}
-                  className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
-                >
-                  뒤로 ▶
-                </button>
-              </form>
-            </div>
+            {!autoSorted && (
+              <div className="flex items-end gap-2">
+                <form action={moveContentItem}>
+                  <input type="hidden" name="id" value={currentItem.id} />
+                  <input type="hidden" name="group" value={group} />
+                  <input type="hidden" name="key" value={key} />
+                  <input type="hidden" name="direction" value="up" />
+                  <button
+                    type="submit"
+                    disabled={items.findIndex((i) => i.itemKey === key) <= 0}
+                    className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
+                  >
+                    ◀ 앞으로
+                  </button>
+                </form>
+                <form action={moveContentItem}>
+                  <input type="hidden" name="id" value={currentItem.id} />
+                  <input type="hidden" name="group" value={group} />
+                  <input type="hidden" name="key" value={key} />
+                  <input type="hidden" name="direction" value="down" />
+                  <button
+                    type="submit"
+                    disabled={items.findIndex((i) => i.itemKey === key) >= items.length - 1}
+                    className="px-3 py-2 border border-line-strong text-[12.5px] font-bold rounded-sm disabled:opacity-40"
+                  >
+                    뒤로 ▶
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
           <p className="mt-2.5 text-[11.5px] text-ink-faint">
             이름·아이콘을 바꿔도 상세페이지 주소와 다른 항목과의 연결은 그대로 유지됩니다.
