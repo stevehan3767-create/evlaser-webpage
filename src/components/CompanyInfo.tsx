@@ -19,7 +19,13 @@ interface OrgUnitDetail {
 export default async function CompanyInfo() {
   const t = await getTranslations("company");
   const greetingParagraphs = t.raw("greeting.paragraphs") as string[];
-  const historyItems = t.raw("history.items") as HistoryYear[];
+  // 연혁은 최신 연도가 맨 위로 오도록 내림차순 정렬한다 (번역 파일의 순서와 무관).
+  const historyItems = [...(t.raw("history.items") as HistoryYear[])].sort((a, b) => {
+    const ya = parseInt(a.year, 10);
+    const yb = parseInt(b.year, 10);
+    if (Number.isNaN(ya) || Number.isNaN(yb)) return b.year.localeCompare(a.year);
+    return yb - ya;
+  });
   const org = t.raw("organization") as { ceoTitle: string; ceoName: string };
   const orgUnits = t.raw("organization.units") as Record<string, OrgUnitDetail>;
   const clientLogos = await seedClientLogosIfEmpty(defaultClientNames)
