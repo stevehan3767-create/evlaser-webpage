@@ -16,6 +16,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/global">글로벌 네트워크 관리</Link>
           <Link href="/admin/careers">채용 지원 관리</Link>
           <Link href="/admin/inquiries">문의 내역</Link>
+          <Link href="/admin/analytics">방문 분석</Link>
         </nav>
         <div className="flex items-center gap-4">
           <Link href="/" className="text-[12.5px] text-ink-soft hover:text-blue">

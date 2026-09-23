@@ -922,3 +922,126 @@ export async function seedContentIfEmpty(
     }
   }
 }
+
+// ── 방문 분석(Analytics) ─────────────────────────────────────────────
+export interface PageViewInput {
+  visitorId: string;
+  sessionId: string;
+  path: string;
+  locale?: string;
+  referrer?: string;
+  refSource?: string;
+  refHost?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  searchKeyword?: string;
+  country?: string;
+  city?: string;
+  timezone?: string;
+  hourLocal?: number;
+  device?: string;
+  browser?: string;
+  os?: string;
+  language?: string;
+}
+
+type Bucket = { label: string; count: number };
+const clean = (v?: string) => (v && v.trim() ? v.trim().slice(0, 300) : null);
+
+export const analyticsRepo = {
+  async record(input: PageViewInput): Promise<string> {
+    await ensureSchema();
+    const id = newId();
+    await sql`
+      INSERT INTO page_views (
+        id, visitor_id, session_id, path, locale, referrer, ref_source, ref_host,
+        utm_source, utm_medium, utm_campaign, search_keyword, country, city, timezone,
+        hour_local, device, browser, os, language, dwell_ms, created_at
+      ) VALUES (
+        ${id}, ${clean(input.visitorId) ?? "anon"}, ${clean(input.sessionId) ?? "anon"}, ${clean(input.path) ?? "/"},
+        ${clean(input.locale)}, ${clean(input.referrer)}, ${clean(input.refSource)}, ${clean(input.refHost)},
+        ${clean(input.utmSource)}, ${clean(input.utmMedium)}, ${clean(input.utmCampaign)}, ${clean(input.searchKeyword)},
+        ${clean(input.country)}, ${clean(input.city)}, ${clean(input.timezone)},
+        ${typeof input.hourLocal === "number" ? input.hourLocal : null},
+        ${clean(input.device)}, ${clean(input.browser)}, ${clean(input.os)}, ${clean(input.language)},
+        0, ${new Date().toISOString()}
+      )
+    `;
+    return id;
+  },
+
+  async addDwell(id: string, dwellMs: number): Promise<void> {
+    await ensureSchema();
+    const ms = Math.max(0, Math.min(dwellMs | 0, 1000 * 60 * 60)); // 상한 1시간(비정상값 방지)
+    await sql`UPDATE page_views SET dwell_ms = ${ms} WHERE id = ${id} AND dwell_ms = 0`;
+  },
+
+  async summary(since: string): Promise<{ views: number; visitors: number; sessions: number; avgDwellMs: number }> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT
+        COUNT(*)::int AS views,
+        COUNT(DISTINCT visitor_id)::int AS visitors,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COALESCE(AVG(dwell_ms) FILTER (WHERE dwell_ms > 0), 0)::int AS avg_dwell
+      FROM page_views WHERE created_at >= ${since}
+    `;
+    const r = rows[0] as { views: number; visitors: number; sessions: number; avg_dwell: number };
+    return { views: r.views, visitors: r.visitors, sessions: r.sessions, avgDwellMs: r.avg_dwell };
+  },
+
+  async byDay(since: string): Promise<Bucket[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT to_char(date_trunc('day', created_at), 'YYYY-MM-DD') AS label, COUNT(*)::int AS count
+      FROM page_views WHERE created_at >= ${since}
+      GROUP BY 1 ORDER BY 1 ASC
+    `;
+    return rows as Bucket[];
+  },
+
+  // 고정된 컬럼별 상위 집계. 컬럼은 아래 switch의 화이트리스트로만 접근하므로
+  // 문자열 삽입 없이 태그드 템플릿으로 안전하게 처리한다.
+  async grouped(since: string, column: string, limit = 12): Promise<Bucket[]> {
+    await ensureSchema();
+    let rows: unknown;
+    switch (column) {
+      case "country": rows = await sql`SELECT COALESCE(NULLIF(country,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND country <> '' AND country IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "city": rows = await sql`SELECT COALESCE(NULLIF(city,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND city <> '' AND city IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "timezone": rows = await sql`SELECT COALESCE(NULLIF(timezone,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND timezone <> '' AND timezone IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "path": rows = await sql`SELECT path AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "ref_source": rows = await sql`SELECT COALESCE(NULLIF(ref_source,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "ref_host": rows = await sql`SELECT ref_host AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND ref_host <> '' AND ref_host IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "search_keyword": rows = await sql`SELECT search_keyword AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND search_keyword <> '' AND search_keyword IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "device": rows = await sql`SELECT COALESCE(NULLIF(device,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "browser": rows = await sql`SELECT COALESCE(NULLIF(browser,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "os": rows = await sql`SELECT COALESCE(NULLIF(os,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "language": rows = await sql`SELECT COALESCE(NULLIF(language,''),'(미상)') AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      case "utm_campaign": rows = await sql`SELECT utm_campaign AS label, COUNT(*)::int AS count FROM page_views WHERE created_at >= ${since} AND utm_campaign <> '' AND utm_campaign IS NOT NULL GROUP BY 1 ORDER BY count DESC LIMIT ${limit}`; break;
+      default: return [];
+    }
+    return rows as Bucket[];
+  },
+
+  async byHour(since: string): Promise<Bucket[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT hour_local AS h, COUNT(*)::int AS count
+      FROM page_views WHERE created_at >= ${since} AND hour_local IS NOT NULL
+      GROUP BY 1 ORDER BY 1 ASC
+    `;
+    const map = new Map<number, number>((rows as { h: number; count: number }[]).map((r) => [r.h, r.count]));
+    return Array.from({ length: 24 }, (_, h) => ({ label: `${String(h).padStart(2, "0")}시`, count: map.get(h) ?? 0 }));
+  },
+
+  async recent(since: string, limit = 40): Promise<Record<string, unknown>[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT created_at, country, city, path, ref_source, ref_host, search_keyword, device, browser, dwell_ms
+      FROM page_views WHERE created_at >= ${since}
+      ORDER BY created_at DESC LIMIT ${limit}
+    `;
+    return rows as Record<string, unknown>[];
+  },
+};

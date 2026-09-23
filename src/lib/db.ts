@@ -255,6 +255,38 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // 방문 분석(홍보효과 측정)용 페이지뷰 로그. 개인정보 보호를 위해 원본 IP는
+    // 저장하지 않고, 서버에서 국가·도시·시간대만 추출해 저장한다. 방문자 식별은
+    // 브라우저에 저장되는 익명 ID(visitor_id)로만 하며 개인을 특정하지 않는다.
+    await sql`
+      CREATE TABLE IF NOT EXISTS page_views (
+        id TEXT PRIMARY KEY,
+        visitor_id TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        path TEXT NOT NULL,
+        locale TEXT,
+        referrer TEXT,
+        ref_source TEXT,
+        ref_host TEXT,
+        utm_source TEXT,
+        utm_medium TEXT,
+        utm_campaign TEXT,
+        search_keyword TEXT,
+        country TEXT,
+        city TEXT,
+        timezone TEXT,
+        hour_local INT,
+        device TEXT,
+        browser TEXT,
+        os TEXT,
+        language TEXT,
+        dwell_ms INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS page_views_created_idx ON page_views (created_at)`;
+    await sql`CREATE INDEX IF NOT EXISTS page_views_visitor_idx ON page_views (visitor_id)`;
+
     // 해외 법인은 구글지도를 써야 하는데, map_provider 컬럼이 추가되기 전에
     // 이미 시딩된 환경에서는 기본값인 'naver'로 남아있을 수 있어 바로잡는다.
     await sql`UPDATE offices SET map_provider = 'google' WHERE name LIKE '%쑤저우%' AND map_provider <> 'google'`;
