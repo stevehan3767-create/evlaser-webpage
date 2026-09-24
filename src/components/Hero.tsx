@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 import HeroCarousel from "./HeroCarousel";
+import HeroSearch from "./HeroSearch";
 import { showcaseSlides } from "@/lib/data";
 import { heroSlideRepo } from "@/lib/repo";
 
@@ -64,6 +65,7 @@ export default async function Hero() {
               {t("cta2")}
             </Link>
           </div>
+          <HeroSearch />
         </div>
 
         {heroSlides.length > 0 ? (

@@ -178,6 +178,34 @@ export default function Header() {
                 </svg>
               </button>
             </div>
+            <form
+              className="p-[18px] border-b border-line"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const query = searchQuery.trim();
+                if (!query) return;
+                setDrawerOpen(false);
+                router.push({ pathname: "/search", query: { q: query } });
+              }}
+            >
+              <div className="flex items-center gap-2 rounded-full border-2 border-blue bg-surface pl-4 pr-1.5 py-1">
+                <svg viewBox="0 0 24 24" className="w-[16px] h-[16px] flex-none text-blue" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <circle cx="10.5" cy="10.5" r="6.5" />
+                  <line x1="15.5" y1="15.5" x2="20.5" y2="20.5" />
+                </svg>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={tSearch("placeholder")}
+                  aria-label={tSearch("label")}
+                  className="flex-1 min-w-0 bg-transparent py-1.5 text-[14px] text-ink outline-none placeholder:text-ink-faint"
+                />
+                <button type="submit" className="flex-none px-3.5 py-2 bg-red text-white rounded-full font-bold text-[12.5px]">
+                  {tSearch("label")}
+                </button>
+              </div>
+            </form>
             {NAV_SECTIONS.map(({ section, items, href }) => (
               <details key={section} className="border-b border-line">
                 <summary className="p-4 px-[18px] font-bold text-[14.5px] list-none flex justify-between cursor-pointer">
