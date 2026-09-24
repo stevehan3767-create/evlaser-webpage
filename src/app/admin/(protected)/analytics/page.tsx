@@ -1,7 +1,70 @@
 import Link from "next/link";
-import { analyticsRepo } from "@/lib/repo";
+import { analyticsRepo, contentItemRepo } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
+
+// 경로를 사람이 알아보기 쉬운 한글 이름으로 변환한다 (검색어는 디코딩해 표시).
+const ROUTE_KO: Record<string, string> = {
+  "": "🏠 메인 홈",
+  company: "회사소개",
+  products: "제품·기술",
+  resources: "자료실",
+  news: "뉴스·소식",
+  careers: "채용",
+  global: "글로벌 네트워크",
+  support: "고객지원",
+  "ceo-channel": "대표이사 직속 소통센터",
+};
+const GROUP_KO: Record<string, string> = {
+  lineup: "설비 라인업", tech: "기술종류별", industry: "산업분야별", material: "재료별",
+};
+const SUPPORT_VIEW_KO: Record<string, string> = {
+  contact: "문의하기", faq: "자주 묻는 질문", resources: "자료실",
+};
+const LOCALES = new Set(["ko", "en", "zh", "ja"]);
+
+function prettyPath(raw: string, items: Record<string, Record<string, string>>): string {
+  let path = raw;
+  let query = "";
+  const qi = raw.indexOf("?");
+  if (qi >= 0) {
+    path = raw.slice(0, qi);
+    query = raw.slice(qi + 1);
+  }
+  try {
+    path = decodeURIComponent(path);
+  } catch {
+    /* keep raw */
+  }
+  const params = new URLSearchParams(query);
+  let seg = path.split("/").filter(Boolean);
+  let langTag = "";
+  if (seg.length && LOCALES.has(seg[0])) {
+    if (seg[0] !== "ko") langTag = ` (${seg[0].toUpperCase()})`;
+    seg = seg.slice(1);
+  }
+  const top = seg[0] ?? "";
+
+  if (top === "search") {
+    const q = params.get("q") || params.get("query") || params.get("keyword") || "";
+    return (q ? `🔍 검색: "${q}"` : "🔍 검색") + langTag;
+  }
+  if (top === "products" && seg[1] === "industries") return `제품·기술 › 산업분야별${langTag}`;
+  if (top === "products" && seg[1] === "materials") return `제품·기술 › 재료별${langTag}`;
+  if (top === "products" && seg[1] && seg[2]) {
+    const g = GROUP_KO[seg[1]] ?? seg[1];
+    const name = items[seg[1]]?.[seg[2]] ?? seg[2];
+    return `${g} › ${name}${langTag}`;
+  }
+  if (top === "support") {
+    const view = params.get("view");
+    const channel = params.get("channel");
+    const suffix = view ? ` › ${SUPPORT_VIEW_KO[view] ?? view}` : channel ? ` › ${channel}` : "";
+    return `고객지원${suffix}${langTag}`;
+  }
+  const base = ROUTE_KO[top] ?? (top ? `/${seg.join("/")}` : "🏠 메인 홈");
+  return base + langTag;
+}
 
 const PERIODS: { key: string; label: string; days: number | null }[] = [
   { key: "today", label: "오늘", days: 1 },
@@ -64,7 +127,7 @@ function BarList({
         <div className="flex flex-col gap-1.5">
           {rows.map((r) => (
             <div key={r.label} className="flex items-center gap-2 text-[12.5px]">
-              <span className="w-[150px] flex-none truncate" title={r.label}>
+              <span className="w-[180px] flex-none truncate" title={transform ? transform(r.label) : r.label}>
                 {transform ? transform(r.label) : r.label}
               </span>
               <span className="flex-1 h-[16px] bg-surface-alt rounded-sm overflow-hidden">
@@ -90,6 +153,18 @@ export default async function AdminAnalyticsPage({
   const { period: rawPeriod } = await searchParams;
   const period = PERIODS.find((p) => p.key === rawPeriod) ?? PERIODS[1];
   const since = sinceFor(period.days);
+
+  // 페이지 경로 → 항목 한글명 매핑 (제품·기술 상세 경로를 사람이 읽기 쉽게)
+  const itemNames: Record<string, Record<string, string>> = {};
+  try {
+    const groups = ["lineup", "tech", "industry", "material"];
+    const lists = await Promise.all(groups.map((g) => contentItemRepo.listByGroup(g)));
+    groups.forEach((g, i) => {
+      itemNames[g] = Object.fromEntries(lists[i].map((it) => [it.itemKey, it.name]));
+    });
+  } catch {
+    /* 매핑 실패 시 원본 경로로 표시 */
+  }
 
   let error = "";
   let summary = { views: 0, visitors: 0, sessions: 0, avgDwellMs: 0 };
@@ -199,7 +274,7 @@ export default async function AdminAnalyticsPage({
             <BarList title="유입 경로" rows={byRefSource} total={summary.views} transform={(l) => REF_SOURCE_KO[l] ?? l} />
             <BarList title="유입 사이트(추천·검색·소셜)" rows={byRefHost} empty="외부 유입 기록이 아직 없습니다." />
             <BarList title="사이트 내 검색어" rows={byKeyword} empty="검색 기록이 아직 없습니다." />
-            <BarList title="가장 많이 본 페이지" rows={byPath} total={summary.views} />
+            <BarList title="가장 많이 본 페이지" rows={byPath} total={summary.views} transform={(p) => prettyPath(p, itemNames)} />
             <BarList title="캠페인(UTM)" rows={byCampaign} empty="UTM 캠페인 유입이 아직 없습니다." />
             <BarList title="접속 시간대(방문자 현지시각)" rows={byHour.filter((h) => h.count > 0)} empty="데이터가 없습니다." />
             <BarList title="기기" rows={byDevice} total={summary.views} />
@@ -240,7 +315,7 @@ export default async function AdminAnalyticsPage({
                           {new Date(r.created_at as string).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
                         </td>
                         <td className="px-3 py-2 whitespace-nowrap">{c ? countryLabel(c) : "-"}{city ? ` · ${city}` : ""}</td>
-                        <td className="px-3 py-2 max-w-[220px] truncate" title={r.path as string}>{r.path as string}</td>
+                        <td className="px-3 py-2 max-w-[240px] truncate" title={r.path as string}>{prettyPath(r.path as string, itemNames)}</td>
                         <td className="px-3 py-2 whitespace-nowrap">{REF_SOURCE_KO[src ?? ""] ?? src ?? "-"}{host ? ` (${host})` : ""}</td>
                         <td className="px-3 py-2">{(r.search_keyword as string) || "-"}</td>
                         <td className="px-3 py-2 whitespace-nowrap">{(r.device as string) || "-"}</td>
