@@ -152,7 +152,7 @@ async function buildDocs(): Promise<SearchDoc[]> {
     title: safeT(tCompany, "greeting.title") || "인사말",
     snippet: greetingParagraphs.join(" "),
     category: safeT(tCompany, "title") || "회사소개",
-    href: "/company#overview",
+    href: "/company",
   });
 
   const historyItems = (safeRaw(tCompany, "history.items") ?? []) as { year: string; items: string[] }[];
@@ -160,7 +160,7 @@ async function buildDocs(): Promise<SearchDoc[]> {
     title: safeT(tCompany, "history.title") || "연혁",
     snippet: historyItems.map((h) => `${h.year} ${h.items.join(" ")}`).join(" "),
     category: safeT(tCompany, "title") || "회사소개",
-    href: "/company#history",
+    href: "/company/history",
   });
 
   const orgUnits = (safeRaw(tCompany, "organization.units") ?? {}) as Record<string, { title: string; desc: string; tasks: string[] }>;
@@ -171,21 +171,21 @@ async function buildDocs(): Promise<SearchDoc[]> {
       ...Object.values(orgUnits).flatMap((u) => [u.title, u.desc, ...(u.tasks ?? [])]),
     ].join(" "),
     category: safeT(tCompany, "title") || "회사소개",
-    href: "/company#organization",
+    href: "/company/organization",
   });
 
   docs.push({
     title: safeT(tCompany, "business.title") || "사업분야",
     snippet: safeT(tCompany, "business.desc"),
     category: safeT(tCompany, "title") || "회사소개",
-    href: "/company#business",
+    href: "/company/business",
   });
 
   docs.push({
     title: safeT(tCompany, "patents.title") || "특허 및 인증",
     snippet: [...patents.map((p) => p.title), ...certifications.map((c) => `${c.title} ${c.subtitle ?? ""}`)].join(" "),
     category: safeT(tCompany, "title") || "회사소개",
-    href: "/company#patents",
+    href: "/company/patents",
   });
 
   // 7. 채용 (실제 채용공고 + 인재상)
