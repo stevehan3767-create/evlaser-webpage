@@ -36,7 +36,7 @@ export default async function Hero() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1240px] px-7 grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-12 items-center py-6 pb-14">
+      <div className="relative mx-auto max-w-[1240px] px-7 grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-12 items-center py-6 pb-14">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="inline-flex items-center gap-1.5 bg-red text-white font-mono font-extrabold text-[14px] sm:text-[15px] tracking-wider px-4 py-[8px] rounded-full shadow-[0_3px_14px_rgba(228,0,43,0.4)]">
@@ -82,8 +82,8 @@ export default async function Hero() {
         {heroSlides.length > 0 ? (
           <HeroCarousel slides={heroSlides.map((s) => ({ id: s.id, imageUrl: s.imageUrl, title: s.title }))} />
         ) : (
-          <div className="relative border border-line bg-surface shadow-xl max-w-[700px] mx-auto md:mx-0">
-            <div className="relative aspect-[7/5] overflow-hidden">
+          <div className="relative border border-line bg-surface shadow-xl w-full max-w-[820px] lg:max-w-[720px] mx-auto lg:mx-0">
+            <div className="relative aspect-[16/10] sm:aspect-[7/5] overflow-hidden">
               {showcaseSlides.map((s, i) => (
                 <div
                   key={s.key}
@@ -92,7 +92,7 @@ export default async function Hero() {
                 >
                   <Icon name={s.icon} className="w-[46px] h-[46px] opacity-90 mb-auto" strokeWidth={1.4} />
                   <span className="font-mono text-[10.5px] tracking-wider opacity-[.85]">{tShowcase(`${s.key}.tag`)}</span>
-                  <h3 className="text-[19px] text-white mt-1">{tShowcase(`${s.key}.title`)}</h3>
+                  <h3 className="text-[16px] sm:text-[19px] lg:text-[21px] text-white mt-1">{tShowcase(`${s.key}.title`)}</h3>
                 </div>
               ))}
             </div>
