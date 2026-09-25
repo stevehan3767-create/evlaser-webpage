@@ -38,6 +38,18 @@ export default function LineupFinder({
   const [selected, setSelected] = useState<Record<string, string[]>>({});
   const [open, setOpen] = useState(false);
 
+  // 메인 화면의 "조건으로 설비 찾기"에서 넘어오면(?finder=open) 필터 패널을 자동으로 연다.
+  useEffect(() => {
+    let shouldOpen = false;
+    try {
+      shouldOpen = new URLSearchParams(window.location.search).get("finder") === "open";
+    } catch {
+      /* noop */
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (shouldOpen) setOpen(true);
+  }, []);
+
   // 패널이 열려 있는 동안에는 뒤 화면이 같이 스크롤되지 않게 한다.
   useEffect(() => {
     if (!open) return;

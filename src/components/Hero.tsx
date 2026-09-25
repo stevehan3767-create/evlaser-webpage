@@ -66,6 +66,15 @@ export default async function Hero() {
             </Link>
           </div>
           <HeroSearch />
+          <Link
+            href="/products?finder=open#lineup"
+            className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-bold text-blue hover:underline"
+          >
+            <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
+              <path d="M3 5h18M6 12h12M10 19h4" />
+            </svg>
+            조건으로 설비 찾기 (기술·재료·산업)
+          </Link>
         </div>
 
         {heroSlides.length > 0 ? (
