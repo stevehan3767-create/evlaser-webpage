@@ -70,7 +70,7 @@
   },
   "search": {
     "label": "搜索",
-    "placeholder": "搜索产品、技术、资料"
+    "placeholder": "按关键词搜索：设备、技术、行业、材料、资料"
   },
   "drawer": {
     "title": "菜单"

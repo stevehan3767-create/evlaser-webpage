@@ -70,7 +70,7 @@
   },
   "search": {
     "label": "Search",
-    "placeholder": "Search products, tech, resources"
+    "placeholder": "Search by keyword: equipment, tech, industry, material, resources"
   },
   "drawer": {
     "title": "Menu"
