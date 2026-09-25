@@ -68,12 +68,14 @@ export default async function Hero() {
           <HeroSearch />
           <Link
             href="/products?finder=open#lineup"
-            className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-bold text-blue hover:underline"
+            className="group mt-3 inline-flex items-center gap-2 rounded-full border-2 border-blue bg-blue-soft px-4 py-2.5 text-[13.5px] font-bold text-blue shadow-sm hover:bg-blue hover:text-white transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
               <path d="M3 5h18M6 12h12M10 19h4" />
             </svg>
-            조건으로 설비 찾기 (기술·재료·산업)
+            조건으로 설비 찾기
+            <span className="font-normal opacity-80">기술·재료·산업</span>
+            <span className="ml-0.5 transition-transform group-hover:translate-x-0.5">→</span>
           </Link>
         </div>
 
