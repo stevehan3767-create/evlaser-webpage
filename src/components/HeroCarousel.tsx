@@ -37,7 +37,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlideItem[] }) {
   if (slides.length === 0) return null;
 
   return (
-    <div className="relative border border-line bg-surface shadow-xl w-full max-w-[820px] lg:max-w-[720px] mx-auto lg:mx-0">
+    <div className="relative border border-line bg-surface shadow-xl w-[70%] sm:w-full max-w-[820px] lg:max-w-[720px] mx-auto lg:mx-0">
       <div className="relative aspect-[16/10] sm:aspect-[7/5] overflow-hidden" onMouseEnter={stop} onMouseLeave={start}>
         {slides.map((s, i) => (
           <div key={s.id} className="absolute inset-0 transition-opacity" style={{ opacity: i === slide ? 1 : 0, transitionDuration: "600ms" }}>

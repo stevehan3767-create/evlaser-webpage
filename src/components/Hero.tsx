@@ -81,7 +81,7 @@ export default async function Hero() {
         {heroSlides.length > 0 ? (
           <HeroCarousel slides={heroSlides.map((s) => ({ id: s.id, imageUrl: s.imageUrl, title: s.title }))} />
         ) : (
-          <div className="relative border border-line bg-surface shadow-xl w-full max-w-[820px] lg:max-w-[720px] mx-auto lg:mx-0">
+          <div className="relative border border-line bg-surface shadow-xl w-[70%] sm:w-full max-w-[820px] lg:max-w-[720px] mx-auto lg:mx-0">
             <div className="relative aspect-[16/10] sm:aspect-[7/5] overflow-hidden">
               {showcaseSlides.map((s, i) => (
                 <div
