@@ -13,7 +13,7 @@ const CARDS: { icon: IconName; title: string; desc: string; href: string }[] = [
 
 export default function CategoryShortcuts() {
   return (
-    <section className="py-14 sm:py-18 border-b border-line">
+    <section className="pt-14 pb-10 sm:pt-18 sm:pb-12 border-b border-line">
       <div className="mx-auto max-w-[1240px] px-7">
         <span className="eyebrow">FIND YOUR SOLUTION</span>
         <h2 className="mt-2.5 text-[22px] sm:text-[30px] font-[family-name:var(--font-display)] tracking-tight">무엇으로 찾으시겠어요?</h2>

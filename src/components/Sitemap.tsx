@@ -7,7 +7,7 @@ export default function Sitemap() {
   const t = useTranslations();
 
   return (
-    <section className="py-16 sm:py-22 border-b border-line">
+    <section className="pt-10 pb-16 sm:pt-12 sm:pb-22 border-b border-line">
       <div className="mx-auto max-w-[1240px] px-7">
         <div className="mb-11">
           <span className="eyebrow">{t("sitemap.eyebrow")}</span>
