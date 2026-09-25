@@ -712,6 +712,15 @@
           ]
         }
       }
+    },
+    "directions": {
+      "eyebrow": "DIRECTIONS",
+      "title": "アクセス",
+      "desc": "㈜イブイレーザー（EVLASER CO., LTD.）へのアクセス案内です。ご訪問前にご連絡いただくとよりスムーズにご案内できます。",
+      "phoneLabel": "電話",
+      "emailLabel": "メール",
+      "viewAll": "グローバルネットワーク全体を見る →",
+      "empty": "登録された事業所情報がありません。"
     }
   },
   "footer": {

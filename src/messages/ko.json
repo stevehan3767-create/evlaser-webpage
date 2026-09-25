@@ -712,6 +712,15 @@
           ]
         }
       }
+    },
+    "directions": {
+      "eyebrow": "DIRECTIONS",
+      "title": "오시는 길",
+      "desc": "㈜이브이레이저를 찾아오시는 길입니다. 방문 전 연락 주시면 더욱 편리하게 안내해 드리겠습니다.",
+      "phoneLabel": "전화",
+      "emailLabel": "이메일",
+      "viewAll": "전체 글로벌 네트워크 보기 →",
+      "empty": "등록된 사업장 정보가 없습니다."
     }
   },
   "footer": {

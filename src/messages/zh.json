@@ -712,6 +712,15 @@
           ]
         }
       }
+    },
+    "directions": {
+      "eyebrow": "DIRECTIONS",
+      "title": "交通指南",
+      "desc": "前往㈜이브이레이저(EVLASER CO., LTD.)的路线指南。到访前请与我们联系，以便更好地为您安排。",
+      "phoneLabel": "电话",
+      "emailLabel": "邮箱",
+      "viewAll": "查看完整全球网络 →",
+      "empty": "暂无营业场所信息。"
     }
   },
   "footer": {

@@ -712,6 +712,15 @@
           ]
         }
       }
+    },
+    "directions": {
+      "eyebrow": "DIRECTIONS",
+      "title": "Directions",
+      "desc": "How to find EVLASER CO., LTD. Please contact us before visiting for a smoother visit.",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email",
+      "viewAll": "View full global network →",
+      "empty": "No office information registered yet."
     }
   },
   "footer": {
