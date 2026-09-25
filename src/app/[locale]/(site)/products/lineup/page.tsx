@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ProductLineup from "@/components/ProductLineup";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "설비 라인업 | EV Laser",
@@ -10,6 +11,7 @@ export default function LineupPage() {
   return (
     <>
       <div className="mx-auto max-w-[1240px] px-7 pt-12">
+        <Breadcrumb items={[{ label: "제품·기술", href: "/products" }, { label: "설비 라인업" }]} />
         <span className="eyebrow">PRODUCTS & TECHNOLOGY</span>
         <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
           설비 라인업

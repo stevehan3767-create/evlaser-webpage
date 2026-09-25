@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import Breadcrumb from "@/components/Breadcrumb";
 import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
@@ -86,6 +87,13 @@ export default async function ContentDetailPage({
   return (
     <div className="py-16 sm:py-22">
       <div className="mx-auto max-w-[900px] px-7">
+        <Breadcrumb
+          items={[
+            { label: "제품·기술", href: "/products" },
+            { label: meta.labelKo, href: meta.backHref },
+            { label: title },
+          ]}
+        />
         <Link href={meta.backHref} className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-6">
           ← {tp("backToList")}
         </Link>
