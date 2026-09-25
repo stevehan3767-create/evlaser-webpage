@@ -240,8 +240,8 @@ export const companyNav: NavItem[] = [
 ];
 
 export const productsNav: NavItem[] = [
-  { key: "lineup", href: "/products#lineup" },
-  { key: "byTech", href: "/products#tech" },
+  { key: "lineup", href: "/products/lineup" },
+  { key: "byTech", href: "/products/tech" },
   { key: "byIndustry", href: "/products/industries" },
   { key: "byMaterial", href: "/products/materials" },
 ];
@@ -482,13 +482,13 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
   lineup: {
     itemSeeds: lineupItems.map((i) => ({ key: i.key, name: i.name, icon: i.icon })),
     seeds: lineupPageSeeds,
-    backHref: "/products#lineup",
+    backHref: "/products/lineup",
     labelKo: "설비 라인업",
   },
   tech: {
     itemSeeds: techItems.map((i) => ({ key: i.key, name: techLabelsKo[i.key], icon: i.icon })),
     seeds: techPageSeeds,
-    backHref: "/products#tech",
+    backHref: "/products/tech",
     labelKo: "기술종류별",
   },
   industry: {

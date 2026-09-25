@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import CategoryShortcuts from "@/components/CategoryShortcuts";
+import TechSolutions from "@/components/TechSolutions";
 
 export const metadata: Metadata = {
-  title: "제품·기술 | EV Laser",
-  description: "설비 라인업과 레이저 절단·용접·마킹·클리닝 등 레이저 기술을 소개합니다.",
+  title: "기술종류별 | EV Laser",
+  description: "레이저 절단·용접·마킹·클리닝 등 ㈜이브이레이저의 레이저 가공 기술을 종류별로 소개합니다.",
 };
 
-export default function ProductsPage() {
+export default function TechPage() {
   return (
     <>
       <div className="mx-auto max-w-[1240px] px-7 pt-12">
         <span className="eyebrow">PRODUCTS & TECHNOLOGY</span>
         <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-          제품·기술
+          기술종류별
         </h1>
       </div>
-      <CategoryShortcuts />
+      <TechSolutions />
     </>
   );
 }

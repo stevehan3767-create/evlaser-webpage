@@ -67,7 +67,7 @@ export default async function Hero() {
           </div>
           <HeroSearch />
           <Link
-            href="/products?finder=open#lineup"
+            href="/products/lineup?finder=open"
             className="group mt-3 inline-flex items-center gap-2 rounded-full border-2 border-blue bg-blue-soft px-4 py-2.5 text-[13.5px] font-bold text-blue shadow-sm hover:bg-blue hover:text-white transition-colors"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">

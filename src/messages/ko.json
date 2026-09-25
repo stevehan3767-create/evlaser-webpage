@@ -113,8 +113,8 @@
     }
   },
   "industries": {
-    "eyebrow": "INDUSTRIES WE SERVE",
-    "title": "이런 산업 현장에서 EV Laser를 만납니다",
+    "eyebrow": "INDUSTRY SOLUTIONS",
+    "title": "산업분야별로 보는 레이저 솔루션",
     "automotive": "자동차",
     "battery": "밧데리",
     "semiconductor": "반도체",
@@ -444,7 +444,7 @@
       "submit": "문의 보내기",
       "sending": "전송 중...",
       "success": "문의가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.",
-  "successNoEmail": "접수되었습니다. 다만 담당자에게 이메일이 자동으로 전달되지 않았습니다 — 빠른 확인이 필요하시면 다른 연락 방법을 이용해 주세요.",
+      "successNoEmail": "접수되었습니다. 다만 담당자에게 이메일이 자동으로 전달되지 않았습니다 — 빠른 확인이 필요하시면 다른 연락 방법을 이용해 주세요.",
       "errorGeneric": "문의 접수 중 오류가 발생했습니다.",
       "errorNetwork": "네트워크 오류로 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.",
       "categoryOptions": [
@@ -737,7 +737,7 @@
   },
   "productLineup": {
     "eyebrow": "EQUIPMENT LINEUP",
-    "title": "설비 라인업",
+    "title": "설비 라인업으로 보는 레이저 솔루션",
     "desc": "㈜이브이레이저의 레이저 플라스틱 용접, 절단, 안전 솔루션 등 설비 라인업입니다. 각 설비를 클릭하면 상세소개 페이지로 이동합니다.",
     "note": "설비 상세 사양 및 사진은 공식 홈페이지 제품 페이지에서도 확인하실 수 있습니다."
   },

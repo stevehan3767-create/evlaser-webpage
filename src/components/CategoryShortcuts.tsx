@@ -5,8 +5,8 @@ import type { IconName } from "@/lib/data";
 // 메인 화면의 4개 카테고리 "입구" 카드. 항목을 나열하지 않고 각 목록 페이지로
 // 바로 이동시켜 첫 화면을 깔끔하게 유지한다.
 const CARDS: { icon: IconName; title: string; desc: string; href: string }[] = [
-  { icon: "machine", title: "설비 라인업", desc: "EV Laser의 전체 설비를 한눈에", href: "/products?finder=open#lineup" },
-  { icon: "weld", title: "기술종류별", desc: "용접·절단·마킹 등 가공 기술로 찾기", href: "/products#tech" },
+  { icon: "machine", title: "설비 라인업", desc: "EV Laser의 전체 설비를 한눈에", href: "/products/lineup?finder=open" },
+  { icon: "weld", title: "기술종류별", desc: "용접·절단·마킹 등 가공 기술로 찾기", href: "/products/tech" },
   { icon: "build", title: "산업분야별", desc: "자동차·반도체·전자 등 산업으로 찾기", href: "/products/industries" },
   { icon: "steel", title: "재료별", desc: "금속·플라스틱·유리 등 소재로 찾기", href: "/products/materials" },
 ];
