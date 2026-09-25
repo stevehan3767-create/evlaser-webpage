@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero";
 import CategoryShortcuts from "@/components/CategoryShortcuts";
-import SloganBanner from "@/components/SloganBanner";
 import Sitemap from "@/components/Sitemap";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +9,6 @@ export default function Home() {
     <>
       <Hero />
       <CategoryShortcuts />
-      <SloganBanner />
       <Sitemap />
     </>
   );
