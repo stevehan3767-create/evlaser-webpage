@@ -73,8 +73,7 @@ export default async function Hero() {
             <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
               <path d="M3 5h18M6 12h12M10 19h4" />
             </svg>
-            조건으로 설비 찾기
-            <span className="font-normal opacity-80">기술·재료·산업</span>
+            설비·기술·재료·산업별로 검색
             <span className="ml-0.5 transition-transform group-hover:translate-x-0.5">→</span>
           </Link>
         </div>
