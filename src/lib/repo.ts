@@ -328,6 +328,131 @@ export async function seedClientLogosIfEmpty(names: string[]): Promise<void> {
   }
 }
 
+// ---- 특허 (patents) ----
+export interface PatentRow {
+  id: string;
+  imageUrl: string;
+  title: string;
+  registeredOn: string | null; // YYYY-MM-DD (등록일)
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToPatent(r: Record<string, unknown>): PatentRow {
+  const reg = r.registered_on;
+  return {
+    id: r.id as string,
+    imageUrl: r.image_url as string,
+    title: r.title as string,
+    registeredOn: reg ? String(reg).slice(0, 10) : null,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const patentRepo = {
+  // 등록일 최신순 → 등록일 미입력분은 뒤로(sort_order 보조)
+  async list(): Promise<PatentRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM patents ORDER BY registered_on DESC NULLS LAST, sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToPatent);
+  },
+  async create(input: { imageUrl: string; title: string; registeredOn?: string | null; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
+      VALUES (${newId()}, ${input.imageUrl}, ${input.title}, ${input.registeredOn || null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { imageUrl: string; title: string; registeredOn?: string | null }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE patents SET image_url = ${input.imageUrl}, title = ${input.title}, registered_on = ${input.registeredOn || null} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM patents WHERE id = ${id}`;
+  },
+};
+
+export async function seedPatentsIfEmpty(items: { image: string; title: string }[]): Promise<void> {
+  await ensureSchema();
+  const rows = await sql`SELECT COUNT(*)::int AS c FROM patents`;
+  if ((rows[0] as { c: number }).c > 0) return;
+  for (let i = 0; i < items.length; i++) {
+    await patentRepo.create({ imageUrl: items[i].image, title: items[i].title, registeredOn: null, sortOrder: i });
+  }
+}
+
+// ---- 인증서 (certifications) ----
+export interface CertificationRow {
+  id: string;
+  imageUrl: string;
+  title: string;
+  subtitle: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToCertification(r: Record<string, unknown>): CertificationRow {
+  return {
+    id: r.id as string,
+    imageUrl: r.image_url as string,
+    title: r.title as string,
+    subtitle: (r.subtitle as string) || null,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const certificationRepo = {
+  async list(): Promise<CertificationRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM certifications ORDER BY sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToCertification);
+  },
+  async create(input: { imageUrl: string; title: string; subtitle?: string | null; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO certifications (id, image_url, title, subtitle, sort_order, created_at)
+      VALUES (${newId()}, ${input.imageUrl}, ${input.title}, ${input.subtitle || null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { imageUrl: string; title: string; subtitle?: string | null }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE certifications SET image_url = ${input.imageUrl}, title = ${input.title}, subtitle = ${input.subtitle || null} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM certifications WHERE id = ${id}`;
+  },
+  // 표시 순서를 한 칸 위/아래로 이동 (인접 항목과 sort_order 교환)
+  async move(id: string, direction: "up" | "down"): Promise<void> {
+    await ensureSchema();
+    const rows = (await sql`SELECT id, sort_order FROM certifications ORDER BY sort_order ASC, created_at ASC`) as {
+      id: string;
+      sort_order: number;
+    }[];
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= rows.length) return;
+    const a = rows[idx];
+    const b = rows[swapIdx];
+    // sort_order가 동일한 레거시 데이터도 안전하게 교환되도록 인덱스 기반 값으로 재지정
+    await sql`UPDATE certifications SET sort_order = ${swapIdx} WHERE id = ${a.id}`;
+    await sql`UPDATE certifications SET sort_order = ${idx} WHERE id = ${b.id}`;
+  },
+};
+
+export async function seedCertificationsIfEmpty(items: { image: string; title: string; subtitle?: string }[]): Promise<void> {
+  await ensureSchema();
+  const rows = await sql`SELECT COUNT(*)::int AS c FROM certifications`;
+  if ((rows[0] as { c: number }).c > 0) return;
+  for (let i = 0; i < items.length; i++) {
+    await certificationRepo.create({ imageUrl: items[i].image, title: items[i].title, subtitle: items[i].subtitle ?? null, sortOrder: i });
+  }
+}
+
 export const inquiryRepo = {
   async create(input: {
     channel: string;

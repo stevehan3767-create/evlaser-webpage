@@ -255,6 +255,31 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // 특허 목록. 등록날짜(registered_on) 기준으로 정렬해 노출한다. 등록일이
+    // 아직 입력되지 않은 항목은 뒤로 밀리며 sort_order로 보조 정렬한다.
+    await sql`
+      CREATE TABLE IF NOT EXISTS patents (
+        id TEXT PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        title TEXT NOT NULL,
+        registered_on DATE,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    // 인증서 목록. 관리자가 지정한 표시 순서(sort_order)대로 노출한다.
+    await sql`
+      CREATE TABLE IF NOT EXISTS certifications (
+        id TEXT PRIMARY KEY,
+        image_url TEXT NOT NULL,
+        title TEXT NOT NULL,
+        subtitle TEXT,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     // 방문 분석(홍보효과 측정)용 페이지뷰 로그. 개인정보 보호를 위해 원본 IP는
     // 저장하지 않고, 서버에서 국가·도시·시간대만 추출해 저장한다. 방문자 식별은
     // 브라우저에 저장되는 익명 ID(visitor_id)로만 하며 개인을 특정하지 않는다.
