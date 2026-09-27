@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 export const metadata: Metadata = {
@@ -27,6 +28,29 @@ export default async function CompanyOverviewPage() {
           </div>
           <p className="mt-6 font-bold text-ink text-[14px]">{t("greeting.signature")}</p>
         </div>
+
+        {/* 대표 설비 이미지 — 무인자동화 레이저용접시스템 */}
+        <figure className="mt-12 max-w-[960px]">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { src: "/images/company/auto-laser-welding-2.webp", w: 1725, h: 922 },
+              { src: "/images/company/auto-laser-welding-1.webp", w: 1280, h: 960 },
+            ].map((img) => (
+              <div key={img.src} className="relative aspect-[4/3] border border-line-strong bg-surface-alt overflow-hidden">
+                <Image
+                  src={img.src}
+                  alt="무인자동화 레이저용접시스템"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 480px"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+          <figcaption className="mt-3 text-[13px] text-ink-soft">
+            <span className="font-bold text-ink">무인자동화 레이저용접시스템</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
