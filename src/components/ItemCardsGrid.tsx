@@ -29,12 +29,12 @@ export default function ItemCardsGrid({
   }
 
   return (
-    <div className="grid gap-px bg-line border border-line" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${minColWidth}, 1fr))` }}>
+    <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${minColWidth}, 1fr))` }}>
       {items.map((item) => (
         <Link
           key={item.itemKey}
           href={hrefFor(item.itemKey)}
-          className="group bg-surface flex flex-col hover:bg-surface-alt transition-colors"
+          className="group bg-surface border border-line rounded-md overflow-hidden flex flex-col hover:border-blue hover:bg-surface-alt transition-colors"
         >
           {item.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
