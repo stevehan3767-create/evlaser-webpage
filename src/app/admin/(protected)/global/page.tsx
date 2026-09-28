@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 import { officeSeeds } from "@/lib/data";
 import { officeRepo, distributorRepo, seedOfficesIfEmpty } from "@/lib/repo";
 import { listCountryOptions, countryFlag, countryName, isCountryCode } from "@/lib/countries";
@@ -94,9 +95,9 @@ export default async function AdminGlobalPage({
           </div>
         </div>
         <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {officeBeingEdited ? "저장" : "추가"}
-          </button>
+          </SubmitButton>
           {officeBeingEdited && (
             <Link href="/admin/global" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
               취소
@@ -187,9 +188,9 @@ export default async function AdminGlobalPage({
           />
         </div>
         <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {distributorBeingEdited ? "저장" : "추가"}
-          </button>
+          </SubmitButton>
           {distributorBeingEdited && (
             <Link href="/admin/global" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
               취소

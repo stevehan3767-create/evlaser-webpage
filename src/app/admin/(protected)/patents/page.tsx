@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 import {
   patentRepo,
   certificationRepo,
@@ -69,9 +70,9 @@ export default async function AdminPatentsPage({
           </div>
           <FileUploadField name="imageUrl" label="인증서 이미지" defaultValue={editingCert?.imageUrl ?? ""} accept="image/*" preview="image" />
           <div className="flex gap-3">
-            <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
               {editingCert ? "저장" : "추가"}
-            </button>
+            </SubmitButton>
             {editingCert && (
               <Link href="/admin/patents" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
                 취소
@@ -160,9 +161,9 @@ export default async function AdminPatentsPage({
           </div>
           <FileUploadField name="imageUrl" label="특허·상표 이미지" defaultValue={editingPatent?.imageUrl ?? ""} accept="image/*" preview="image" />
           <div className="flex gap-3">
-            <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
               {editingPatent ? "저장" : "추가"}
-            </button>
+            </SubmitButton>
             {editingPatent && (
               <Link href="/admin/patents" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
                 취소

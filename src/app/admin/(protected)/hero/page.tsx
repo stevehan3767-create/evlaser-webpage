@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 import { heroSlideRepo } from "@/lib/repo";
 import { saveHeroSlide, deleteHeroSlide } from "./actions";
 import FileUploadField from "@/components/FileUploadField";
@@ -47,9 +48,9 @@ export default async function AdminHeroPage({ searchParams }: { searchParams: Pr
             />
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+            <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
               {editing ? "저장" : "추가"}
-            </button>
+            </SubmitButton>
             {editing && (
               <Link href="/admin/hero" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
                 취소

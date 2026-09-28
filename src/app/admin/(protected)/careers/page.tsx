@@ -1,6 +1,7 @@
 import { settingsRepo, jobApplicationRepo } from "@/lib/repo";
 import { DEFAULT_CAREERS_EMAIL } from "@/lib/mail";
 import { saveCareersEmail } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +25,9 @@ export default async function AdminCareersPage() {
           placeholder={DEFAULT_CAREERS_EMAIL}
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
         />
-        <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+        <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
           저장
-        </button>
+        </SubmitButton>
       </form>
 
       <h2 className="text-[15px] font-bold mb-3">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 import { clientLogoRepo, seedClientLogosIfEmpty } from "@/lib/repo";
 import { defaultClientNames } from "@/lib/data";
 import { saveClientLogo, deleteClientLogo } from "./actions";
@@ -42,9 +43,9 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
         </div>
         <FileUploadField name="logoUrl" label="로고 이미지" defaultValue={editing?.logoUrl ?? ""} accept="image/*" preview="image" />
         <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {editing ? "저장" : "추가"}
-          </button>
+          </SubmitButton>
           {editing && (
             <Link href="/admin/clients" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
               취소

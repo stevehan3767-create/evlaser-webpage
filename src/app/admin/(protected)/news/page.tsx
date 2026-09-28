@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, seedIfEmpty } from "@/lib/repo";
 import { saveNews, deleteNews } from "./actions";
@@ -49,9 +50,9 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
         />
         <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+          <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {editing ? "저장" : "추가"}
-          </button>
+          </SubmitButton>
           {editing && (
             <Link href="/admin/news" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
               취소
