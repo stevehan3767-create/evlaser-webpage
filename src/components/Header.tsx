@@ -29,7 +29,6 @@ const LANG_LABELS: Record<string, string> = { ko: "한국어", en: "EN", zh: "�
 
 export default function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const t = useTranslations("nav");
   const tTop = useTranslations("topbar");
@@ -114,39 +113,6 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1320px)]:ml-0">
-            <button
-              type="button"
-              aria-label={tSearch("label")}
-              onClick={() => setSearchOpen((v) => !v)}
-              className="hidden [@media(min-width:1320px)]:flex items-center gap-1.5 h-[38px] px-3.5 border-2 border-blue rounded-full bg-blue-soft text-blue font-bold text-[13px] hover:bg-blue hover:text-white transition-colors"
-            >
-              <svg viewBox="0 0 24 24" className="w-[15px] h-[15px] flex-none" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <circle cx="10.5" cy="10.5" r="6.5" />
-                <line x1="15.5" y1="15.5" x2="20.5" y2="20.5" />
-              </svg>
-              {tSearch("label")}
-            </button>
-            {searchOpen && (
-              <form
-                className="absolute top-full right-0 mt-2 bg-surface border border-line shadow-lg p-3 flex items-center gap-2 z-10"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const query = searchQuery.trim();
-                  if (!query) return;
-                  setSearchOpen(false);
-                  router.push({ pathname: "/search", query: { q: query } });
-                }}
-              >
-                <input
-                  autoFocus
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={tSearch("placeholder")}
-                  className="w-[240px] px-3 py-2 border border-line-strong bg-surface-alt text-[13px] text-ink rounded-sm"
-                />
-              </form>
-            )}
             <button
               aria-label="Menu"
               onClick={() => setDrawerOpen(true)}
