@@ -6,7 +6,7 @@ import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
 import { contentGroups, type IconName } from "@/lib/data";
-import { resolveSpecRows } from "@/lib/spec";
+import { resolveSpecRowsWithOptions } from "@/lib/spec";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -70,7 +70,7 @@ export default async function ContentDetailPage({
 
   const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
-  const specRows = resolveSpecRows(page?.specTable, page?.description);
+  const specRows = resolveSpecRowsWithOptions(page?.specTable, page?.description, page?.options);
 
   // 기술종류별/산업분야별/재료별 상세페이지에는 그 카테고리가 등록된
   // 설비 라인업 목록을 함께 보여준다.

@@ -445,21 +445,34 @@ export const standardSpecRows: string[] = [
   "가공 정밀도(Processing accuracy)",
   "반복 정밀도(Repeatability)",
   "위치 정밀도(Positioning accuracy)",
-  "최소 선폭·스폿(Min. line width / Spot size)",
+  "최소 선폭·빔사이즈(Min. line width / Spot size)",
   "가공 속도(Processing speed)",
   "가공 재료(Processable materials)",
   "제어 방식(Control system)",
   "소프트웨어(Software)",
   "냉각 방식(Cooling)",
+  "레이저안전(Laser Safety)",
   "사용 온도(Ambient temperature)",
   "사용 습도(Ambient humidity)",
-  "유틸리티 사양(Utility)",
-  "전원 사양(Power supply)",
   "외형 치수(Dimensions)",
   "중량(Weight)",
-  "옵션(Options)",
+  "유틸리티 사양(Utility)",
+  "전원 사양(Power supply)",
   "인증(Certification)",
   "보증 기간(Warranty)",
+];
+
+// 옵션(Options)은 표준 표에 직접 적지 않고, 관리자가 등록한 옵션 목록에서
+// 체크해 선택한다. 선택된 옵션은 사양서(주요 사양) 맨 아래에 "옵션(Options)"
+// 행으로 자동 추가된다. 아래는 최초 시딩용 기본 옵션 목록.
+export const specOptionDefaults: string[] = [
+  "ATC (Auto Tool Change)",
+  "MES 연동",
+  "3D Scanner",
+  "ETM (Error Tracking Monitor)",
+  "Power Meter",
+  "Vision System",
+  "Rotary Axis",
 ];
 export const standardSpecTable: string = standardSpecRows.map((r) => `${r} | `).join("\n");
 

@@ -149,6 +149,7 @@ export interface ContentPageRow {
   isOem: boolean;
   oemSource: string | null;
   specTable: string | null;
+  options: string | null;
   updatedAt: string;
 }
 
@@ -216,6 +217,7 @@ function rowToContentPage(r: Record<string, unknown>): ContentPageRow {
     isOem: Boolean(r.is_oem),
     oemSource: (r.oem_source as string) ?? null,
     specTable: (r.spec_table as string) ?? null,
+    options: (r.options as string) ?? null,
     updatedAt: r.updated_at as string,
   };
 }
@@ -450,6 +452,68 @@ export async function seedCertificationsIfEmpty(items: { image: string; title: s
   if ((rows[0] as { c: number }).c > 0) return;
   for (let i = 0; i < items.length; i++) {
     await certificationRepo.create({ imageUrl: items[i].image, title: items[i].title, subtitle: items[i].subtitle ?? null, sortOrder: i });
+  }
+}
+
+// ---- 사양서 옵션 마스터 목록 (spec_options) ----
+export interface SpecOptionRow {
+  id: string;
+  label: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToSpecOption(r: Record<string, unknown>): SpecOptionRow {
+  return {
+    id: r.id as string,
+    label: r.label as string,
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const specOptionRepo = {
+  async list(): Promise<SpecOptionRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM spec_options ORDER BY sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToSpecOption);
+  },
+  async create(input: { label: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO spec_options (id, label, sort_order, created_at)
+      VALUES (${newId()}, ${input.label}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { label: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE spec_options SET label = ${input.label} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM spec_options WHERE id = ${id}`;
+  },
+  async move(id: string, direction: "up" | "down"): Promise<void> {
+    await ensureSchema();
+    const rows = (await sql`SELECT id, sort_order FROM spec_options ORDER BY sort_order ASC, created_at ASC`) as {
+      id: string;
+      sort_order: number;
+    }[];
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= rows.length) return;
+    await sql`UPDATE spec_options SET sort_order = ${swapIdx} WHERE id = ${rows[idx].id}`;
+    await sql`UPDATE spec_options SET sort_order = ${idx} WHERE id = ${rows[swapIdx].id}`;
+  },
+};
+
+export async function seedSpecOptionsIfEmpty(labels: string[]): Promise<void> {
+  await ensureSchema();
+  const rows = await sql`SELECT COUNT(*)::int AS c FROM spec_options`;
+  if ((rows[0] as { c: number }).c > 0) return;
+  for (let i = 0; i < labels.length; i++) {
+    await specOptionRepo.create({ label: labels[i], sortOrder: i });
   }
 }
 
@@ -939,17 +1003,18 @@ export const contentPageRepo = {
       isOem?: boolean;
       oemSource?: string;
       specTable?: string;
+      options?: string;
     }
   ): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO content_pages (group_key, item_key, title, description, image_url, spec_file_url, spec_file_name, name_en, model, is_oem, oem_source, spec_table, updated_at)
-      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.specFileUrl ?? null}, ${input.specFileName ?? null}, ${input.nameEn ?? null}, ${input.model ?? null}, ${input.isOem ?? false}, ${input.oemSource ?? null}, ${input.specTable ?? null}, ${new Date().toISOString()})
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, spec_file_url, spec_file_name, name_en, model, is_oem, oem_source, spec_table, options, updated_at)
+      VALUES (${groupKey}, ${itemKey}, ${input.title}, ${input.description}, ${input.imageUrl ?? null}, ${input.specFileUrl ?? null}, ${input.specFileName ?? null}, ${input.nameEn ?? null}, ${input.model ?? null}, ${input.isOem ?? false}, ${input.oemSource ?? null}, ${input.specTable ?? null}, ${input.options ?? null}, ${new Date().toISOString()})
       ON CONFLICT (group_key, item_key) DO UPDATE SET
         title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url,
         spec_file_url = EXCLUDED.spec_file_url, spec_file_name = EXCLUDED.spec_file_name,
         name_en = EXCLUDED.name_en, model = EXCLUDED.model, is_oem = EXCLUDED.is_oem,
-        oem_source = EXCLUDED.oem_source, spec_table = EXCLUDED.spec_table, updated_at = EXCLUDED.updated_at
+        oem_source = EXCLUDED.oem_source, spec_table = EXCLUDED.spec_table, options = EXCLUDED.options, updated_at = EXCLUDED.updated_at
     `;
   },
   async count(groupKey: string): Promise<number> {

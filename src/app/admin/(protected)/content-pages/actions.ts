@@ -55,6 +55,13 @@ export async function saveContentAll(formData: FormData) {
   const isOem = formData.get("isOem") === "on";
   const oemSource = String(formData.get("oemSource") ?? "").trim();
   const specTable = String(formData.get("specTable") ?? "").trim();
+  // 선택된 옵션(체크박스) — 라벨을 쉼표로 이어 저장. 직접 입력한 추가 옵션도 병합.
+  const selectedOptions = formData.getAll("optionSel").map(String).map((s) => s.trim()).filter(Boolean);
+  const extraOptions = String(formData.get("optionsExtra") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const options = [...selectedOptions, ...extraOptions].join(", ");
   await contentPageRepo.upsert(group, key, {
     title,
     description,
@@ -66,6 +73,7 @@ export async function saveContentAll(formData: FormData) {
     isOem,
     oemSource: oemSource || undefined,
     specTable: specTable || undefined,
+    options: options || undefined,
   });
 
   // 설비 라인업 항목은 기술/산업/재료에, 재료 항목은 기술에 각각 다중 선택으로

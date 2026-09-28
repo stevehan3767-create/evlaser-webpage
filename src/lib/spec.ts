@@ -62,3 +62,18 @@ export function resolveSpecRows(
   if (primary.length > 0) return primary;
   return specRowsFromDescription(description);
 }
+
+// 최종 사양 행 = 기본 사양(표준/레거시)에서 기존 "옵션" 행을 제거하고,
+// 선택된 옵션(options)을 맨 아래 "옵션(Options)" 행으로 추가한다.
+export function resolveSpecRowsWithOptions(
+  specTable: string | null | undefined,
+  description: string | null | undefined,
+  options: string | null | undefined
+): SpecRow[] {
+  const base = resolveSpecRows(specTable, description).filter(
+    (r) => !/^(옵션|options)/i.test(r.k.trim())
+  );
+  const opt = (options ?? "").trim();
+  if (opt) base.push({ k: "옵션(Options)", v: opt });
+  return base;
+}

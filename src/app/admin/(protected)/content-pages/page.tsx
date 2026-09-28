@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { contentGroups, iconNames, standardSpecTable } from "@/lib/data";
+import { contentGroups, iconNames, standardSpecTable, specOptionDefaults } from "@/lib/data";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -8,6 +8,8 @@ import {
   contentLinkRepo,
   seedContentIfEmpty,
   seedContentItemsIfEmpty,
+  specOptionRepo,
+  seedSpecOptionsIfEmpty,
   AUTO_SORT_GROUPS,
 } from "@/lib/repo";
 import {
@@ -115,6 +117,15 @@ export default async function AdminContentPagesPage({
       )
     : [];
   const currentItem = items.find((i) => i.itemKey === key);
+
+  // 옵션 마스터 목록 + 현재 항목에 선택된 옵션(쉼표 구분)
+  await seedSpecOptionsIfEmpty(specOptionDefaults);
+  const specOptions = await specOptionRepo.list();
+  const selectedOptionLabels = (page?.options ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const extraOptionLabels = selectedOptionLabels.filter((l) => !specOptions.some((o) => o.label === l));
 
   return (
     <div>
@@ -389,7 +400,36 @@ export default async function AdminContentPagesPage({
               />
               <p className="text-[11px] text-ink-faint mt-1.5">
                 표준 항목이 기본으로 채워져 있습니다. 값이 없으면 빈칸으로 두고(사양서에 공란 표시), 필요 없는 행은 삭제, 새 항목은 <code>항목 | 값</code> 형식으로 추가하세요.
+                <br />※ <b>옵션(Options)</b>은 여기 적지 말고 아래 &quot;옵션 선택&quot;에서 체크하세요 — 사양서 맨 아래에 자동으로 추가됩니다.
               </p>
+            </div>
+
+            {/* 옵션 선택 — 등록된 옵션 목록에서 체크한 항목이 사양서 맨 아래 "옵션" 행으로 추가된다 */}
+            <div>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <label className="text-[12.5px] font-bold text-ink-soft block">옵션 선택 (해당 옵션을 체크)</label>
+                <Link href="/admin/spec-options" target="_blank" className="text-[12px] font-bold text-blue hover:underline">
+                  옵션 목록 관리 →
+                </Link>
+              </div>
+              <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-2 border border-line-strong rounded-sm p-3">
+                {specOptions.length === 0 ? (
+                  <span className="text-[12.5px] text-ink-faint">등록된 옵션이 없습니다. &quot;옵션 목록 관리&quot;에서 추가하세요.</span>
+                ) : (
+                  specOptions.map((o) => (
+                    <label key={o.id} className="inline-flex items-center gap-1.5 text-[12.5px]">
+                      <input type="checkbox" name="optionSel" value={o.label} defaultChecked={selectedOptionLabels.includes(o.label)} />
+                      {o.label}
+                    </label>
+                  ))
+                )}
+              </div>
+              <input
+                name="optionsExtra"
+                defaultValue={extraOptionLabels.join(", ")}
+                placeholder="목록에 없는 옵션은 여기에 쉼표로 구분해 직접 입력 (선택)"
+                className="w-full mt-2 border border-line-strong px-3 py-2 text-[13px] rounded-sm"
+              />
             </div>
           </div>
           {lineupCategoryGroups.map(({ groupKey, label, items: catItems, linkedKeys }) => (

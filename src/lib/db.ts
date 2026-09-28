@@ -181,6 +181,8 @@ function createSchema(): Promise<void> {
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS is_oem BOOLEAN NOT NULL DEFAULT false`;
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS oem_source TEXT`;
     await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS spec_table TEXT`;
+    // 옵션(Options): 관리자가 등록한 옵션 목록에서 선택한 값들을 쉼표로 이어 저장.
+    await sql`ALTER TABLE content_pages ADD COLUMN IF NOT EXISTS options TEXT`;
 
     // 적용사례 photos (max 5, enforced in the admin action).
     await sql`
@@ -263,6 +265,17 @@ function createSchema(): Promise<void> {
         image_url TEXT NOT NULL,
         title TEXT NOT NULL,
         registered_on DATE,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
+    // 사양서 옵션 마스터 목록. 관리자가 등록/삭제/정렬하며, 각 설비에서
+    // 체크 선택한 항목이 사양서의 "옵션(Options)" 행으로 추가된다.
+    await sql`
+      CREATE TABLE IF NOT EXISTS spec_options (
+        id TEXT PRIMARY KEY,
+        label TEXT NOT NULL,
         sort_order INT NOT NULL DEFAULT 0,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
