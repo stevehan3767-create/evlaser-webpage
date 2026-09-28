@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { contentGroups } from "@/lib/data";
 import { contentPageRepo, contentImageRepo, contentItemRepo, seedContentItemsIfEmpty } from "@/lib/repo";
-import { filledSpecRows } from "@/lib/spec";
+import { resolveSpecRows } from "@/lib/spec";
 import PrintButton from "@/components/PrintButton";
 
 export const dynamic = "force-dynamic";
@@ -26,8 +26,9 @@ export default async function SpecSheetPage({
   ]);
 
   const title = page?.title || item.name;
-  // 값이 입력된 항목만 사양서에 표시한다(공란 항목은 제외).
-  const rows = filledSpecRows(page?.specTable);
+  // 값이 입력된 항목만 사양서에 표시한다(공란 항목은 제외). 표준 폼이 비어 있으면
+  // 내용의 [사양] 표(레거시)를 자동으로 사용한다.
+  const rows = resolveSpecRows(page?.specTable, page?.description);
   const samples = images.slice(0, 3);
   const isOem = page?.isOem ?? false;
 

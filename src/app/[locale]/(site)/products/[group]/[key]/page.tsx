@@ -6,7 +6,7 @@ import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
 import { contentGroups, type IconName } from "@/lib/data";
-import { filledSpecRows } from "@/lib/spec";
+import { resolveSpecRows } from "@/lib/spec";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -70,7 +70,7 @@ export default async function ContentDetailPage({
 
   const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
-  const specRows = filledSpecRows(page?.specTable);
+  const specRows = resolveSpecRows(page?.specTable, page?.description);
 
   // 기술종류별/산업분야별/재료별 상세페이지에는 그 카테고리가 등록된
   // 설비 라인업 목록을 함께 보여준다.
@@ -184,10 +184,10 @@ export default async function ContentDetailPage({
           </div>
         )}
 
-        {/* 사양서 — 자동 생성 사양서(사양 표 입력 시) + 업로드 첨부파일(있으면) */}
-        {(page?.specTable || page?.specFileUrl) && (
+        {/* 사양서 — 자동 생성 사양서(사양 입력 시) + 업로드 첨부파일(있으면) */}
+        {(specRows.length > 0 || page?.specFileUrl) && (
           <div className="mt-8 flex flex-wrap gap-3">
-            {page?.specTable && (
+            {specRows.length > 0 && (
               <a
                 href={`/spec/${group}/${key}`}
                 target="_blank"

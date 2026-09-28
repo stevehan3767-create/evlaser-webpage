@@ -29,3 +29,36 @@ export function parseSpecRows(text: string | null | undefined): SpecRow[] {
 export function filledSpecRows(text: string | null | undefined): SpecRow[] {
   return parseSpecRows(text).filter((r) => r.v !== "" && !/^[-–—·・\s]+$/.test(r.v));
 }
+
+// 내용(description) 안의 "[사양]" 표 구간을 뽑아 값이 있는 행만 반환.
+// 표준 사양서 폼이 비어 있을 때의 폴백(레거시 데이터)으로 사용한다.
+export function specRowsFromDescription(desc: string | null | undefined): SpecRow[] {
+  if (!desc) return [];
+  const lines = desc.replace(/\r\n/g, "\n").split("\n");
+  const idx = lines.findIndex((l) => {
+    const t = l.replace(/\s/g, "");
+    return t === "[사양]" || t === "[사양·Specifications]" || t === "[Specifications]";
+  });
+  if (idx === -1) return [];
+  const tableLines: string[] = [];
+  for (let i = idx + 1; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (t === "") continue;
+    if (!t.startsWith("|")) break;
+    tableLines.push(t);
+  }
+  return filledSpecRows(tableLines.join("\n")).filter(
+    (r) => r.k !== "항목" && r.k.toLowerCase() !== "item"
+  );
+}
+
+// 사양 표의 최종 출처를 결정한다: 표준 사양서 폼에 입력된 값이 있으면 그것을,
+// 없으면 내용의 [사양] 표(레거시)를 사용한다.
+export function resolveSpecRows(
+  specTable: string | null | undefined,
+  description: string | null | undefined
+): SpecRow[] {
+  const primary = filledSpecRows(specTable);
+  if (primary.length > 0) return primary;
+  return specRowsFromDescription(description);
+}
