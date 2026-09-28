@@ -25,6 +25,7 @@ import CaseImageStager from "@/components/CaseImageStager";
 import CaseVideoStager from "@/components/CaseVideoStager";
 import Icon from "@/components/Icon";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
+import SubmitButton from "@/components/SubmitButton";
 import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -503,9 +504,9 @@ export default async function AdminContentPagesPage({
         </div>
 
         <div className="flex items-center gap-3 pt-2">
-          <button type="submit" className="justify-self-start px-6 py-3 bg-red text-white font-bold text-[13.5px]">
+          <SubmitButton className="justify-self-start px-6 py-3 bg-red text-white font-bold text-[13.5px]">
             저장
-          </button>
+          </SubmitButton>
           <MessageBanner msg={msg} />
         </div>
       </form>
