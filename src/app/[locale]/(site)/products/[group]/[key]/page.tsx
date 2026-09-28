@@ -19,17 +19,30 @@ import {
 
 const LINEUP_CATEGORY_GROUPS = new Set(["tech", "industry", "material"]);
 
-// 내용(description) 안에 수동으로 적어둔 "[사양]" 표는 이제 표준 사양서에서
-// 자동 생성하므로, 상세페이지에서는 해당 구간(제목 + 뒤따르는 표/빈 줄)을
-// 제거해 중복을 없앤다.
+// 내용(description) 안에 수동으로 적어둔 "[사양]" 표, "[관련설비]"/"[관련 설비]"
+// 목록 등은 이제 각각 표준 사양서·연결(카테고리)에서 자동 생성되므로, 상세페이지
+// 에서는 해당 구간(제목 + 뒤따르는 표/목록/빈 줄)을 제거해 중복을 없앤다.
+const STRIP_HEADINGS = new Set([
+  "[사양]",
+  "[사양·Specifications]",
+  "[Specifications]",
+  "[관련설비]",
+  "[관련설비·RelatedEquipment]",
+  "[관련장비]",
+]);
 function stripSpecSection(text: string): string {
   const lines = text.replace(/\r\n/g, "\n").split("\n");
   const out: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     const t = lines[i].replace(/\s/g, "");
-    if (t === "[사양]" || t === "[사양·Specifications]" || t === "[Specifications]") {
+    if (STRIP_HEADINGS.has(t)) {
       i++;
-      while (i < lines.length && (lines[i].trim() === "" || lines[i].trim().startsWith("|"))) i++;
+      // 뒤따르는 빈 줄 / 표(|) / 목록(- •) 줄을 건너뛴다
+      while (i < lines.length) {
+        const s = lines[i].trim();
+        if (s === "" || s.startsWith("|") || /^[-•]/.test(s)) i++;
+        else break;
+      }
       i--; // for 루프의 i++ 보정
       continue;
     }
