@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { specOptionRepo } from "@/lib/repo";
 
 function revalidate() {
@@ -18,6 +19,7 @@ export async function saveSpecOption(formData: FormData) {
     await specOptionRepo.create({ label });
   }
   revalidate();
+  redirect("/admin/spec-options?msg=saved");
 }
 
 export async function deleteSpecOption(formData: FormData) {
@@ -25,6 +27,7 @@ export async function deleteSpecOption(formData: FormData) {
   if (!id) return;
   await specOptionRepo.remove(id);
   revalidate();
+  redirect("/admin/spec-options?msg=deleted");
 }
 
 export async function moveSpecOption(formData: FormData) {

@@ -2,11 +2,12 @@ import Link from "next/link";
 import { specOptionRepo, seedSpecOptionsIfEmpty } from "@/lib/repo";
 import { specOptionDefaults } from "@/lib/data";
 import { saveSpecOption, deleteSpecOption, moveSpecOption } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSpecOptionsPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
-  const { edit } = await searchParams;
+export default async function AdminSpecOptionsPage({ searchParams }: { searchParams: Promise<{ edit?: string; msg?: string }> }) {
+  const { edit, msg } = await searchParams;
   await seedSpecOptionsIfEmpty(specOptionDefaults);
   const options = await specOptionRepo.list();
   const editing = edit ? options.find((o) => o.id === edit) : undefined;
@@ -31,14 +32,24 @@ export default async function AdminSpecOptionsPage({ searchParams }: { searchPar
             className="w-full border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
-        <div className="flex gap-3">
-          <button type="submit" className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
+        <div className="flex items-center gap-3">
+          <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {editing ? "저장" : "추가"}
-          </button>
+          </SubmitButton>
           {editing && (
             <Link href="/admin/spec-options" className="inline-flex items-center px-5 py-2.5 border border-line-strong text-[13px] font-bold">
               취소
             </Link>
+          )}
+          {msg === "saved" && (
+            <span className="inline-flex items-center px-3 py-2 text-[12.5px] font-bold rounded-sm bg-[#e9f7ee] text-[#0a7a3d] border border-[#b8e6c8]">
+              저장되었습니다.
+            </span>
+          )}
+          {msg === "deleted" && (
+            <span className="inline-flex items-center px-3 py-2 text-[12.5px] font-bold rounded-sm bg-[#e9f7ee] text-[#0a7a3d] border border-[#b8e6c8]">
+              삭제되었습니다.
+            </span>
           )}
         </div>
       </form>
