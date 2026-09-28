@@ -139,8 +139,8 @@ export default async function ContentDetailPage({
           <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>
         </div>
 
-        {/* 같은 그룹의 다른 항목으로 바로 이동 */}
-        <div className="flex flex-wrap gap-2 mt-6">
+        {/* 같은 그룹의 다른 항목으로 바로 이동 — 가로 5개 고정 그리드 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-6">
           {items.map((it) => {
             const active = it.itemKey === key;
             return (
@@ -148,7 +148,7 @@ export default async function ContentDetailPage({
                 key={it.id}
                 href={`/products/${group}/${it.itemKey}`}
                 aria-current={active ? "page" : undefined}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 border rounded-sm text-[12.5px] font-semibold whitespace-nowrap transition-colors ${
+                className={`flex items-center justify-center text-center gap-1.5 px-3 py-2 border rounded-sm text-[12.5px] font-semibold leading-snug transition-colors ${
                   active
                     ? "bg-red text-white border-red"
                     : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
