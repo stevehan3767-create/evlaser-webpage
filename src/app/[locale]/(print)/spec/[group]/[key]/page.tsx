@@ -1,23 +1,10 @@
 import { notFound } from "next/navigation";
-import { contentGroups, standardSpecTable } from "@/lib/data";
+import { contentGroups } from "@/lib/data";
 import { contentPageRepo, contentImageRepo, contentItemRepo, seedContentItemsIfEmpty } from "@/lib/repo";
+import { filledSpecRows } from "@/lib/spec";
 import PrintButton from "@/components/PrintButton";
 
 export const dynamic = "force-dynamic";
-
-// "항목 | 값" 여러 줄을 [항목, 값] 배열로. 값에 |가 있을 수 있으니 첫 |만 분리.
-function parseSpecRows(text: string | null): { k: string; v: string }[] {
-  if (!text) return [];
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const i = line.indexOf("|");
-      if (i === -1) return { k: line, v: "" };
-      return { k: line.slice(0, i).trim(), v: line.slice(i + 1).trim() };
-    });
-}
 
 export default async function SpecSheetPage({
   params,
@@ -39,8 +26,8 @@ export default async function SpecSheetPage({
   ]);
 
   const title = page?.title || item.name;
-  // 사양 표 미입력 시에도 표준 항목 골격을 공란으로 표시한다.
-  const rows = parseSpecRows(page?.specTable && page.specTable.trim() ? page.specTable : standardSpecTable);
+  // 값이 입력된 항목만 사양서에 표시한다(공란 항목은 제외).
+  const rows = filledSpecRows(page?.specTable);
   const samples = images.slice(0, 3);
   const isOem = page?.isOem ?? false;
 

@@ -327,7 +327,7 @@ export default async function AdminContentPagesPage({
           <div>
             <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">
               내용 (A4 1장 분량 권장) — 첫 줄은 이미지 아래 캡션(굵게·좌측정렬)으로, <code>[소제목]</code> 줄은 소제목으로,{" "}
-              <code>- 항목</code> 줄은 목록으로, <code>| 항목 | 내용 |</code> 형식의 줄은 표(사양서)로 자동 변환됩니다
+              <code>- 항목</code> 줄은 목록으로 자동 변환됩니다. <b>사양 표는 여기 적지 마세요</b> — 아래 &quot;표준 사양서&quot;에 입력한 항목이 상세페이지의 &quot;주요 사양&quot;으로 자동 표시됩니다(값을 비운 항목은 표시되지 않습니다).
             </label>
             <textarea
               name="description"

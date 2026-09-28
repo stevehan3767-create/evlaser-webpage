@@ -6,6 +6,7 @@ import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
 import { contentGroups, type IconName } from "@/lib/data";
+import { filledSpecRows } from "@/lib/spec";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -17,6 +18,25 @@ import {
 } from "@/lib/repo";
 
 const LINEUP_CATEGORY_GROUPS = new Set(["tech", "industry", "material"]);
+
+// 내용(description) 안에 수동으로 적어둔 "[사양]" 표는 이제 표준 사양서에서
+// 자동 생성하므로, 상세페이지에서는 해당 구간(제목 + 뒤따르는 표/빈 줄)을
+// 제거해 중복을 없앤다.
+function stripSpecSection(text: string): string {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const out: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].replace(/\s/g, "");
+    if (t === "[사양]" || t === "[사양·Specifications]" || t === "[Specifications]") {
+      i++;
+      while (i < lines.length && (lines[i].trim() === "" || lines[i].trim().startsWith("|"))) i++;
+      i--; // for 루프의 i++ 보정
+      continue;
+    }
+    out.push(lines[i]);
+  }
+  return out.join("\n").trim();
+}
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +70,7 @@ export default async function ContentDetailPage({
 
   const title = page?.title || item.name;
   const hasCases = images.length > 0 || videos.length > 0;
+  const specRows = filledSpecRows(page?.specTable);
 
   // 기술종류별/산업분야별/재료별 상세페이지에는 그 카테고리가 등록된
   // 설비 라인업 목록을 함께 보여준다.
@@ -135,14 +156,33 @@ export default async function ContentDetailPage({
           </div>
         )}
 
-        {/* 3. 내용 (캡션 + 주요특징 + 사양서) */}
+        {/* 3. 내용 (캡션 + 주요특징) — [사양] 표는 아래 "주요 사양"으로 자동 대체 */}
         <div className="mt-10">
           {page?.description ? (
-            <RichDescription text={page.description} />
+            <RichDescription text={stripSpecSection(page.description)} />
           ) : (
             <p className="text-ink-faint text-[13.5px]">{tp("descriptionEmpty")}</p>
           )}
         </div>
+
+        {/* 주요 사양 — 표준 사양서에 입력된(값이 있는) 항목만 자동 표시 */}
+        {specRows.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-[16px] font-bold mb-3">주요 사양</h2>
+            <div className="overflow-x-auto border border-line-strong">
+              <table className="w-full border-collapse text-[13px]">
+                <tbody>
+                  {specRows.map((r, i) => (
+                    <tr key={i} className="border-b border-line last:border-b-0">
+                      <th className="text-left font-bold bg-surface-alt px-3.5 py-2.5 w-[38%] align-top whitespace-nowrap">{r.k}</th>
+                      <td className="px-3.5 py-2.5 text-ink-soft align-top">{r.v}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* 사양서 — 자동 생성 사양서(사양 표 입력 시) + 업로드 첨부파일(있으면) */}
         {(page?.specTable || page?.specFileUrl) && (
