@@ -969,7 +969,7 @@ export const contentImageRepo = {
     await ensureSchema();
     const rows = await sql`
       SELECT * FROM content_images WHERE group_key = ${groupKey} AND item_key = ${itemKey}
-      ORDER BY created_at DESC
+      ORDER BY sort_order ASC, created_at ASC
     `;
     return (rows as Record<string, unknown>[]).map(rowToContentImage);
   },
