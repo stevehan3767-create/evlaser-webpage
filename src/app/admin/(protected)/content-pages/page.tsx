@@ -26,6 +26,7 @@ import CaseVideoStager from "@/components/CaseVideoStager";
 import Icon from "@/components/Icon";
 import ConfirmSubmitButton from "@/components/ConfirmSubmitButton";
 import SubmitButton from "@/components/SubmitButton";
+import ContentDraftKeeper from "@/components/ContentDraftKeeper";
 import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -294,6 +295,8 @@ export default async function AdminContentPagesPage({
       <form key={`${group}-${key}-${editingImage?.id ?? "newimg"}-${editingVideo?.id ?? "newvid"}`} action={saveContentAll} className="border border-line p-5 mb-10 grid gap-8">
         <input type="hidden" name="group" value={group} />
         <input type="hidden" name="key" value={key} />
+
+        <ContentDraftKeeper storageKey={`content-draft:${group}:${key}`} />
 
         {/* 1~3. 제목 / 대표 이미지 / 내용 */}
         <div className="grid gap-3.5">
