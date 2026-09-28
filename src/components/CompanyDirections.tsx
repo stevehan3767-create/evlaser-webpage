@@ -7,6 +7,8 @@ import { mapSearchUrl } from "@/lib/maps";
 import GoogleMapEmbed from "./GoogleMapEmbed";
 import NaverMapEmbed from "./NaverMapEmbed";
 
+const NAVER_ENABLED = !!process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
+
 export default async function CompanyDirections() {
   const t = await getTranslations("company.directions");
 
@@ -27,15 +29,17 @@ export default async function CompanyDirections() {
           <div className="mt-9 grid gap-6 md:grid-cols-2">
             {offices.map((o) => (
               <div key={o.id} className="border border-line bg-surface flex flex-col">
-                {o.mapProvider === "google" ? (
+                {/* 국내(naver) 사업장은 지도를 항상 임베드로 표시(네이버 키+좌표 없으면
+                    주소 기반 구글 임베드로 대체). 해외(google)는 링크만 제공. */}
+                {o.mapProvider === "naver" && (
                   <div className="border-b border-line-strong overflow-hidden">
-                    <GoogleMapEmbed query={`${o.name} ${o.address}`} title={`${o.name} 지도`} />
+                    {NAVER_ENABLED && o.lat !== null && o.lng !== null ? (
+                      <NaverMapEmbed lat={o.lat} lng={o.lng} title={`${o.name} 지도`} />
+                    ) : (
+                      <GoogleMapEmbed query={`${o.name} ${o.address}`} title={`${o.name} 지도`} />
+                    )}
                   </div>
-                ) : o.lat !== null && o.lng !== null ? (
-                  <div className="border-b border-line-strong overflow-hidden">
-                    <NaverMapEmbed lat={o.lat} lng={o.lng} title={`${o.name} 지도`} />
-                  </div>
-                ) : null}
+                )}
 
                 <div className="p-5 flex flex-col gap-2.5">
                   <h3 className="flex items-center gap-2 text-[16px] font-bold">
