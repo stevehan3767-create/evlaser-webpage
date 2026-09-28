@@ -1,5 +1,5 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
-import { techPageSeeds } from "./data";
+import { techPageSeeds, specOptionDefaults, specOptionLegacyDefaults } from "./data";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -331,7 +331,25 @@ function createSchema(): Promise<void> {
 
     await ensureLaserSolderingTechItem();
     await ensureElectronics3cIndustry();
+    await ensureSpecOptionsDefault();
   })();
+}
+
+// spec_options가 비어 있으면 정식 옵션 목록을 시딩하고, 이전 배포의 예시 목록으로만
+// 채워져 있으면(관리자가 아직 편집하지 않은 상태) 정식 목록으로 한 번 교체한다.
+// 관리자가 이미 손댄 경우(예시값 외 항목이 하나라도 있으면)에는 건드리지 않는다.
+async function ensureSpecOptionsDefault(): Promise<void> {
+  const rows = (await sql`SELECT label FROM spec_options`) as { label: string }[];
+  const labels = rows.map((r) => r.label);
+  const untouched = labels.length === 0 || labels.every((l) => specOptionLegacyDefaults.includes(l));
+  if (!untouched) return;
+  await sql`DELETE FROM spec_options`;
+  for (let i = 0; i < specOptionDefaults.length; i++) {
+    await sql`
+      INSERT INTO spec_options (id, label, sort_order, created_at)
+      VALUES (${newId()}, ${specOptionDefaults[i]}, ${i}, ${new Date().toISOString()})
+    `;
+  }
 }
 
 // 이미 시딩된 환경의 산업분야별 목록에 "전자·3C" 항목을 한 번만 추가한다
