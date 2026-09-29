@@ -17,12 +17,14 @@ export default function ItemCardsGrid({
   minColWidth = "190px",
   iconColorClass = "text-red",
   emptyMessage,
+  activeKey,
 }: {
   items: ItemCard[];
   hrefFor: (itemKey: string) => string;
   minColWidth?: string;
   iconColorClass?: string;
   emptyMessage?: string;
+  activeKey?: string;
 }) {
   if (items.length === 0) {
     return emptyMessage ? <p className="text-[13px] text-ink-faint py-8 text-center">{emptyMessage}</p> : null;
@@ -30,22 +32,28 @@ export default function ItemCardsGrid({
 
   return (
     <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${minColWidth}, 1fr))` }}>
-      {items.map((item) => (
-        <Link
-          key={item.itemKey}
-          href={hrefFor(item.itemKey)}
-          className="group bg-surface border border-line rounded-md overflow-hidden flex flex-col hover:border-blue hover:bg-surface-alt transition-colors"
-        >
-          {item.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.imageUrl} alt="" className="w-full h-[72px] object-cover bg-surface-alt border-b border-line" />
-          )}
-          <div className="flex-1 px-3 py-2.5 flex items-center justify-center gap-2">
-            <Icon name={item.icon as IconName} className={`w-5 h-5 flex-none ${iconColorClass}`} strokeWidth={1.5} />
-            <h3 className="text-[13.5px] font-semibold leading-snug text-center">{item.name}</h3>
-          </div>
-        </Link>
-      ))}
+      {items.map((item) => {
+        const active = activeKey !== undefined && item.itemKey === activeKey;
+        return (
+          <Link
+            key={item.itemKey}
+            href={hrefFor(item.itemKey)}
+            aria-current={active ? "page" : undefined}
+            className={`group border rounded-md overflow-hidden flex flex-col transition-colors ${
+              active ? "bg-red border-red" : "bg-surface border-line hover:border-blue hover:bg-surface-alt"
+            }`}
+          >
+            {item.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={item.imageUrl} alt="" className="w-full h-[72px] object-cover bg-surface-alt border-b border-line" />
+            )}
+            <div className="flex-1 px-3.5 py-3 flex items-center gap-2">
+              <Icon name={item.icon as IconName} className={`w-5 h-5 flex-none ${active ? "text-white" : iconColorClass}`} strokeWidth={1.5} />
+              <h3 className={`text-[13.5px] font-semibold leading-snug text-left ${active ? "text-white" : ""}`}>{item.name}</h3>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
+import ItemCardsGrid from "@/components/ItemCardsGrid";
 import { contentGroups, type IconName } from "@/lib/data";
 import { resolveSpecRowsWithOptions } from "@/lib/spec";
 import {
@@ -140,28 +141,15 @@ export default async function ContentDetailPage({
         </div>
       </div>
 
-      {/* 같은 그룹의 다른 항목으로 바로 이동 — 목록 페이지와 동일한 카드 그리드(가로 5개, 한 줄 라벨) */}
-      <div className="mx-auto max-w-[1160px] px-7 mt-7">
-        <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
-          {items.map((it) => {
-            const active = it.itemKey === key;
-            return (
-              <Link
-                key={it.id}
-                href={`/products/${group}/${it.itemKey}`}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center justify-center text-center gap-1.5 px-3 py-2.5 border rounded-md text-[13px] font-semibold leading-snug transition-colors ${
-                  active
-                    ? "bg-red text-white border-red"
-                    : "bg-surface border-line text-ink-soft hover:border-blue hover:text-blue"
-                }`}
-              >
-                <Icon name={it.icon as IconName} className="w-4 h-4 flex-none" strokeWidth={1.6} />
-                {it.name}
-              </Link>
-            );
-          })}
-        </div>
+      {/* 같은 그룹의 다른 항목으로 바로 이동 — 목록(기술종류별) 페이지와 100% 동일한 카드 그리드 */}
+      <div className="mx-auto max-w-[1240px] px-7 mt-7">
+        <ItemCardsGrid
+          items={items.map((it) => ({ itemKey: it.itemKey, name: it.name, icon: it.icon }))}
+          hrefFor={(k) => `/products/${group}/${k}`}
+          activeKey={key}
+          minColWidth="190px"
+          iconColorClass="text-red"
+        />
       </div>
 
       <div className="mx-auto max-w-[900px] px-7 mt-10">
