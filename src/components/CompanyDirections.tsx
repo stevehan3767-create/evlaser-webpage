@@ -3,9 +3,8 @@ import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 import { officeSeeds } from "@/lib/data";
 import { officeRepo, seedOfficesIfEmpty } from "@/lib/repo";
-import { mapSearchUrl, kakaoRoughmapFor } from "@/lib/maps";
+import { mapSearchUrl } from "@/lib/maps";
 import GoogleMapEmbed from "./GoogleMapEmbed";
-import KakaoRoughmap from "./KakaoRoughmap";
 
 export default async function CompanyDirections() {
   const t = await getTranslations("company.directions");
@@ -27,15 +26,11 @@ export default async function CompanyDirections() {
           <div className="mt-9 grid gap-6 md:grid-cols-2">
             {offices.map((o) => (
               <div key={o.id} className="border border-line bg-surface flex flex-col">
-                {/* 국내 사업장(본사·레이저기술센터)은 evlaser.co.kr과 동일한 카카오 약도.
-                    그 외 국내 사업장은 주소 기반 구글 임베드로 대체. 해외(google)는 링크만. */}
+                {/* 국내 사업장(본사·레이저기술센터)만 지도 임베드. 우선순위 네이버→구글이며,
+                    현재는 키 불필요한 구글 임베드로 표시. 해외(google)는 링크만. */}
                 {o.mapProvider === "naver" && (
                   <div className="border-b border-line-strong overflow-hidden">
-                    {kakaoRoughmapFor(o.name) ? (
-                      <KakaoRoughmap mapKey={kakaoRoughmapFor(o.name)!.key} timestamp={kakaoRoughmapFor(o.name)!.timestamp} />
-                    ) : (
-                      <GoogleMapEmbed query={`${o.name} ${o.address}`} title={`${o.name} 지도`} />
-                    )}
+                    <GoogleMapEmbed query={`${o.name} ${o.address}`} title={`${o.name} 지도`} />
                   </div>
                 )}
 
@@ -60,17 +55,13 @@ export default async function CompanyDirections() {
                     )}
                   </div>
                   <a
-                    href={
-                      o.mapProvider === "google"
-                        ? mapSearchUrl("google", `${o.name} ${o.address}`)
-                        : `https://map.kakao.com/?q=${encodeURIComponent(`${o.name} ${o.address}`)}`
-                    }
+                    href={mapSearchUrl(o.mapProvider, `${o.name} ${o.address}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 mt-1.5 text-[12.5px] font-bold text-blue hover:underline"
                   >
                     <Icon name="pin" className="w-3.5 h-3.5 flex-none" />
-                    {o.mapProvider === "google" ? "Google 지도에서 보기" : "카카오맵에서 보기"}
+                    {o.mapProvider === "google" ? "Google 지도에서 보기" : "네이버 지도에서 보기"}
                   </a>
                 </div>
               </div>

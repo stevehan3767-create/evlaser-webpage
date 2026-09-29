@@ -3,9 +3,8 @@ import Icon from "./Icon";
 import { officeSeeds } from "@/lib/data";
 import { officeRepo, distributorRepo, seedOfficesIfEmpty, type OfficeRow, type DistributorRow } from "@/lib/repo";
 import { countryFlag, countryName, isCountryCode } from "@/lib/countries";
-import { mapSearchUrl, kakaoRoughmapFor } from "@/lib/maps";
+import { mapSearchUrl } from "@/lib/maps";
 import GoogleMapEmbed from "./GoogleMapEmbed";
-import KakaoRoughmap from "./KakaoRoughmap";
 
 function MapLink({ href, label }: { href: string; label: string }) {
   return (
@@ -46,25 +45,17 @@ function OfficeTable({ headers, rows }: { headers: [string, string, string, stri
               </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] align-top">
                 <p>{r.address}</p>
-                {/* 국내 사업장(본사·레이저기술센터)은 evlaser.co.kr과 동일한 카카오 약도로
-                    표시. 그 외 국내 사업장은 주소 기반 구글 임베드로 대체. 해외(google)
+                {/* 국내 사업장(본사·레이저기술센터)만 지도를 임베드로 표시한다.
+                    우선순위: 네이버(키·좌표 필요) → 구글(주소 기반, 키 불필요). 해외(google)
                     사업장은 임베드 없이 "지도에서 보기" 링크만 제공. */}
                 {r.mapProvider === "naver" && (
                   <div className="mt-2.5 mb-1.5 border border-line-strong overflow-hidden rounded-sm">
-                    {kakaoRoughmapFor(r.name) ? (
-                      <KakaoRoughmap mapKey={kakaoRoughmapFor(r.name)!.key} timestamp={kakaoRoughmapFor(r.name)!.timestamp} />
-                    ) : (
-                      <GoogleMapEmbed query={`${r.name} ${r.address}`} title={`${r.name} 지도`} />
-                    )}
+                    <GoogleMapEmbed query={`${r.name} ${r.address}`} title={`${r.name} 지도`} />
                   </div>
                 )}
                 <MapLink
-                  href={
-                    r.mapProvider === "google"
-                      ? mapSearchUrl("google", `${r.name} ${r.address}`)
-                      : `https://map.kakao.com/?q=${encodeURIComponent(`${r.name} ${r.address}`)}`
-                  }
-                  label={r.mapProvider === "google" ? "Google 지도에서 보기" : "카카오맵에서 보기"}
+                  href={mapSearchUrl(r.mapProvider, `${r.name} ${r.address}`)}
+                  label={r.mapProvider === "google" ? "Google 지도에서 보기" : "네이버 지도에서 보기"}
                 />
               </td>
               <td className="px-3.5 py-4 border-b border-line text-[13.5px] font-mono align-top">{r.phone}</td>
