@@ -24,9 +24,9 @@ export default function CategoryShortcuts() {
             <Link
               key={c.title}
               href={c.href}
-              className="group border border-line rounded-lg p-5 sm:p-6 bg-surface text-center hover:border-blue hover:shadow-[0_6px_18px_rgba(11,77,162,0.12)] hover:-translate-y-0.5 transition-all"
+              className="group border border-line rounded-lg p-5 sm:p-6 bg-surface text-left hover:border-blue hover:shadow-[0_6px_18px_rgba(11,77,162,0.12)] hover:-translate-y-0.5 transition-all"
             >
-              <span className="w-[52px] h-[52px] rounded-xl bg-blue-soft text-blue flex items-center justify-center mx-auto mb-3 group-hover:bg-blue group-hover:text-white transition-colors">
+              <span className="w-[52px] h-[52px] rounded-xl bg-blue-soft text-blue flex items-center justify-center mb-3 group-hover:bg-blue group-hover:text-white transition-colors">
                 <Icon name={c.icon} className="w-6 h-6" strokeWidth={1.6} />
               </span>
               <span className="block text-[15.5px] font-bold">{c.title}</span>
