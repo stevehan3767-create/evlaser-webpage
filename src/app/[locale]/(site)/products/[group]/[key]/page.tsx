@@ -121,7 +121,7 @@ export default async function ContentDetailPage({
 
   return (
     <div className="py-16 sm:py-22">
-      <div className="mx-auto max-w-[900px] px-7">
+      <div className="mx-auto max-w-[1240px] px-7">
         <Breadcrumb
           items={[
             { label: "제품·기술", href: "/products" },
@@ -152,7 +152,9 @@ export default async function ContentDetailPage({
         />
       </div>
 
-      <div className="mx-auto max-w-[900px] px-7 mt-10">
+      {/* 본문 — 좌측 기준선은 위(제목·카드)와 동일(1240 컨테이너)하게 두고, 읽기 좋은 폭(900)으로 왼쪽 정렬 */}
+      <div className="mx-auto max-w-[1240px] px-7 mt-10">
+        <div className="max-w-[900px]">
         {/* 2. 설비 사진 */}
         {page?.imageUrl && (
           <div className="mt-8 border border-line-strong bg-surface-alt overflow-hidden">
@@ -325,6 +327,7 @@ export default async function ContentDetailPage({
               )}
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>
