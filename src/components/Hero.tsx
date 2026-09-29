@@ -51,31 +51,26 @@ export default async function Hero() {
             <p className="mt-2.5 text-[13.5px] sm:text-[15px] font-semibold tracking-wide text-blue uppercase">{t("titleSub")}</p>
           )}
           <p className="mt-5 max-w-[52ch] text-ink-soft text-[16.5px]">{t("body")}</p>
-          <div className="flex gap-3 mt-8 flex-wrap">
+          <HeroSearch />
+          {/* 검색창 아래: 조건 검색 + 제품·기술 보기 버튼을 함께 배치 (상담 문의하기는 상단 메뉴로 대체) */}
+          <div className="flex flex-wrap items-center gap-3 mt-3">
+            <Link
+              href="/products/lineup?finder=open"
+              className="group inline-flex items-center gap-2 rounded-full border-2 border-blue bg-blue-soft px-4 py-2.5 text-[13.5px] font-bold text-blue shadow-sm hover:bg-blue hover:text-white transition-colors"
+            >
+              <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
+                <path d="M3 5h18M6 12h12M10 19h4" />
+              </svg>
+              설비·기술·재료·산업별로 검색
+              <span className="ml-0.5 transition-transform group-hover:translate-x-0.5">→</span>
+            </Link>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025] hover:border-[#c40025]"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-red text-white font-bold text-[13.5px] border-2 border-red hover:bg-[#c40025] hover:border-[#c40025] transition-colors"
             >
               {t("cta1")}
             </Link>
-            <Link
-              href="/support"
-              className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-transparent text-ink font-bold text-[13.5px] border border-line-strong hover:border-blue hover:text-blue"
-            >
-              {t("cta2")}
-            </Link>
           </div>
-          <HeroSearch />
-          <Link
-            href="/products/lineup?finder=open"
-            className="group mt-3 inline-flex items-center gap-2 rounded-full border-2 border-blue bg-blue-soft px-4 py-2.5 text-[13.5px] font-bold text-blue shadow-sm hover:bg-blue hover:text-white transition-colors"
-          >
-            <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
-              <path d="M3 5h18M6 12h12M10 19h4" />
-            </svg>
-            설비·기술·재료·산업별로 검색
-            <span className="ml-0.5 transition-transform group-hover:translate-x-0.5">→</span>
-          </Link>
         </div>
 
         {heroSlides.length > 0 ? (
