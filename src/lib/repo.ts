@@ -33,6 +33,28 @@ export interface NewsRow {
   createdAt: string;
 }
 
+export interface NewsImageRow {
+  id: string;
+  newsId: string;
+  url: string;
+  caption: string | null;
+  content: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToNewsImage(r: Record<string, unknown>): NewsImageRow {
+  return {
+    id: r.id as string,
+    newsId: r.news_id as string,
+    url: r.url as string,
+    caption: (r.caption as string) ?? null,
+    content: (r.content as string) ?? null,
+    sortOrder: (r.sort_order as number) ?? 0,
+    createdAt: r.created_at as string,
+  };
+}
+
 function rowToInquiry(r: Record<string, unknown>): Inquiry {
   return {
     id: r.id as string,
@@ -596,12 +618,14 @@ export const newsRepo = {
       : await sql`SELECT * FROM news_items ORDER BY date DESC`;
     return (rows as Record<string, unknown>[]).map(rowToNews);
   },
-  async create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): Promise<void> {
+  async create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): Promise<string> {
     await ensureSchema();
+    const id = newId();
     await sql`
       INSERT INTO news_items (id, tag, title, date, body, published, created_at)
-      VALUES (${newId()}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${new Date().toISOString()})
+      VALUES (${id}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${new Date().toISOString()})
     `;
+    return id;
   },
   async update(id: string, input: { tag: string; title: string; date: string; body?: string }): Promise<void> {
     await ensureSchema();
@@ -612,12 +636,55 @@ export const newsRepo = {
   },
   async remove(id: string): Promise<void> {
     await ensureSchema();
+    await sql`DELETE FROM news_images WHERE news_id = ${id}`;
     await sql`DELETE FROM news_items WHERE id = ${id}`;
   },
   async count(): Promise<number> {
     await ensureSchema();
     const rows = await sql`SELECT COUNT(*)::int AS c FROM news_items`;
     return (rows[0] as { c: number }).c;
+  },
+};
+
+export const newsImageRepo = {
+  async listByNews(newsId: string): Promise<NewsImageRow[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT * FROM news_images WHERE news_id = ${newsId}
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    return (rows as Record<string, unknown>[]).map(rowToNewsImage);
+  },
+  // 게시글 여러 개의 사진을 한 번에 모아 newsId별로 그룹화해서 반환(목록 렌더링용).
+  async mapForNews(newsIds: string[]): Promise<Record<string, NewsImageRow[]>> {
+    await ensureSchema();
+    const map: Record<string, NewsImageRow[]> = {};
+    if (newsIds.length === 0) return map;
+    const rows = await sql`
+      SELECT * FROM news_images WHERE news_id = ANY(${newsIds})
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    for (const r of rows as Record<string, unknown>[]) {
+      const img = rowToNewsImage(r);
+      (map[img.newsId] ??= []).push(img);
+    }
+    return map;
+  },
+  async count(newsId: string): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM news_images WHERE news_id = ${newsId}`;
+    return (rows[0] as { c: number }).c;
+  },
+  async create(input: { newsId: string; url: string; caption?: string; content?: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO news_images (id, news_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${input.newsId}, ${input.url}, ${input.caption ?? null}, ${input.content ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM news_images WHERE id = ${id}`;
   },
 };
 

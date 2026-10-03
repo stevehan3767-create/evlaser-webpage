@@ -1,10 +1,13 @@
 import Link from "next/link";
 import SubmitButton from "@/components/SubmitButton";
+import CaseImageStager from "@/components/CaseImageStager";
 import { newsItems as seedNewsItems } from "@/lib/data";
-import { newsRepo, seedIfEmpty } from "@/lib/repo";
-import { saveNews, deleteNews } from "./actions";
+import { newsRepo, newsImageRepo, seedIfEmpty } from "@/lib/repo";
+import { saveNews, deleteNews, deleteNewsImage } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const MAX_IMAGES = 12;
 
 export default async function AdminNewsPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const { edit } = await searchParams;
@@ -12,6 +15,8 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
   await seedIfEmpty(seedNewsItems);
   const items = await newsRepo.list();
   const editing = edit ? items.find((i) => i.id === edit) : undefined;
+  const editingImages = editing ? await newsImageRepo.listByNews(editing.id) : [];
+  const imageMap = await newsImageRepo.mapForNews(items.map((i) => i.id));
 
   return (
     <div>
@@ -44,11 +49,38 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
         </div>
         <textarea
           name="body"
-          placeholder="본문 (선택)"
+          placeholder="본문 (선택) — 줄바꿈이 그대로 표시됩니다."
           defaultValue={editing?.body ?? ""}
-          rows={3}
+          rows={6}
           className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm resize-y"
         />
+
+        {editing && editingImages.length > 0 && (
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">등록된 사진 ({editingImages.length})</label>
+            <div className="border border-line-strong rounded-sm divide-y divide-line">
+              {editingImages.map((img) => (
+                <div key={img.id} className="flex items-center gap-3 p-2.5 text-[12.5px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt="" className="w-10 h-10 flex-none object-cover border border-line-strong bg-surface-alt" />
+                  <span className="flex-1 min-w-0 truncate">{img.caption || img.url}</span>
+                  <form action={deleteNewsImage}>
+                    <input type="hidden" name="imageId" value={img.id} />
+                    <button type="submit" className="text-red font-bold flex-none">
+                      삭제
+                    </button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-2">사진 추가 (선택)</label>
+          <CaseImageStager fieldName="images" remaining={MAX_IMAGES - editingImages.length} />
+        </div>
+
         <div className="flex gap-3">
           <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {editing ? "저장" : "추가"}
@@ -70,7 +102,10 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
               <span className="font-mono text-[10.5px] text-blue border border-line-strong px-1.5 py-0.5 flex-none mt-0.5">{item.tag}</span>
               <div className="flex-1">
                 <p>{item.title}</p>
-                {item.body && <p className="mt-1 text-[12px] text-ink-soft line-clamp-2">{item.body}</p>}
+                {item.body && <p className="mt-1 text-[12px] text-ink-soft line-clamp-2 whitespace-pre-line">{item.body}</p>}
+                {(imageMap[item.id]?.length ?? 0) > 0 && (
+                  <p className="mt-1 text-[11px] text-blue font-bold">사진 {imageMap[item.id].length}장</p>
+                )}
               </div>
               <span className="font-mono text-ink-faint flex-none">{item.date}</span>
               <div className="flex gap-3 flex-none">

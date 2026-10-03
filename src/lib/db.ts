@@ -86,6 +86,20 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // 뉴스 게시글에 첨부하는 사진(전시회 품목 사진 등). caption=제목, content=부가설명.
+    await sql`
+      CREATE TABLE IF NOT EXISTS news_images (
+        id TEXT PRIMARY KEY,
+        news_id TEXT NOT NULL,
+        url TEXT NOT NULL,
+        caption TEXT,
+        content TEXT,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS news_images_news_idx ON news_images (news_id)`;
+
     // Admin-managed FAQ entries, shown on /support alongside the fixed
     // (translated) FAQ items already built into the page.
     await sql`
@@ -332,7 +346,61 @@ function createSchema(): Promise<void> {
     await ensureLaserSolderingTechItem();
     await ensureElectronics3cIndustry();
     await ensureSpecOptionsDefault();
+    await ensureMetalWeek2026News();
   })();
+}
+
+// KOREA METAL WEEK 2026(금속산업대전) 전시회소식 게시글을 사진과 함께 한 번만 등록한다.
+// settings 플래그로 1회성 등록을 보장하므로, 관리자가 이후 글을 삭제해도 다시 생기지 않는다.
+async function ensureMetalWeek2026News(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'metalweek2026_news_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+
+  const newsId = newId();
+  const body = [
+    "[행사 개요]",
+    "전시회명 : KOREA METAL WEEK 2026 (금속산업대전)",
+    "기간 : 2026년 10월 28일(수) ~ 30일(금)",
+    "장소 : 일산 KINTEX 제1전시장 (1·3홀), 경기도 고양시",
+    "전시분야 : 레이저·용접 설비, 파스너&와이어, 주조&다이캐스팅, 프레스&단조 등 금속산업 전 분야",
+    "",
+    "㈜이브이레이저가 국내 최대 금속산업 전문 전시회인 KOREA METAL WEEK(금속산업대전)에 참가합니다. 금속·플라스틱 정밀 가공을 위한 당사의 레이저 솔루션과 용접 소재를 현장에서 직접 만나보실 수 있습니다.",
+    "",
+    "[주요 전시 품목]",
+    "· 레이저 가공 시스템 (Fiber & Diode, Up to 1200W / CNC & Handheld / 절단·용접·클리닝·마킹)",
+    "· 용접 소재(Welding Wire) 라인업 — 서브머지드 아크(SAW) / TIG(GTAW) / 플럭스 코어드(FCW) / 알루미늄 / 동도금",
+    "(아래 사진 참조)",
+    "",
+    "[방문 안내]",
+    "부스에서는 당사 엔지니어가 설비 시연과 함께 기술·사양 상담을 진행합니다. 사전 상담 예약을 원하시면 아래 문의처로 연락 주시기 바랍니다.",
+    "문의 : ㈜이브이레이저 · Tel 031-452-9860 · info@evlaser.co.kr",
+    "공식 홈페이지 : korea-metal.com",
+  ].join("\n");
+
+  await sql`
+    INSERT INTO news_items (id, tag, title, date, body, published, created_at)
+    VALUES (${newsId}, '전시회소식', 'KOREA METAL WEEK 2026 (금속산업대전) 참가 안내', '2026.10.28', ${body}, true, ${new Date().toISOString()})
+  `;
+
+  const images: { url: string; caption: string; content: string }[] = [
+    { url: "/images/news/metalweek2026/laser-system.jpg", caption: "레이저 가공 시스템 (Fiber & Diode)", content: "Up to 1200W · CNC & Handheld · 절단/용접/클리닝/마킹 · ±0.01mm" },
+    { url: "/images/news/metalweek2026/wire-saw.jpg", caption: "서브머지드 아크 용접 와이어 (SAW)", content: "Submerged Arc Welding Wire" },
+    { url: "/images/news/metalweek2026/wire-gtaw.jpg", caption: "TIG 용접봉 (GTAW)", content: "Gas Tungsten Arc Welding Wire" },
+    { url: "/images/news/metalweek2026/wire-fcw.jpg", caption: "플럭스 코어드 와이어 (FCW)", content: "Flux Cored Welding Wire" },
+    { url: "/images/news/metalweek2026/wire-aluminum.jpg", caption: "알루미늄 용접 와이어", content: "Aluminum Welding Wire" },
+    { url: "/images/news/metalweek2026/wire-copper.jpg", caption: "동(銅)도금 용접 와이어", content: "Copper Plated Welding Wire" },
+  ];
+  for (let i = 0; i < images.length; i++) {
+    await sql`
+      INSERT INTO news_images (id, news_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${newsId}, ${images[i].url}, ${images[i].caption}, ${images[i].content}, ${i}, ${new Date().toISOString()})
+    `;
+  }
+
+  await sql`
+    INSERT INTO settings (key, value) VALUES ('metalweek2026_news_seeded', ${new Date().toISOString()})
+    ON CONFLICT (key) DO NOTHING
+  `;
 }
 
 // spec_options가 비어 있으면 정식 옵션 목록을 시딩하고, 이전 배포의 예시 목록으로만

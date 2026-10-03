@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { newsItems as seedNewsItems } from "@/lib/data";
-import { newsRepo, seedIfEmpty } from "@/lib/repo";
-import type { NewsRow } from "@/lib/repo";
+import { newsRepo, newsImageRepo, seedIfEmpty } from "@/lib/repo";
+import type { NewsRow, NewsImageRow } from "@/lib/repo";
 
 const CATEGORIES = [
   { key: "company", tag: "회사소식" },
@@ -10,8 +10,32 @@ const CATEGORIES = [
   { key: "industry", tag: "산업동향" },
 ] as const;
 
-function NewsRowItem({ n }: { n: NewsRow }) {
-  if (!n.body) {
+function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
+  return (
+    <div
+      className="grid gap-3 pb-5"
+      style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}
+    >
+      {images.map((img) => (
+        <figure key={img.id} className="border border-line rounded-md overflow-hidden bg-surface">
+          <div className="aspect-[4/3] bg-surface-alt overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={img.url} alt={img.caption ?? ""} loading="lazy" className="w-full h-full object-cover" />
+          </div>
+          {(img.caption || img.content) && (
+            <figcaption className="px-2.5 py-2">
+              {img.caption && <b className="block text-[12px] font-bold text-ink leading-snug">{img.caption}</b>}
+              {img.content && <span className="block mt-0.5 text-[11px] text-ink-faint leading-snug">{img.content}</span>}
+            </figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  );
+}
+
+function NewsRowItem({ n, images }: { n: NewsRow; images: NewsImageRow[] }) {
+  if (!n.body && images.length === 0) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto] gap-1 sm:gap-4 items-center py-4 sm:py-5 border-b border-line">
         <span className="font-mono text-[10.5px] text-blue border border-line-strong px-2 py-[3px] w-fit tracking-wide">{n.tag}</span>
@@ -38,7 +62,8 @@ function NewsRowItem({ n }: { n: NewsRow }) {
           <path d="M1 1.5 6 6.5 11 1.5" />
         </svg>
       </summary>
-      <p className="pb-5 text-ink-soft text-[13.3px] leading-relaxed max-w-[80ch]">{n.body}</p>
+      {n.body && <p className="pb-5 text-ink-soft text-[13.3px] leading-relaxed max-w-[80ch] whitespace-pre-line">{n.body}</p>}
+      {images.length > 0 && <NewsImageGrid images={images} />}
     </details>
   );
 }
@@ -53,6 +78,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
   const items = await newsRepo.list(true);
   const activeTag = CATEGORIES.find((c) => c.key === activeCat)!.tag;
   const activeItems = items.filter((n) => n.tag === activeTag);
+  const imageMap = await newsImageRepo.mapForNews(activeItems.map((n) => n.id));
 
   return (
     <section id="news" className="py-16 sm:py-22 border-b border-line bg-surface-alt">
@@ -84,7 +110,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           {activeItems.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
           ) : (
-            activeItems.map((n) => <NewsRowItem key={n.id} n={n} />)
+            activeItems.map((n) => <NewsRowItem key={n.id} n={n} images={imageMap[n.id] ?? []} />)
           )}
         </div>
       </div>
