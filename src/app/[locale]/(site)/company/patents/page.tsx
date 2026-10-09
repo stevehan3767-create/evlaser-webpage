@@ -47,7 +47,7 @@ export default async function CompanyPatentsPage() {
               <div className="relative aspect-[248/371] bg-surface-alt">
                 <Image src={c.imageUrl} alt={c.title} fill sizes="200px" className="object-contain" />
               </div>
-              <div className="p-2">
+              <div className="p-2 text-center">
                 <p className="text-[11px] text-ink-soft leading-snug line-clamp-2">{c.title}</p>
                 {c.subtitle && <p className="text-[10.5px] text-ink-faint leading-snug mt-0.5">{c.subtitle}</p>}
               </div>
@@ -71,7 +71,7 @@ export default async function CompanyPatentsPage() {
               <div className="relative aspect-[248/371] bg-surface-alt">
                 <Image src={p.imageUrl} alt={p.title} fill sizes="200px" className="object-contain" />
               </div>
-              <div className="p-2">
+              <div className="p-2 text-center">
                 <p className="text-[11px] text-ink-soft leading-snug line-clamp-3">{p.title}</p>
                 {p.registeredOn && <p className="text-[10.5px] text-ink-faint font-mono mt-0.5">{p.registeredOn}</p>}
               </div>
