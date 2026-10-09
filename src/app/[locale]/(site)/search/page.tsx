@@ -10,6 +10,7 @@ import {
   resourceRepo,
   officeRepo,
   distributorRepo,
+  pressRepo,
 } from "@/lib/repo";
 
 export const dynamic = "force-dynamic";
@@ -81,7 +82,7 @@ function safeRaw(t: Translator, key: string): unknown {
 async function buildDocs(): Promise<SearchDoc[]> {
   const docs: SearchDoc[] = [];
 
-  const [pages, news, faqs, resources, offices, distributors, tCompany, tCeo, tSupport, tCareers, tNav] =
+  const [pages, news, faqs, resources, offices, distributors, press, tCompany, tCeo, tSupport, tCareers, tNav] =
     await Promise.all([
       contentPageRepo.listAll().catch(() => []),
       newsRepo.list(true).catch(() => []),
@@ -89,6 +90,7 @@ async function buildDocs(): Promise<SearchDoc[]> {
       resourceRepo.list().catch(() => []),
       officeRepo.list().catch(() => []),
       distributorRepo.list().catch(() => []),
+      pressRepo.list(true).catch(() => []),
       getTranslations("company"),
       getTranslations("ceo"),
       getTranslations("support"),
@@ -119,6 +121,14 @@ async function buildDocs(): Promise<SearchDoc[]> {
   }
   for (const r of resources) {
     docs.push({ title: r.title, snippet: r.description, category: "자료실", href: "/resources" });
+  }
+  for (const p of press) {
+    docs.push({
+      title: p.title,
+      snippet: [p.source ?? "", p.body].join(" "),
+      category: "언론·연구활동",
+      href: "/company/press",
+    });
   }
 
   // 3. 전체 메뉴(사이트맵) 항목 — 각 서브 메뉴의 실제 표시 라벨

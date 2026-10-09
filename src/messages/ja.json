@@ -9,7 +9,8 @@
         "patents": "特許・認証",
         "clients": "主要顧客",
         "directions": "アクセス",
-        "organization": "組織図"
+        "organization": "組織図",
+        "press": "メディア・研究"
       }
     },
     "products": {
@@ -767,6 +768,20 @@
       "emailLabel": "メール",
       "viewAll": "グローバルネットワーク全体を見る →",
       "empty": "登録された事業所情報がありません。"
+    },
+    "press": {
+      "eyebrow": "PRESS & RESEARCH",
+      "title": "メディア・研究活動",
+      "summary": "㈱EV Laserの報道、放送出演、論文・学会発表など対外活動を紹介します。",
+      "tabs": {
+        "all": "すべて",
+        "media": "報道",
+        "broadcast": "放送",
+        "paper": "論文・学会"
+      },
+      "download": "PDF原文ダウンロード",
+      "viewOriginal": "原文を見る",
+      "empty": "登録された資料がありません。"
     }
   },
   "footer": {

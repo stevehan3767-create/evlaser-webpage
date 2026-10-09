@@ -9,7 +9,8 @@
         "patents": "특허·인증",
         "clients": "주요 고객사",
         "directions": "오시는 길",
-        "organization": "조직도"
+        "organization": "조직도",
+        "press": "언론·연구활동"
       }
     },
     "products": {
@@ -767,6 +768,20 @@
       "emailLabel": "이메일",
       "viewAll": "전체 글로벌 네트워크 보기 →",
       "empty": "등록된 사업장 정보가 없습니다."
+    },
+    "press": {
+      "eyebrow": "PRESS & RESEARCH",
+      "title": "언론·연구활동",
+      "summary": "㈜이브이레이저의 언론보도, 방송 출연, 논문·학회 발표 등 대외 활동을 소개합니다.",
+      "tabs": {
+        "all": "전체",
+        "media": "언론보도",
+        "broadcast": "방송",
+        "paper": "논문·학회"
+      },
+      "download": "PDF 원문 다운로드",
+      "viewOriginal": "원문 보기",
+      "empty": "등록된 자료가 없습니다."
     }
   },
   "footer": {

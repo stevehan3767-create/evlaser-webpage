@@ -688,6 +688,100 @@ export const newsImageRepo = {
   },
 };
 
+// ---- 언론·연구활동 (press_items) ----
+export type PressCategory = "media" | "broadcast" | "paper";
+
+export interface PressItemRow {
+  id: string;
+  category: PressCategory;
+  title: string;
+  source: string | null;
+  date: string | null;
+  body: string;
+  linkUrl: string | null;
+  pdfUrl: string | null;
+  pdfName: string | null;
+  thumbnailUrl: string | null;
+  published: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToPressItem(r: Record<string, unknown>): PressItemRow {
+  return {
+    id: r.id as string,
+    category: (r.category as PressCategory) ?? "media",
+    title: r.title as string,
+    source: (r.source as string) ?? null,
+    date: (r.date as string) ?? null,
+    body: (r.body as string) ?? "",
+    linkUrl: (r.link_url as string) ?? null,
+    pdfUrl: (r.pdf_url as string) ?? null,
+    pdfName: (r.pdf_name as string) ?? null,
+    thumbnailUrl: (r.thumbnail_url as string) ?? null,
+    published: Boolean(r.published),
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: r.created_at as string,
+  };
+}
+
+export const pressRepo = {
+  async list(onlyPublished = false): Promise<PressItemRow[]> {
+    await ensureSchema();
+    const rows = onlyPublished
+      ? await sql`SELECT * FROM press_items WHERE published = true ORDER BY sort_order ASC, date DESC NULLS LAST, created_at DESC`
+      : await sql`SELECT * FROM press_items ORDER BY sort_order ASC, date DESC NULLS LAST, created_at DESC`;
+    return (rows as Record<string, unknown>[]).map(rowToPressItem);
+  },
+  async get(id: string): Promise<PressItemRow | null> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM press_items WHERE id = ${id}`;
+    return rows.length ? rowToPressItem(rows[0] as Record<string, unknown>) : null;
+  },
+  async create(input: {
+    category: string;
+    title: string;
+    source?: string | null;
+    date?: string | null;
+    body?: string;
+    linkUrl?: string | null;
+    pdfUrl?: string | null;
+    pdfName?: string | null;
+    thumbnailUrl?: string | null;
+    sortOrder?: number;
+  }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+      VALUES (${newId()}, ${input.category}, ${input.title}, ${input.source || null}, ${input.date || null}, ${input.body ?? ""},
+        ${input.linkUrl || null}, ${input.pdfUrl || null}, ${input.pdfName || null}, ${input.thumbnailUrl || null}, true, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: {
+    category: string;
+    title: string;
+    source?: string | null;
+    date?: string | null;
+    body?: string;
+    linkUrl?: string | null;
+    pdfUrl?: string | null;
+    pdfName?: string | null;
+    thumbnailUrl?: string | null;
+  }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      UPDATE press_items SET category = ${input.category}, title = ${input.title}, source = ${input.source || null},
+        date = ${input.date || null}, body = ${input.body ?? ""}, link_url = ${input.linkUrl || null},
+        pdf_url = ${input.pdfUrl || null}, pdf_name = ${input.pdfName || null}, thumbnail_url = ${input.thumbnailUrl || null}
+      WHERE id = ${id}
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM press_items WHERE id = ${id}`;
+  },
+};
+
 export const settingsRepo = {
   async get(key: string): Promise<string | null> {
     await ensureSchema();

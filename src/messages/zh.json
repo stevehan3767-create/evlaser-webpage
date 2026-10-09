@@ -9,7 +9,8 @@
         "patents": "专利与认证",
         "clients": "主要客户",
         "directions": "交通指南",
-        "organization": "组织架构"
+        "organization": "组织架构",
+        "press": "媒体·研究"
       }
     },
     "products": {
@@ -767,6 +768,20 @@
       "emailLabel": "邮箱",
       "viewAll": "查看完整全球网络 →",
       "empty": "暂无营业场所信息。"
+    },
+    "press": {
+      "eyebrow": "PRESS & RESEARCH",
+      "title": "媒体·研究活动",
+      "summary": "介绍㈜EV Laser的媒体报道、电视节目及论文·学会发表等对外活动。",
+      "tabs": {
+        "all": "全部",
+        "media": "媒体报道",
+        "broadcast": "电视·广播",
+        "paper": "论文·学会"
+      },
+      "download": "下载PDF原文",
+      "viewOriginal": "查看原文",
+      "empty": "暂无内容。"
     }
   },
   "footer": {
