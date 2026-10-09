@@ -11,6 +11,43 @@ const CATEGORIES: { key: string; icon: IconName }[] = [
   { key: "case", icon: "case" },
 ];
 
+// 유튜브 URL에서 영상 ID를 뽑아 미리보기 썸네일 주소를 만든다. (그 외 링크는 null)
+function youtubeThumb(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
+
+function VideoThumb({ url, title }: { url: string | null; title: string }) {
+  const thumb = youtubeThumb(url);
+  const inner = (
+    <div className="relative aspect-video overflow-hidden rounded-md border border-line bg-surface-alt">
+      {thumb ? (
+        // 외부(YouTube) 썸네일은 방문자 브라우저에서 로드 — 일반 img 사용
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={thumb} alt={title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-soft to-surface-alt text-blue/70">
+          <Icon name="play" className="w-9 h-9" />
+        </div>
+      )}
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white">
+          <svg viewBox="0 0 24 24" className="w-5 h-5 ml-0.5" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </span>
+    </div>
+  );
+  if (!url) return <div className="mb-3">{inner}</div>;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="block mb-3">
+      {inner}
+    </a>
+  );
+}
+
 export default async function Resources({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
   const { cat: rawCat } = await searchParams;
   const activeCat = CATEGORIES.some((c) => c.key === rawCat) ? (rawCat as string) : CATEGORIES[0].key;
@@ -56,6 +93,7 @@ export default async function Resources({ searchParams }: { searchParams: Promis
             <div className="grid grid-cols-1 md:grid-cols-3 gap-[22px]">
               {activeItems.map((item) => (
                 <div key={item.id} className="border border-line bg-surface p-5">
+                  {activeCat === "video" && <VideoThumb url={item.url} title={item.title} />}
                   <h3 className="text-[15.5px] mb-2">{item.title}</h3>
                   <p className="text-[13px] text-ink-soft">{item.description}</p>
                   {item.url && (
@@ -67,14 +105,6 @@ export default async function Resources({ searchParams }: { searchParams: Promis
           )}
         </div>
 
-        <div className="inline-flex items-center gap-[7px] mt-8 text-[12px] text-blue bg-blue-soft border border-line-strong px-3.5 py-2.5 font-mono">
-          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M4 12a8 8 0 0 1 14-5.2M20 12a8 8 0 0 1-14 5.2" />
-            <polyline points="17 3 18 7 14 6.3" />
-            <polyline points="7 21 6 17 10 17.7" />
-          </svg>
-          <span>{t("autoBadge")}</span>
-        </div>
       </div>
     </section>
   );
