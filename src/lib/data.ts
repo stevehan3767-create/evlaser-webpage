@@ -157,6 +157,8 @@ export const techLabelsKo: Record<string, string> = {
 export interface OrgUnit {
   icon: IconName;
   key: string;
+  // 해외 법인(중국 쑤저우)은 본사 부문과 구분해 강조(빨간색)한다.
+  overseas?: boolean;
 }
 
 // Department breakdown provided by the user; role descriptions authored
@@ -165,8 +167,11 @@ export const orgChart: OrgUnit[] = [
   { icon: "briefcase", key: "management" },
   { icon: "handshake", key: "domesticSales" },
   { icon: "globe", key: "overseasSales" },
-  { icon: "build", key: "manufacturing" },
+  { icon: "build", key: "production" },
+  { icon: "shield", key: "techSupport" },
   { icon: "measure", key: "rnd" },
+  { icon: "bell", key: "marketing" },
+  { icon: "flag", key: "chinaSuzhou", overseas: true },
 ];
 
 // Each of the 15 tech items links to its own detail page

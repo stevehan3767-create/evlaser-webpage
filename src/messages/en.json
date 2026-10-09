@@ -673,58 +673,88 @@
     "organization": {
       "eyebrow": "ORGANIZATION",
       "title": "Organization Chart",
-      "desc": "EVLASER CO., LTD. operates through five organizations — Management Support, Domestic Sales, Overseas Sales, Manufacturing Technology, and the In-house R&D Institute — working together under the direct leadership of the CEO.",
+      "desc": "EV Laser is organized into eight teams — Management Support, Domestic Sales, Overseas Sales, Production Engineering, Technical Support, R&D Center, Marketing & PR, and the China (Suzhou) Subsidiary — working closely under the direct oversight of the CEO.",
       "ceoTitle": "CEO",
       "ceoName": "Steve Han",
       "units": {
         "management": {
           "title": "Management Support",
-          "desc": "Oversees the company-wide functions that underpin all business activities — HR, finance, general affairs, and procurement — and supports management planning and internal controls.",
+          "desc": "Oversees company-wide HR, finance, general affairs and purchasing, and supports planning and internal controls.",
           "tasks": [
-            "HR & General Affairs",
-            "Finance & Accounting",
-            "Purchasing & Materials",
-            "Legal & Contract Management"
+            "HR & general affairs",
+            "Accounting & finance",
+            "Purchasing & materials",
+            "Legal & contracts"
           ]
         },
         "domesticSales": {
           "title": "Domestic Sales",
-          "desc": "Proposes laser processing solutions to manufacturers in Korea and manages the entire process from quotation through contract to delivery.",
+          "desc": "Proposes laser processing solutions to domestic manufacturers and manages the full cycle from quotation to delivery.",
           "tasks": [
-            "New customer development and account management in Korea",
-            "Quotations, contracts, and order management",
-            "Industry-focused sales (automotive, semiconductor, battery, etc.)",
-            "Coordination with technical support for customers"
+            "New customer development",
+            "Quotation·contract·orders",
+            "Industry sales (automotive·semiconductor·battery)",
+            "Customer technical-support liaison"
           ]
         },
         "overseasSales": {
           "title": "Overseas Sales",
-          "desc": "Partners with global customers across the Americas, Europe, China, and Southeast Asia to grow overseas revenue and build brand awareness.",
+          "desc": "Expands overseas revenue and brand presence with global partners across the US, Europe, China and Southeast Asia.",
           "tasks": [
-            "Development of new overseas markets",
-            "Sales support for overseas subsidiaries (e.g. Suzhou, China)",
-            "Participation in overseas exhibitions and marketing",
-            "Import/export and overseas turnkey project management"
+            "New market development",
+            "Distributor & partner management",
+            "Overseas exhibitions & marketing",
+            "Import/export & turnkey projects"
           ]
         },
-        "manufacturing": {
-          "title": "Manufacturing Technology",
-          "desc": "Turns specifications defined by sales and R&D into actual equipment, and is responsible for production quality and on-time delivery.",
+        "production": {
+          "title": "Production Engineering",
+          "desc": "Turns confirmed specifications into real equipment, covering design, programming, assembly and process set-up.",
           "tasks": [
-            "Laser system design, assembly, and inspection",
-            "Production process management",
-            "Quality control (QC/QA)",
-            "Automation equipment setup and maintenance"
+            "Mechanical & electrical design",
+            "Control S/W & recipe programming",
+            "Assembly & wiring",
+            "Process set-up & mass-production handover"
+          ]
+        },
+        "techSupport": {
+          "title": "Technical Support",
+          "desc": "Ensures delivered equipment performs at its best on site, from installation through after-sales service.",
+          "tasks": [
+            "On-site installation & commissioning",
+            "Operation training",
+            "Scheduled & preventive maintenance",
+            "After-sales service & parts"
           ]
         },
         "rnd": {
-          "title": "In-house R&D Institute",
-          "desc": "Continuously advances the company's core laser application technology and commercializes new technologies.",
+          "title": "R&D Center",
+          "desc": "An R&D organization that advances our core laser application technologies and commercializes new ones.",
           "tasks": [
-            "R&D of new laser processes",
-            "Patent filing and certification response",
-            "Advance development of customer-tailored solutions",
-            "Operation of the Laser Technology Center"
+            "New laser process R&D",
+            "Patent filing & certification",
+            "Customized solution pre-development",
+            "Laser Technology Center (ELTC)"
+          ]
+        },
+        "marketing": {
+          "title": "Marketing & PR",
+          "desc": "Builds brand value and communicates with the market, supporting sales through online and offline channels.",
+          "tasks": [
+            "Brand·website·content",
+            "Exhibition & seminar planning",
+            "Catalog & promotional materials",
+            "Digital marketing & lead management"
+          ]
+        },
+        "chinaSuzhou": {
+          "title": "China (Suzhou) Subsidiary",
+          "desc": "Our local subsidiary in Suzhou, China, handling production, sales and technical support for the Greater China market.",
+          "tasks": [
+            "Greater China sales & accounts",
+            "Local production & assembly",
+            "Local installation & after-sales",
+            "Supplier & supply-chain management"
           ]
         }
       }
