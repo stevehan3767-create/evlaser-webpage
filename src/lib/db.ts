@@ -365,6 +365,8 @@ function createSchema(): Promise<void> {
 
     // 언론보도·방송 카테고리를 "언론·방송"(media)으로 통합.
     await sql`UPDATE press_items SET category = 'media' WHERE category = 'broadcast'`;
+    // SBS Biz <오굿데이> 방송 썸네일(캡처 이미지) 지정 — 썸네일 없이 시딩된 환경 보정.
+    await sql`UPDATE press_items SET thumbnail_url = '/press/sbsbiz-ohgoodday-2026.webp' WHERE link_url = 'https://programs.sbs.co.kr/sbsbiz/ohgoodday/clip/89058/22000633202' AND (thumbnail_url IS NULL OR thumbnail_url = '')`;
 
     await ensureLaserSolderingTechItem();
     await ensureElectronics3cIndustry();
@@ -474,7 +476,7 @@ async function ensureSbsBizBroadcast2026(): Promise<void> {
     await sql`
       INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
       VALUES (${newId()}, 'media', 'SBS Biz <오굿데이> 출연 — 레이저 플라스틱 용접 기술', 'SBS Biz <오굿데이 — 세상의 모든 정보> · 오정연 아나운서', '2026.07.19', ${body},
-        ${link}, ${null}, ${null}, ${null}, true, 0, ${new Date().toISOString()})
+        ${link}, ${null}, ${null}, ${"/press/sbsbiz-ohgoodday-2026.webp"}, true, 0, ${new Date().toISOString()})
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('sbsbiz_ohgoodday_2026_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
