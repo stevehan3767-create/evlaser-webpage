@@ -347,7 +347,31 @@ function createSchema(): Promise<void> {
     await ensureElectronics3cIndustry();
     await ensureSpecOptionsDefault();
     await ensureMetalWeek2026News();
+    await ensureBusinessRegistrationCert();
   })();
+}
+
+// 이미 시딩된 환경의 인증서 목록 맨 앞에 "사업자등록증"을 한 번만 추가한다.
+// settings 플래그로 1회성 등록을 보장하므로 관리자가 삭제해도 다시 생기지 않는다.
+async function ensureBusinessRegistrationCert(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'business_reg_cert_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM certifications`) as { c: number }[];
+  // 비어 있으면 seedCertificationsIfEmpty가 data.ts(맨 앞 index 0)로 시딩하므로 건드리지 않는다.
+  if (cnt[0].c === 0) return;
+  const url = "/images/certifications/business-registration.webp";
+  const exists = await sql`SELECT 1 FROM certifications WHERE image_url = ${url} LIMIT 1`;
+  if (exists.length === 0) {
+    const minRow = (await sql`SELECT COALESCE(MIN(sort_order), 0) AS m FROM certifications`) as { m: number }[];
+    await sql`
+      INSERT INTO certifications (id, image_url, title, subtitle, sort_order, created_at)
+      VALUES (${newId()}, ${url}, '사업자등록증', 'Business Registration Certificate', ${minRow[0].m - 1}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`
+    INSERT INTO settings (key, value) VALUES ('business_reg_cert_seeded', ${new Date().toISOString()})
+    ON CONFLICT (key) DO NOTHING
+  `;
 }
 
 // KOREA METAL WEEK 2026(금속산업대전) 전시회소식 게시글을 사진과 함께 한 번만 등록한다.

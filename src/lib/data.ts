@@ -669,6 +669,7 @@ export const patents = [
 // the official Korean document name with an English gloss for international
 // standards, since these are registered document titles, not marketing copy.
 export const certifications = [
+  { image: "/images/certifications/business-registration.webp", title: "사업자등록증", subtitle: "Business Registration Certificate" },
   { image: "/images/certifications/cert-01.jpg", title: "ISO 9001:2015 / KS Q ISO 9001:2015", subtitle: "품질경영시스템 인증 (Quality Management System)" },
   { image: "/images/certifications/cert-02.jpg", title: "ISO 14001:2015 / KS I ISO 14001:2015", subtitle: "환경경영시스템 인증 (Environmental Management System)" },
   { image: "/images/certifications/cert-03.jpg", title: "CE 인증 (EC Declaration of Conformity)", subtitle: "ELCR LASER / ELCR-LC" },
