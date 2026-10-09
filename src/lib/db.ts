@@ -381,6 +381,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2021Feb();
     await ensureLampWeldingVideo2023();
     await ensurePressInterviewThumbnail();
+    await ensureIntroVideo2021Jan();
   })();
 }
 
@@ -466,6 +467,21 @@ async function ensurePressInterviewThumbnail(): Promise<void> {
     WHERE pdf_url = '/press/evlaser-kangso-interview-2025.pdf' AND (thumbnail_url IS NULL OR thumbnail_url = '')
   `;
   await sql`INSERT INTO settings (key, value) VALUES ('press_interview_thumb_set', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2021.01.21 유튜브 영상을 동영상자료실(resources)에 한 번만 등록한다.
+async function ensureIntroVideo2021Jan(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'intro_video_2021_01_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://youtu.be/ql7U8ZCazF4";
+  const exists = await sql`SELECT 1 FROM resources WHERE url LIKE '%ql7U8ZCazF4%' LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, 'video', '레이저 플라스틱 용접 공정 — ㈜이브이레이저', '㈜이브이레이저의 레이저 플라스틱 용접 공정과 적용 사례를 소개하는 영상입니다.', ${url}, '2021-01-21T00:00:00.000Z')
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_01_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 2023.03.22 페이스북 영상(자동차 램프 레이저 용접)을 동영상자료실에 한 번만 등록한다.
