@@ -664,6 +664,7 @@ export const patents = [
   { image: "/images/patents/patent-21.jpg", title: "레이저 필름접장치" },
   { image: "/images/patents/patent-22.jpg", title: "레이저 플라스틱 용접시스템" },
   { image: "/images/patents/patent-23.jpg", title: "플라스틱 레이저용접의 클램핑 방법" },
+  { image: "/images/patents/ssw-china-patent.webp", title: "Super Scan Welding기술 중국특허등록" },
 ];
 
 // Real certifications (source: evlaser.co.kr "특허&인증서" page). Titles keep

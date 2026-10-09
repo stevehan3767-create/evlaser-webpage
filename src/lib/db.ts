@@ -369,7 +369,30 @@ function createSchema(): Promise<void> {
     await ensureMetalWeek2026News();
     await ensureBusinessRegistrationCert();
     await ensurePressInterview2025();
+    await ensureSswChinaPatent();
   })();
+}
+
+// 이미 시딩된 환경의 특허 목록 맨 뒤에 "Super Scan Welding기술 중국특허등록"을 한 번만 추가한다.
+async function ensureSswChinaPatent(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ssw_china_patent_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM patents`) as { c: number }[];
+  // 비어 있으면 seedPatentsIfEmpty가 data.ts(맨 끝)로 시딩하므로 건드리지 않는다.
+  if (cnt[0].c === 0) return;
+  const url = "/images/patents/ssw-china-patent.webp";
+  const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${url} LIMIT 1`;
+  if (exists.length === 0) {
+    const maxRow = (await sql`SELECT COALESCE(MAX(sort_order), 0) AS m FROM patents`) as { m: number }[];
+    await sql`
+      INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
+      VALUES (${newId()}, ${url}, 'Super Scan Welding기술 중국특허등록', ${null}, ${maxRow[0].m + 1}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`
+    INSERT INTO settings (key, value) VALUES ('ssw_china_patent_seeded', ${new Date().toISOString()})
+    ON CONFLICT (key) DO NOTHING
+  `;
 }
 
 // 언론·연구활동 첫 게시물(강소기업뉴스 인터뷰, 2025.11.19)을 한 번만 등록한다.
