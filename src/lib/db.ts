@@ -379,6 +379,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2025();
     await ensureIntroVideo2021();
     await ensureIntroVideo2021Feb();
+    await ensureLampWeldingVideo2023();
   })();
 }
 
@@ -453,6 +454,21 @@ async function ensureIntroVideo2021Feb(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_02_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2023.03.22 페이스북 영상(자동차 램프 레이저 용접)을 동영상자료실에 한 번만 등록한다.
+async function ensureLampWeldingVideo2023(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'lamp_welding_video_2023_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://www.facebook.com/share/v/1AeZiyuDfy/";
+  const exists = await sql`SELECT 1 FROM resources WHERE url = ${url} LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, 'video', '자동차 램프 레이저 용접, 역시 ㈜이브이레이저', '플라스틱 용접 관련 특허 기술을 다량 보유하고, 레이저 용접 분야 최다 실적을 자랑하는 ㈜이브이레이저의 자동차 램프 레이저 용접 영상입니다.', ${url}, '2023-03-22T00:00:00.000Z')
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('lamp_welding_video_2023_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 중복 등록된 CE 인증서(동일 문서)를 한 번만 정리한다.
