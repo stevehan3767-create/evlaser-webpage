@@ -246,8 +246,8 @@ export const companyNav: NavItem[] = [
 ];
 
 export const productsNav: NavItem[] = [
-  { key: "lineup", href: "/products/lineup" },
   { key: "byTech", href: "/products/tech" },
+  { key: "lineup", href: "/products/lineup" },
   { key: "byIndustry", href: "/products/industries" },
   { key: "byMaterial", href: "/products/materials" },
 ];
