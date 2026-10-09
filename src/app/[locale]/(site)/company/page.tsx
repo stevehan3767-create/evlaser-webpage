@@ -23,22 +23,30 @@ export default async function CompanyOverviewPage() {
             {greetingParagraphs.map((p, i) => (
               <div key={i} className="contents">
                 <p className="text-ink-soft text-[15px] leading-relaxed">{p}</p>
-                {/* 본문 중간에 대표 설비 이미지 배치 (무인자동화 레이저용접시스템) */}
+                {/* 본문 중간에 대표 설비 이미지 3종을 가로로 배치 (캡션 가운데 정렬) */}
                 {i === 3 && (
-                  <figure className="my-4 mx-auto sm:mx-0 w-[220px] max-w-full">
-                    <div className="relative aspect-[16/10] border border-line-strong bg-surface-alt overflow-hidden">
-                      <Image
-                        src="/images/company/auto-laser-welding-2.webp"
-                        alt="무인자동화 레이저용접시스템"
-                        fill
-                        sizes="220px"
-                        className="object-cover"
-                      />
-                    </div>
-                    <figcaption className="mt-2 text-[12px] text-ink-soft text-center sm:text-left">
-                      <span className="font-bold text-ink">무인자동화 레이저용접시스템</span>
-                    </figcaption>
-                  </figure>
+                  <div className="my-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                      { src: "/images/company/auto-laser-welding-2.webp", caption: "무인자동화 레이저용접시스템" },
+                      { src: "/images/company/battery-case-laser-welding.webp", caption: "밧데리케이스 레이저용접시스템" },
+                      { src: "/images/company/cfrp-laser-cutting-drilling.webp", caption: "CFRP 레이저 절단및 드릴링시스템" },
+                    ].map((img) => (
+                      <figure key={img.src}>
+                        <div className="relative aspect-[16/10] border border-line-strong bg-surface-alt overflow-hidden">
+                          <Image
+                            src={img.src}
+                            alt={img.caption}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 200px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <figcaption className="mt-2 text-[12px] text-ink-soft text-center">
+                          <span className="font-bold text-ink">{img.caption}</span>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
                 )}
               </div>
             ))}
