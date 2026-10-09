@@ -378,6 +378,7 @@ function createSchema(): Promise<void> {
     await ensureMoveYtnResourceToPress();
     await ensureIntroVideo2025();
     await ensureIntroVideo2021();
+    await ensureIntroVideo2021Feb();
   })();
 }
 
@@ -437,6 +438,21 @@ async function ensureIntroVideo2021(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_08_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2021.02.23 유튜브 영상을 동영상자료실(resources)에 한 번만 등록한다.
+async function ensureIntroVideo2021Feb(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'intro_video_2021_02_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://youtu.be/BxaBbRIY7Js";
+  const exists = await sql`SELECT 1 FROM resources WHERE url LIKE '%BxaBbRIY7Js%' LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, 'video', '레이저 가공 솔루션 — ㈜이브이레이저', '㈜이브이레이저의 레이저 가공 기술과 응용 분야를 소개하는 영상입니다.', ${url}, '2021-02-23T00:00:00.000Z')
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_02_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 중복 등록된 CE 인증서(동일 문서)를 한 번만 정리한다.
