@@ -370,7 +370,20 @@ function createSchema(): Promise<void> {
     await ensureBusinessRegistrationCert();
     await ensurePressInterview2025();
     await ensureSswChinaPatent();
+    await ensureDedupeCeCerts();
   })();
+}
+
+// 중복 등록된 CE 인증서(동일 문서)를 한 번만 정리한다.
+// cert-05(= cert-03 중복), cert-10(= cert-04 중복)을 제거한다.
+async function ensureDedupeCeCerts(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ce_certs_deduped'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`DELETE FROM certifications WHERE image_url IN ('/images/certifications/cert-05.jpg', '/images/certifications/cert-10.jpg')`;
+  await sql`
+    INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
+    ON CONFLICT (key) DO NOTHING
+  `;
 }
 
 // 이미 시딩된 환경의 특허 목록 맨 뒤에 "Super Scan Welding기술 중국특허등록"을 한 번만 추가한다.
