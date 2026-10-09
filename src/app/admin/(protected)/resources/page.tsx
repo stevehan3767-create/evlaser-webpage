@@ -48,6 +48,13 @@ export default async function AdminResourcesPage({ searchParams }: { searchParam
           defaultValue={editing?.url ?? ""}
           preview="none"
         />
+        <FileUploadField
+          name="thumbnailUrl"
+          label="미리보기 썸네일 이미지 (선택 · 동영상자료실 권장)"
+          defaultValue={editing?.thumbnailUrl ?? ""}
+          accept="image/*"
+          preview="image"
+        />
         <div className="flex gap-3">
           <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
             {editing ? "저장" : "추가"}

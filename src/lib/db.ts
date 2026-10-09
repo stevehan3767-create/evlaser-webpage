@@ -73,6 +73,8 @@ function createSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    // 동영상자료실 등 자료 카드의 미리보기 썸네일(선택).
+    await sql`ALTER TABLE resources ADD COLUMN IF NOT EXISTS thumbnail_url TEXT`;
 
     await sql`
       CREATE TABLE IF NOT EXISTS news_items (
@@ -367,6 +369,8 @@ function createSchema(): Promise<void> {
     await sql`UPDATE press_items SET category = 'media' WHERE category = 'broadcast'`;
     // SBS Biz <오굿데이> 방송 썸네일(캡처 이미지) 지정 — 썸네일 없이 시딩된 환경 보정.
     await sql`UPDATE press_items SET thumbnail_url = '/press/sbsbiz-ohgoodday-2026.webp' WHERE link_url = 'https://programs.sbs.co.kr/sbsbiz/ohgoodday/clip/89058/22000633202' AND (thumbnail_url IS NULL OR thumbnail_url = '')`;
+    // 자동차 램프 레이저 용접(페이스북) 영상 썸네일(캡처 이미지) 지정.
+    await sql`UPDATE resources SET thumbnail_url = '/resources/lamp-welding.webp' WHERE url = 'https://www.facebook.com/share/v/1AeZiyuDfy/' AND (thumbnail_url IS NULL OR thumbnail_url = '')`;
 
     await ensureLaserSolderingTechItem();
     await ensureElectronics3cIndustry();
@@ -516,8 +520,8 @@ async function ensureLampWeldingVideo2023(): Promise<void> {
   const exists = await sql`SELECT 1 FROM resources WHERE url = ${url} LIMIT 1`;
   if (exists.length === 0) {
     await sql`
-      INSERT INTO resources (id, category, title, description, url, created_at)
-      VALUES (${newId()}, 'video', '자동차 램프 레이저 용접, 역시 ㈜이브이레이저', '플라스틱 용접 관련 특허 기술을 다량 보유하고, 레이저 용접 분야 최다 실적을 자랑하는 ㈜이브이레이저의 자동차 램프 레이저 용접 영상입니다.', ${url}, '2023-03-22T00:00:00.000Z')
+      INSERT INTO resources (id, category, title, description, url, thumbnail_url, created_at)
+      VALUES (${newId()}, 'video', '자동차 램프 레이저 용접, 역시 ㈜이브이레이저', '플라스틱 용접 관련 특허 기술을 다량 보유하고, 레이저 용접 분야 최다 실적을 자랑하는 ㈜이브이레이저의 자동차 램프 레이저 용접 영상입니다.', ${url}, '/resources/lamp-welding.webp', '2023-03-22T00:00:00.000Z')
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('lamp_welding_video_2023_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;

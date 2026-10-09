@@ -20,6 +20,7 @@ export interface ResourceRow {
   title: string;
   description: string;
   url: string | null;
+  thumbnailUrl: string | null;
   createdAt: string;
 }
 
@@ -78,6 +79,7 @@ function rowToResource(r: Record<string, unknown>): ResourceRow {
     title: r.title as string,
     description: r.description as string,
     url: (r.url as string) ?? null,
+    thumbnailUrl: (r.thumbnail_url as string) ?? null,
     createdAt: r.created_at as string,
   };
 }
@@ -585,17 +587,17 @@ export const resourceRepo = {
     const rows = await sql`SELECT * FROM resources ORDER BY created_at DESC`;
     return (rows as Record<string, unknown>[]).map(rowToResource);
   },
-  async create(input: { category: string; title: string; description: string; url?: string }): Promise<void> {
+  async create(input: { category: string; title: string; description: string; url?: string; thumbnailUrl?: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO resources (id, category, title, description, url, created_at)
-      VALUES (${newId()}, ${input.category}, ${input.title}, ${input.description}, ${input.url ?? null}, ${new Date().toISOString()})
+      INSERT INTO resources (id, category, title, description, url, thumbnail_url, created_at)
+      VALUES (${newId()}, ${input.category}, ${input.title}, ${input.description}, ${input.url ?? null}, ${input.thumbnailUrl ?? null}, ${new Date().toISOString()})
     `;
   },
-  async update(id: string, input: { category: string; title: string; description: string; url?: string }): Promise<void> {
+  async update(id: string, input: { category: string; title: string; description: string; url?: string; thumbnailUrl?: string }): Promise<void> {
     await ensureSchema();
     await sql`
-      UPDATE resources SET category = ${input.category}, title = ${input.title}, description = ${input.description}, url = ${input.url ?? null}
+      UPDATE resources SET category = ${input.category}, title = ${input.title}, description = ${input.description}, url = ${input.url ?? null}, thumbnail_url = ${input.thumbnailUrl ?? null}
       WHERE id = ${id}
     `;
   },

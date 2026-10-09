@@ -18,8 +18,8 @@ function youtubeThumb(url: string | null | undefined): string | null {
   return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
 }
 
-function VideoThumb({ url, title }: { url: string | null; title: string }) {
-  const thumb = youtubeThumb(url);
+function VideoThumb({ url, title, thumbnailUrl }: { url: string | null; title: string; thumbnailUrl?: string | null }) {
+  const thumb = thumbnailUrl || youtubeThumb(url);
   const inner = (
     <div className="relative aspect-video overflow-hidden rounded-md border border-line bg-surface-alt">
       {thumb ? (
@@ -93,7 +93,7 @@ export default async function Resources({ searchParams }: { searchParams: Promis
             <div className="grid grid-cols-1 md:grid-cols-3 gap-[22px]">
               {activeItems.map((item) => (
                 <div key={item.id} className="border border-line bg-surface p-5">
-                  {activeCat === "video" && <VideoThumb url={item.url} title={item.title} />}
+                  {activeCat === "video" && <VideoThumb url={item.url} title={item.title} thumbnailUrl={item.thumbnailUrl} />}
                   <h3 className="text-[15.5px] mb-2">{item.title}</h3>
                   <p className="text-[13px] text-ink-soft">{item.description}</p>
                   {item.url && (
