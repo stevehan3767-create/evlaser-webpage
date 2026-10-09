@@ -382,6 +382,7 @@ function createSchema(): Promise<void> {
     await ensureLampWeldingVideo2023();
     await ensurePressInterviewThumbnail();
     await ensureIntroVideo2021Jan();
+    await ensureSbsBizBroadcast2026();
   })();
 }
 
@@ -456,6 +457,27 @@ async function ensureIntroVideo2021Feb(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_02_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// SBS Biz <오굿데이 — 세상의 모든 정보> 출연(2026.07.19)을 언론·방송(press)에 한 번만 등록한다.
+async function ensureSbsBizBroadcast2026(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'sbsbiz_ohgoodday_2026_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const link = "https://programs.sbs.co.kr/sbsbiz/ohgoodday/clip/89058/22000633202";
+  const body = [
+    "㈜이브이레이저가 SBS Biz <오굿데이 — 세상의 모든 정보>(진행 오정연 아나운서)에 소개되었습니다.",
+    "자동차 부품을 비롯한 다양한 산업에서 전통적인 초음파 융착·접착제 방식을 대체하고 있는 당사의 레이저 플라스틱 용접 기술이 방송을 통해 쉽고 생생하게 전해졌습니다.",
+    "아래 링크에서 방송 영상을 시청하실 수 있습니다.",
+  ].join("\n\n");
+  const exists = await sql`SELECT 1 FROM press_items WHERE link_url = ${link} LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+      VALUES (${newId()}, 'media', 'SBS Biz <오굿데이> 출연 — 레이저 플라스틱 용접 기술', 'SBS Biz <오굿데이 — 세상의 모든 정보> · 오정연 아나운서', '2026.07.19', ${body},
+        ${link}, ${null}, ${null}, ${null}, true, 0, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('sbsbiz_ohgoodday_2026_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 이미 등록된 강소기업뉴스 인터뷰 기사에 대표 인물사진 썸네일을 한 번만 지정한다.
