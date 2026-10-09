@@ -380,6 +380,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2021();
     await ensureIntroVideo2021Feb();
     await ensureLampWeldingVideo2023();
+    await ensurePressInterviewThumbnail();
   })();
 }
 
@@ -454,6 +455,17 @@ async function ensureIntroVideo2021Feb(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_02_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 이미 등록된 강소기업뉴스 인터뷰 기사에 대표 인물사진 썸네일을 한 번만 지정한다.
+async function ensurePressInterviewThumbnail(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'press_interview_thumb_set'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`
+    UPDATE press_items SET thumbnail_url = '/press/kangso-interview-ceo.webp'
+    WHERE pdf_url = '/press/evlaser-kangso-interview-2025.pdf' AND (thumbnail_url IS NULL OR thumbnail_url = '')
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('press_interview_thumb_set', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 2023.03.22 페이스북 영상(자동차 램프 레이저 용접)을 동영상자료실에 한 번만 등록한다.
@@ -539,7 +551,7 @@ async function ensurePressInterview2025(): Promise<void> {
       ${newId()}, 'media',
       ${"[인터뷰] 정밀한 한 점의 레이저 빔, 자동차의 성능과 품질을 바꾸다 — 이브이레이저 한상배 대표"},
       ${"강소기업뉴스 · 양해원 객원기자"}, '2025.11.19', ${body},
-      ${null}, ${"/press/evlaser-kangso-interview-2025.pdf"}, ${"이브이레이저_강소기업뉴스_인터뷰_2025-11-19.pdf"}, ${null},
+      ${null}, ${"/press/evlaser-kangso-interview-2025.pdf"}, ${"이브이레이저_강소기업뉴스_인터뷰_2025-11-19.pdf"}, ${"/press/kangso-interview-ceo.webp"},
       true, 0, ${new Date().toISOString()}
     )
   `;

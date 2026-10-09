@@ -38,9 +38,9 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
   return (
     <article className="py-7 border-b border-line">
       <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-5">
-        {/* 썸네일 또는 카테고리 플레이스홀더 (영상이면 클릭 시 재생) */}
+        {/* 썸네일 또는 카테고리 플레이스홀더 (영상이면 클릭 시 재생, 기사면 PDF 원문 열림) */}
         <div className="relative hidden sm:block">
-          <ThumbWrap href={item.linkUrl}>
+          <ThumbWrap href={item.linkUrl ?? item.pdfUrl}>
             <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-surface-alt">
               {item.thumbnailUrl ? (
                 <>
