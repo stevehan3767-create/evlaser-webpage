@@ -775,8 +775,8 @@
       "summary": "介绍㈜EV Laser的媒体报道、电视节目及论文·学会发表等对外活动。",
       "tabs": {
         "all": "全部",
-        "media": "媒体报道",
-        "broadcast": "电视·广播",
+        "media": "媒体·电视",
+        "broadcast": "媒体·电视",
         "paper": "论文·学会"
       },
       "download": "下载PDF原文",

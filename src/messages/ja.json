@@ -775,8 +775,8 @@
       "summary": "㈱EV Laserの報道、放送出演、論文・学会発表など対外活動を紹介します。",
       "tabs": {
         "all": "すべて",
-        "media": "報道",
-        "broadcast": "放送",
+        "media": "報道・放送",
+        "broadcast": "報道・放送",
         "paper": "論文・学会"
       },
       "download": "PDF原文ダウンロード",

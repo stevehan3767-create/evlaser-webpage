@@ -7,8 +7,8 @@ import { savePress, deletePress } from "./actions";
 export const dynamic = "force-dynamic";
 
 const CAT_LABEL: Record<string, string> = {
-  media: "언론보도",
-  broadcast: "방송",
+  media: "언론·방송",
+  broadcast: "언론·방송",
   paper: "논문·학회",
 };
 
@@ -27,9 +27,8 @@ export default async function AdminPressPage({ searchParams }: { searchParams: P
         <input type="hidden" name="id" value={editing?.id ?? ""} />
 
         <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr_140px] gap-3.5">
-          <select name="category" defaultValue={editing?.category ?? "media"} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm">
-            <option value="media">언론보도</option>
-            <option value="broadcast">방송</option>
+          <select name="category" defaultValue={editing?.category === "broadcast" ? "media" : editing?.category ?? "media"} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm">
+            <option value="media">언론·방송</option>
             <option value="paper">논문·학회</option>
           </select>
           <input

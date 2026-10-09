@@ -728,9 +728,10 @@ function rowToPressItem(r: Record<string, unknown>): PressItemRow {
 export const pressRepo = {
   async list(onlyPublished = false): Promise<PressItemRow[]> {
     await ensureSchema();
+    // 자료 생성 시점(date) 최신순, 날짜 미입력분은 등록일(created_at)순으로 뒤에 배치.
     const rows = onlyPublished
-      ? await sql`SELECT * FROM press_items WHERE published = true ORDER BY sort_order ASC, date DESC NULLS LAST, created_at DESC`
-      : await sql`SELECT * FROM press_items ORDER BY sort_order ASC, date DESC NULLS LAST, created_at DESC`;
+      ? await sql`SELECT * FROM press_items WHERE published = true ORDER BY date DESC NULLS LAST, created_at DESC`
+      : await sql`SELECT * FROM press_items ORDER BY date DESC NULLS LAST, created_at DESC`;
     return (rows as Record<string, unknown>[]).map(rowToPressItem);
   },
   async get(id: string): Promise<PressItemRow | null> {

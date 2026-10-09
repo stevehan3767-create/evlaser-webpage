@@ -363,6 +363,9 @@ function createSchema(): Promise<void> {
     // 이미 시딩된 환경에서는 기본값인 'naver'로 남아있을 수 있어 바로잡는다.
     await sql`UPDATE offices SET map_provider = 'google' WHERE name LIKE '%쑤저우%' AND map_provider <> 'google'`;
 
+    // 언론보도·방송 카테고리를 "언론·방송"(media)으로 통합.
+    await sql`UPDATE press_items SET category = 'media' WHERE category = 'broadcast'`;
+
     await ensureLaserSolderingTechItem();
     await ensureElectronics3cIndustry();
     await ensureSpecOptionsDefault();
@@ -371,7 +374,69 @@ function createSchema(): Promise<void> {
     await ensurePressInterview2025();
     await ensureSswChinaPatent();
     await ensureDedupeCeCerts();
+    await ensureYtnChoikangPress();
+    await ensureMoveYtnResourceToPress();
+    await ensureIntroVideo2025();
+    await ensureIntroVideo2021();
   })();
+}
+
+// YTN <최강기업> 출연(2025.05.12)을 언론·방송(press)에 한 번만 등록한다.
+async function ensureYtnChoikangPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ytn_choikang_2025_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const link = "https://www.youtube.com/watch?v=lPpvC1Wl5yE&t=6s";
+  const thumb = "https://img.youtube.com/vi/lPpvC1Wl5yE/hqdefault.jpg";
+  const body = [
+    "㈜이브이레이저가 YTN <최강기업>에 방송되었습니다.",
+    "\"대한민국 산업계를 이끄는 최강기업들의 생생한 현장 소식을 발빠르게 전하는 YTN <최강기업>\"을 통해, 24년간 이어온 연구와 개발로 완성된 당사의 레이저 응용기술과 품질관리 체계가 소개되었습니다.",
+    "이번 방송에서는 자동차 부품의 플라스틱 접합에 적용되는 당사의 레이저 플라스틱 용접 기술과, 고출력 레이저·2D 스캐너·광섬유를 결합한 독자 기술 SSW(Super Scan Welding)의 경쟁력이 조명되었습니다.",
+    "아래 링크에서 방송 영상을 시청하실 수 있습니다.",
+  ].join("\n\n");
+  await sql`
+    INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+    VALUES (${newId()}, 'media', 'YTN <최강기업> 출연 — ㈜이브이레이저', 'YTN <최강기업>', '2025.05.12', ${body},
+      ${link}, ${null}, ${null}, ${thumb}, true, 0, ${new Date().toISOString()})
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('ytn_choikang_2025_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 기존 동영상자료실에 등록돼 있던 YTN 관련 항목을 언론·방송으로 이관(자료실에서 제거).
+async function ensureMoveYtnResourceToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ytn_resource_moved'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`DELETE FROM resources WHERE category = 'video' AND (title ILIKE '%YTN%' OR title ILIKE '%최강기업%')`;
+  await sql`INSERT INTO settings (key, value) VALUES ('ytn_resource_moved', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2025.04.15 유튜브 소개 영상을 동영상자료실(resources)에 한 번만 등록한다.
+async function ensureIntroVideo2025(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'intro_video_2025_04_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://youtu.be/lvGJxkRgaUk";
+  const exists = await sql`SELECT 1 FROM resources WHERE url LIKE '%lvGJxkRgaUk%' LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, 'video', '더 좋은 레이저 기술로 더 좋은 세상을 — ㈜이브이레이저 기업·기술 소개', '㈜이브이레이저의 레이저 솔루션과 기술력을 담은 소개 영상입니다.', ${url}, '2025-04-15T00:00:00.000Z')
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2025_04_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2021.08.10 유튜브 영상을 동영상자료실(resources)에 한 번만 등록한다.
+async function ensureIntroVideo2021(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'intro_video_2021_08_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://youtu.be/wKqutFyBBmE";
+  const exists = await sql`SELECT 1 FROM resources WHERE url LIKE '%wKqutFyBBmE%' LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO resources (id, category, title, description, url, created_at)
+      VALUES (${newId()}, 'video', '레이저 플라스틱 용접 기술 — ㈜이브이레이저', '㈜이브이레이저의 레이저 플라스틱 용접 공법과 응용 기술을 소개하는 영상입니다.', ${url}, '2021-08-10T00:00:00.000Z')
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('intro_video_2021_08_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 중복 등록된 CE 인증서(동일 문서)를 한 번만 정리한다.

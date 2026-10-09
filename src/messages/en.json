@@ -775,8 +775,8 @@
       "summary": "Press coverage, broadcast features and academic & conference activities of EV Laser.",
       "tabs": {
         "all": "All",
-        "media": "Press",
-        "broadcast": "Broadcast",
+        "media": "Press & Broadcast",
+        "broadcast": "Press & Broadcast",
         "paper": "Papers & Conferences"
       },
       "download": "Download PDF",
