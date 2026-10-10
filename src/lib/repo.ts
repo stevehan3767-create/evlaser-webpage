@@ -591,6 +591,76 @@ export const inquiryRepo = {
   },
 };
 
+// ---- 고객지원 문의접수 공개 게시판 (support_posts) ----
+export interface SupportPostRow {
+  id: string;
+  postNo: string | null;
+  title: string;
+  author: string | null;
+  postedOn: string | null;
+  status: string; // 'answered' | 'received'
+  sortOrder: number;
+  createdAt: string;
+}
+
+function rowToSupportPost(r: Record<string, unknown>): SupportPostRow {
+  return {
+    id: r.id as string,
+    postNo: (r.post_no as string) ?? null,
+    title: (r.title as string) ?? "",
+    author: (r.author as string) ?? null,
+    postedOn: (r.posted_on as string) ?? null,
+    status: (r.status as string) ?? "answered",
+    sortOrder: Number(r.sort_order ?? 0),
+    createdAt: String(r.created_at ?? ""),
+  };
+}
+
+export const supportPostRepo = {
+  async list(): Promise<SupportPostRow[]> {
+    await ensureSchema();
+    const rows = await sql`SELECT * FROM support_posts ORDER BY sort_order ASC, created_at ASC`;
+    return (rows as Record<string, unknown>[]).map(rowToSupportPost);
+  },
+  async create(input: { postNo?: string | null; title: string; author?: string | null; postedOn?: string | null; status?: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO support_posts (id, post_no, title, author, posted_on, status, sort_order, created_at)
+      VALUES (${newId()}, ${input.postNo || null}, ${input.title}, ${input.author || null}, ${input.postedOn || null}, ${input.status === "received" ? "received" : "answered"}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async update(id: string, input: { postNo?: string | null; title: string; author?: string | null; postedOn?: string | null; status?: string }): Promise<void> {
+    await ensureSchema();
+    await sql`UPDATE support_posts SET post_no = ${input.postNo || null}, title = ${input.title}, author = ${input.author || null}, posted_on = ${input.postedOn || null}, status = ${input.status === "received" ? "received" : "answered"} WHERE id = ${id}`;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM support_posts WHERE id = ${id}`;
+  },
+  // 표시 순서를 한 칸 위/아래로 이동 (인접 항목과 sort_order 교환)
+  async move(id: string, direction: "up" | "down"): Promise<void> {
+    await ensureSchema();
+    const rows = (await sql`SELECT id FROM support_posts ORDER BY sort_order ASC, created_at ASC`) as { id: string }[];
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= rows.length) return;
+    await sql`UPDATE support_posts SET sort_order = ${swapIdx} WHERE id = ${rows[idx].id}`;
+    await sql`UPDATE support_posts SET sort_order = ${idx} WHERE id = ${rows[swapIdx].id}`;
+  },
+  // 신규 문의 접수 시 게시판 맨 위에 한 줄 자동 추가(번호 자동 증번, 상태=접수).
+  async addFromInquiry(input: { title: string; author: string | null; postedOn: string }): Promise<void> {
+    await ensureSchema();
+    const agg = (await sql`SELECT COALESCE(MIN(sort_order), 0) AS mn, COALESCE(MAX(CAST(NULLIF(regexp_replace(post_no, '[^0-9]', '', 'g'), '') AS INT)), 0) AS mx FROM support_posts`) as { mn: number; mx: number }[];
+    const minSort = Number(agg[0]?.mn ?? 0);
+    const maxNo = Number(agg[0]?.mx ?? 0);
+    await sql`
+      INSERT INTO support_posts (id, post_no, title, author, posted_on, status, sort_order, created_at)
+      VALUES (${newId()}, ${String(maxNo + 1)}, ${input.title}, ${input.author || null}, ${input.postedOn}, 'received', ${minSort - 1}, ${new Date().toISOString()})
+    `;
+  },
+};
+
 export const resourceRepo = {
   async list(): Promise<ResourceRow[]> {
     await ensureSchema();

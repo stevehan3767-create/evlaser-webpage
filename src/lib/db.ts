@@ -3,6 +3,7 @@ import { techPageSeeds, specOptionDefaults, specOptionLegacyDefaults } from "./d
 import tidingsPosts from "./tidings-data.json";
 import exhibitionPosts from "./exhibition-data.json";
 import mainnewsPosts from "./mainnews-data.json";
+import supportInquirySeed from "./support-inquiries-data.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -301,6 +302,21 @@ function createSchema(): Promise<void> {
       )
     `;
 
+    // 고객지원 문의접수 공개 게시판(관리자 관리). 구 홈페이지 문의접수 목록을
+    // 이관해 보관하고, 신규 문의 접수 시 자동으로 한 줄 추가된다. 본문은 비공개.
+    await sql`
+      CREATE TABLE IF NOT EXISTS support_posts (
+        id TEXT PRIMARY KEY,
+        post_no TEXT,
+        title TEXT NOT NULL,
+        author TEXT,
+        posted_on TEXT,
+        status TEXT NOT NULL DEFAULT 'answered',
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+
     // 특허 목록. 등록날짜(registered_on) 기준으로 정렬해 노출한다. 등록일이
     // 아직 입력되지 않은 항목은 뒤로 밀리며 sort_order로 보조 정렬한다.
     await sql`
@@ -418,6 +434,7 @@ function createSchema(): Promise<void> {
     await ensureMetalWeek2026Views();
     await ensureMetalWeek2026ViewsAdjust();
     await ensureMainNewsIntegration();
+    await ensureSupportPostsSeed();
   })();
 }
 
@@ -660,6 +677,33 @@ async function ensureTidingsImport(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 구 홈페이지 문의접수 목록(크롤러로 수집·마스킹한 60건)을 고객지원 게시판(support_posts)에
+// 한 번만 시드한다. 이후 관리자가 수정·삭제·순서변경하며, 신규 문의도 자동 누적된다.
+async function ensureSupportPostsSeed(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'support_posts_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+
+  type SPost = { no: string; title: string; author: string; date: string; status: string };
+  const posts = supportInquirySeed as SPost[];
+  if (posts.length) {
+    const ids: string[] = [], postNos: (string | null)[] = [], titles: string[] = [];
+    const authors: (string | null)[] = [], dates: (string | null)[] = [], statuses: string[] = [], sorts: number[] = [];
+    posts.forEach((p, i) => {
+      ids.push(newId()); postNos.push(p.no || null); titles.push(p.title);
+      authors.push(p.author || null); dates.push(p.date || null);
+      statuses.push(p.status === "received" ? "received" : "answered"); sorts.push(i);
+    });
+    await sql`
+      INSERT INTO support_posts (id, post_no, title, author, posted_on, status, sort_order)
+      SELECT * FROM UNNEST(
+        ${ids}::text[], ${postNos}::text[], ${titles}::text[], ${authors}::text[],
+        ${dates}::text[], ${statuses}::text[], ${sorts}::int[]
+      )
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('support_posts_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 구 홈페이지 주요뉴스 게시판을 뉴스·소식 > 회사소식으로 한 번만 통합한다.

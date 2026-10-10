@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { inquiryRepo } from "@/lib/repo";
+import { inquiryRepo, supportPostRepo } from "@/lib/repo";
 import { sendInquiryEmail } from "@/lib/mail";
+import { maskName, deriveInquiryTitle } from "@/lib/mask";
 
 // sendInquiryEmail is internally capped at 15s, under this — set explicitly
 // so a misconfigured SMTP host can never make Vercel kill the function with
@@ -46,6 +47,22 @@ export async function POST(req: NextRequest) {
     emailSent: mailResult.sent,
     emailError: mailResult.sent ? undefined : mailResult.error,
   });
+
+  // 일반 문의는 공개 게시판(고객지원 문의접수) 맨 위에 자동 등록(이름 마스킹, 본문 비공개).
+  // 민감한 CEO 직속 채널은 공개 목록에 올리지 않는다. 실패해도 접수 자체는 성공 처리.
+  if (channel === "general") {
+    try {
+      const now = new Date();
+      const p = (n: number) => String(n).padStart(2, "0");
+      await supportPostRepo.addFromInquiry({
+        title: deriveInquiryTitle(message, industry),
+        author: maskName(name),
+        postedOn: `${now.getFullYear()}.${p(now.getMonth() + 1)}.${p(now.getDate())}`,
+      });
+    } catch {
+      /* 공개 게시판 등록 실패는 접수 결과에 영향 없음 */
+    }
+  }
 
   return NextResponse.json({
     ok: true,
