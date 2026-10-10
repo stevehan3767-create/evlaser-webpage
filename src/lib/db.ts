@@ -415,6 +415,7 @@ function createSchema(): Promise<void> {
     await ensureRemoveTidingsLogoImages();
     await ensureExhibitionImport();
     await ensureMetalWeek2026Views();
+    await ensureMetalWeek2026ViewsAdjust();
     await ensureMainNewsIntegration();
   })();
 }
@@ -730,6 +731,18 @@ async function ensureMetalWeek2026Views(): Promise<void> {
     WHERE title = 'KOREA METAL WEEK 2026 (금속산업대전) 참가 안내' AND views IS NULL
   `;
   await sql`INSERT INTO settings (key, value) VALUES ('metalweek2026_views_set', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 조회수 없는 신규글의 초기 조회수 정책: "같은 게시판에서 가장 최근 등록글의 조회수 -20%".
+// KOREA METAL WEEK 2026 = 전시회소식 최근 실제글(2025 CIOE, 639) × 0.8 ≈ 511 로 조정.
+async function ensureMetalWeek2026ViewsAdjust(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'metalweek2026_views_v2'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`
+    UPDATE news_items SET views = 511
+    WHERE title = 'KOREA METAL WEEK 2026 (금속산업대전) 참가 안내'
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('metalweek2026_views_v2', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 구 홈페이지 전시회 게시판 전체를 뉴스·소식 > 전시회소식으로 한 번만 이관한다.
