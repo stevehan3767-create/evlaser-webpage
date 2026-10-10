@@ -34,7 +34,7 @@ export async function savePress(formData: FormData) {
     await pressRepo.create({ ...input, sortOrder: 0 });
   }
   revalidatePath("/admin/press");
-  revalidatePath("/company/press");
+  revalidatePath("/news/press");
 }
 
 export async function deletePress(formData: FormData) {
@@ -42,5 +42,5 @@ export async function deletePress(formData: FormData) {
   if (!id) return;
   await pressRepo.remove(id);
   revalidatePath("/admin/press");
-  revalidatePath("/company/press");
+  revalidatePath("/news/press");
 }

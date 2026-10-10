@@ -127,7 +127,7 @@ async function buildDocs(): Promise<SearchDoc[]> {
       title: p.title,
       snippet: [p.source ?? "", p.body].join(" "),
       category: "언론·연구활동",
-      href: "/company/press",
+      href: "/news/press",
     });
   }
 

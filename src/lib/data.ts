@@ -265,13 +265,6 @@ export const companyMegaGroups: { titleKey: string; items: { labelKey: string; h
       { labelKey: "company.items.clients", href: "/company/clients" },
     ],
   },
-  {
-    titleKey: "company.groups.careers",
-    items: [
-      { labelKey: "careers.items.openings", href: "/careers" },
-      { labelKey: "careers.items.culture", href: "/careers#culture" },
-    ],
-  },
 ];
 
 export const productsNav: NavItem[] = [
@@ -291,7 +284,7 @@ export const newsNav: NavItem[] = [
   { key: "company", href: "/news?cat=company" },
   { key: "exhibition", href: "/news?cat=exhibition" },
   { key: "industry", href: "/news?cat=industry" },
-  { key: "press", href: "/company/press" },
+  { key: "press", href: "/news/press" },
 ];
 
 export const careersNav: NavItem[] = [
