@@ -2,6 +2,7 @@ import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import { techPageSeeds, specOptionDefaults, specOptionLegacyDefaults } from "./data";
 import tidingsPosts from "./tidings-data.json";
 import exhibitionPosts from "./exhibition-data.json";
+import mainnewsPosts from "./mainnews-data.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -414,6 +415,7 @@ function createSchema(): Promise<void> {
     await ensureRemoveTidingsLogoImages();
     await ensureExhibitionImport();
     await ensureMetalWeek2026Views();
+    await ensureMainNewsIntegration();
   })();
 }
 
@@ -656,6 +658,66 @@ async function ensureTidingsImport(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 구 홈페이지 주요뉴스 게시판을 뉴스·소식 > 회사소식으로 한 번만 통합한다.
+// 이미 회사소식에 있는 글(시드/사내소식)은 제목으로 매칭해 조회수(및 누락 이미지)만 채우고,
+// 없는 글만 신규로 추가한다. → 중복 없이 조회수까지 보존.
+async function ensureMainNewsIntegration(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'mainnews_integrated'`) as { value: string }[];
+  if (flag.length > 0) return;
+
+  type MPost = { postNo: string | null; title: string; date: string; author: string | null; views: number | null; body: string; images: string[] };
+  const posts = mainnewsPosts as MPost[];
+  if (!posts.length) return;
+
+  const rows = (await sql`
+    SELECT n.id, n.title, n.views,
+           (SELECT COUNT(*)::int FROM news_images i WHERE i.news_id = n.id) AS imgcount
+    FROM news_items n WHERE n.tag = '회사소식'
+  `) as { id: string; title: string; views: number | null; imgcount: number }[];
+
+  const norm = (s: string) => (s || "").replace(/[^0-9a-z가-힣]/gi, "").toLowerCase();
+  const byNorm = new Map<string, { id: string; views: number | null; imgcount: number }>();
+  for (const r of rows) { const k = norm(r.title); if (!byNorm.has(k)) byNorm.set(k, r); }
+
+  const ids: string[] = [], tags: string[] = [], titles: string[] = [], dates: string[] = [];
+  const bodies: string[] = [], authors: (string | null)[] = [], views: (number | null)[] = [], postNos: (string | null)[] = [];
+  const imgIds: string[] = [], imgNews: string[] = [], imgUrls: string[] = [], imgSort: number[] = [];
+
+  for (const p of posts) {
+    const m = byNorm.get(norm(p.title));
+    if (m) {
+      // 기존 글: 조회수가 비어 있으면 채우고, 이미지가 없으면 추가
+      if (m.views == null && p.views != null) await sql`UPDATE news_items SET views = ${p.views} WHERE id = ${m.id}`;
+      if (m.imgcount === 0 && p.images.length) {
+        p.images.forEach((url, i) => { imgIds.push(newId()); imgNews.push(m.id); imgUrls.push(url); imgSort.push(i); });
+      }
+    } else {
+      // 신규 글
+      const id = newId();
+      ids.push(id); tags.push("회사소식"); titles.push(p.title); dates.push(p.date);
+      bodies.push(p.body ?? ""); authors.push(p.author ?? null); views.push(p.views ?? null); postNos.push(p.postNo || null);
+      p.images.forEach((url, i) => { imgIds.push(newId()); imgNews.push(id); imgUrls.push(url); imgSort.push(i); });
+    }
+  }
+
+  if (ids.length) {
+    await sql`
+      INSERT INTO news_items (id, tag, title, date, body, author, views, post_no)
+      SELECT * FROM UNNEST(
+        ${ids}::text[], ${tags}::text[], ${titles}::text[], ${dates}::text[],
+        ${bodies}::text[], ${authors}::text[], ${views}::int[], ${postNos}::text[]
+      )
+    `;
+  }
+  if (imgIds.length) {
+    await sql`
+      INSERT INTO news_images (id, news_id, url, sort_order)
+      SELECT * FROM UNNEST(${imgIds}::text[], ${imgNews}::text[], ${imgUrls}::text[], ${imgSort}::int[])
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('mainnews_integrated', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // KOREA METAL WEEK 2026 안내글은 신규 등록글이라 조회수가 비어 목록에 표시되지 않는다.
