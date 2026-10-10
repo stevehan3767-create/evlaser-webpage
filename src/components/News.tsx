@@ -13,11 +13,14 @@ const CATEGORIES = [
 
 const PAGE_SIZE = 15;
 
+// 이미지 테두리 스타일 A: 둥근 모서리 + 부드러운 그림자 (실선 제거)
+const IMG_SHADOW = "shadow-[0_6px_18px_rgba(17,20,24,0.14),0_1px_3px_rgba(17,20,24,0.08)]";
+
 function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
   return (
-    <div className="grid gap-3 pb-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+    <div className="grid gap-4 pb-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
       {images.map((img) => (
-        <figure key={img.id} className="border border-line rounded-md overflow-hidden bg-surface">
+        <figure key={img.id} className={`rounded-xl overflow-hidden bg-surface ${IMG_SHADOW}`}>
           <div className="aspect-[4/3] bg-surface-alt overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.url} alt={img.caption ?? ""} loading="lazy" className="w-full h-full object-cover" />
@@ -34,74 +37,71 @@ function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
   );
 }
 
-// 목록 한 건: 썸네일 + 제목 + 3줄 미리보기 + 메타(번호·작성자·조회·등록일).
-// 클릭하면 본문 전체 + 사진 그리드가 펼쳐진다.
-const ROW_COLS = "grid grid-cols-[44px_48px_1fr] sm:grid-cols-[72px_56px_1fr_90px_110px] gap-x-3 sm:gap-x-4 items-center";
-
+// 목록 한 건: 썸네일 + (번호·제목 / 우측 메타) + 2줄 미리보기.
+// 클릭하면 같은 본문이 펼쳐지고(line-clamp 해제) 사진 그리드가 이어서 표시된다.
 function NewsRowItem({ n, images }: { n: NewsRow; images: NewsImageRow[] }) {
   const isNotice = n.postNo === "공지";
   const thumb = images[0]?.url ?? null;
   const hasDetail = Boolean(n.body) || images.length > 0;
 
-  const no = (
-    <div className="text-center">
-      {isNotice ? (
-        <span className="inline-block text-[11px] font-bold text-white bg-red rounded-[5px] px-1.5 py-0.5">공지</span>
-      ) : (
-        <span className="font-mono text-[12.5px] text-ink-faint">{n.postNo ?? ""}</span>
-      )}
+  const meta = (
+    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] sm:text-[12px] text-ink-faint">
+      {n.author && <span>{n.author}</span>}
+      <span className="font-mono">{n.date}</span>
+      {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
+      {images.length > 0 && <span className="font-semibold text-blue">사진 {images.length}</span>}
     </div>
   );
-  const thumbCell = (
-    <div className="flex justify-center">
+
+  const thumbEl = (
+    <div className="flex-none">
       {thumb ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={thumb} alt="" loading="lazy" className="w-11 h-11 object-cover rounded-md border border-line" />
+        <img src={thumb} alt="" loading="lazy" className={`w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl ${IMG_SHADOW}`} />
       ) : (
-        <span className="w-11 h-11 rounded-md border border-dashed border-line-strong bg-surface-alt" />
+        <span className="block w-24 h-24 sm:w-32 sm:h-32 rounded-xl border border-dashed border-line-strong bg-surface-alt" />
       )}
     </div>
   );
-  const titleCell = (
-    <div className="min-w-0">
-      <div className="flex items-center gap-1.5">
-        <span className="truncate font-semibold text-[14px] sm:text-[14.5px] text-ink group-hover:text-blue">{n.title}</span>
-        {hasDetail && (
-          <svg viewBox="0 0 12 8" className="flex-none w-2.5 h-2 text-ink-faint transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M1 1.5 6 6.5 11 1.5" />
-          </svg>
-        )}
-      </div>
-      {/* 모바일: 등록일·조회를 제목 아래로 */}
-      <div className="sm:hidden mt-1 flex gap-2.5 text-[11px] font-mono text-ink-faint">
-        <span>{n.date}</span>
-        {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
-      </div>
-    </div>
-  );
-  const viewsCell = <div className="hidden sm:block text-right font-mono text-[12.5px] text-ink-faint">{n.views != null ? n.views.toLocaleString() : ""}</div>;
-  const dateCell = <div className="hidden sm:block text-right font-mono text-[12.5px] text-ink-faint">{n.date}</div>;
 
-  const summaryInner = (
-    <>
-      {no}
-      {thumbCell}
-      {titleCell}
-      {viewsCell}
-      {dateCell}
-    </>
+  const content = (
+    <div className="min-w-0 flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4">
+        <div className="flex items-center gap-2 min-w-0">
+          {isNotice ? (
+            <span className="flex-none inline-block text-[11px] font-bold text-white bg-red rounded-[5px] px-1.5 py-0.5">공지</span>
+          ) : (
+            n.postNo && <span className="flex-none font-mono text-[12.5px] text-ink-faint">#{n.postNo}</span>
+          )}
+          <span className="truncate font-bold text-[15px] sm:text-[16px] text-ink group-hover:text-blue">{n.title}</span>
+          {hasDetail && (
+            <svg viewBox="0 0 12 8" className="flex-none w-2.5 h-2 text-ink-faint transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 1.5 6 6.5 11 1.5" />
+            </svg>
+          )}
+        </div>
+        <div className="flex-none">{meta}</div>
+      </div>
+      {n.body && (
+        <p className="mt-2 max-w-[85ch] text-ink-soft text-[13px] sm:text-[13.5px] leading-relaxed whitespace-pre-line line-clamp-2 group-open:line-clamp-none">
+          {n.body}
+        </p>
+      )}
+    </div>
   );
 
   if (!hasDetail) {
-    return <div className={`${ROW_COLS} py-3 border-b border-line`}>{summaryInner}</div>;
+    return <div className="flex gap-4 sm:gap-5 py-5 border-b border-line">{thumbEl}{content}</div>;
   }
   return (
     <details className="group border-b border-line">
-      <summary className={`${ROW_COLS} py-3 cursor-pointer list-none marker:content-none`}>{summaryInner}</summary>
-      <div className="pb-7 pt-2 sm:pl-[116px]">
-        {n.body && <p className="mb-4 text-ink-soft text-[13.5px] leading-relaxed max-w-[80ch] whitespace-pre-line">{n.body}</p>}
+      <summary className="flex gap-4 sm:gap-5 py-5 cursor-pointer list-none marker:content-none">
+        {thumbEl}
+        {content}
+      </summary>
+      <div className="pb-7 pt-1 sm:pl-[148px]">
         {images.length > 0 && <NewsImageGrid images={images} />}
-        <div className="mt-3 flex justify-center">
+        <div className="mt-1 flex justify-center sm:justify-start">
           <NewsCollapseButton />
         </div>
       </div>
@@ -155,18 +155,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           <p className="text-[12.5px] text-ink-faint mb-2">전체 {activeItems.length}건</p>
         )}
 
-        {/* 게시판 헤더 (PC) */}
-        {pageItems.length > 0 && (
-          <div className={`${ROW_COLS} hidden sm:grid py-2.5 border-t-2 border-ink/70 border-b border-line-strong text-[12.5px] font-bold text-ink-soft`}>
-            <span className="text-center">번호</span>
-            <span />
-            <span>제목</span>
-            <span className="text-right">조회</span>
-            <span className="text-right">등록일</span>
-          </div>
-        )}
-
-        <div className="border-t border-line sm:border-t-0">
+        <div className="border-t-2 border-ink/70">
           {pageItems.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
           ) : (
