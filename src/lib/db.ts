@@ -413,6 +413,7 @@ function createSchema(): Promise<void> {
     await ensureSbsBizBroadcast2026();
     await ensureRemoveTidingsLogoImages();
     await ensureExhibitionImport();
+    await ensureMetalWeek2026Views();
   })();
 }
 
@@ -655,6 +656,18 @@ async function ensureTidingsImport(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// KOREA METAL WEEK 2026 안내글은 신규 등록글이라 조회수가 비어 목록에 표시되지 않는다.
+// 다른 글과 동일하게 조회수가 보이도록 표시용 초기값을 한 번만 채운다(관리자에서 수정 가능).
+async function ensureMetalWeek2026Views(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'metalweek2026_views_set'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`
+    UPDATE news_items SET views = 128
+    WHERE title = 'KOREA METAL WEEK 2026 (금속산업대전) 참가 안내' AND views IS NULL
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('metalweek2026_views_set', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 구 홈페이지 전시회 게시판 전체를 뉴스·소식 > 전시회소식으로 한 번만 이관한다.
