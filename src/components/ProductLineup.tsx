@@ -63,11 +63,9 @@ export default async function ProductLineup() {
     }));
 
   return (
-    <section id="lineup" className="py-16 sm:py-22 border-b border-line">
+    <section id="lineup" className="pt-6 pb-16 sm:pb-22 border-b border-line">
       <div className="mx-auto max-w-[1240px] px-7">
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h2 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{t("title")}</h2>
-        <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("desc")}</p>
+        <p className="max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("desc")}</p>
 
         <div className="mt-8">
           <LineupFinder

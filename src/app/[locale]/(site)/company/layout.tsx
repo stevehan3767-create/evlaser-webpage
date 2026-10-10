@@ -7,12 +7,9 @@ export default async function CompanyLayout({ children }: { children: React.Reac
 
   return (
     <>
-      <div className="mx-auto max-w-[1240px] px-7 pt-12">
+      {/* 섹션 대제목은 각 하위 페이지의 제목과 중복되므로 생략하고, 브레드크럼 + 탭만 제공 */}
+      <div className="mx-auto max-w-[1240px] px-7 pt-10">
         <Breadcrumb items={[{ label: t("title") }]} />
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-          {t("title")}
-        </h1>
         <CompanyNav />
       </div>
       {children}
