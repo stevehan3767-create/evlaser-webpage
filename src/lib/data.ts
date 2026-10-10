@@ -641,6 +641,9 @@ export const ceoCards = [
 // Real patent titles as registered with the Korean Intellectual Property
 // Office (source: evlaser.co.kr "특허&인증서" page, provided by the user).
 export const patents = [
+  { image: "/images/patents/kr-surface-heat-2016.jpg", title: "금속표면 경도측정장치를 채용한 레이저 금속 표면 열처리 시스템 (특허 제10-1652180호)", date: "2016-08-23" },
+  { image: "/images/patents/kr-vacuum-heat-2015.jpg", title: "레이저를 이용한 진공챔버에서의 금속표면 열처리장치 (특허 제10-1551498호)", date: "2015-09-02" },
+  { image: "/images/patents/kr-crankshaft-2012.jpg", title: "크랭크샤프트용 레이저 열처리장치 (특허 제10-1202117호)", date: "2012-11-09" },
   { image: "/images/patents/patent-01.jpg", title: "레이저빔 투과율 측정장치" },
   { image: "/images/patents/patent-02.jpg", title: "다중 레이저빔을 이용한 원통형플라스틱 배관 경방향 접근 방식 동시조사 레이저 용접장치" },
   { image: "/images/patents/patent-03.jpg", title: "레이저빔 반사채널 및 다관절로봇을 이용한 레이저플라스틱 용접장치" },

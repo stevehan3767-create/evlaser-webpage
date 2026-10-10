@@ -404,12 +404,12 @@ export const patentRepo = {
   },
 };
 
-export async function seedPatentsIfEmpty(items: { image: string; title: string; file?: string; fileName?: string }[]): Promise<void> {
+export async function seedPatentsIfEmpty(items: { image: string; title: string; date?: string; file?: string; fileName?: string }[]): Promise<void> {
   await ensureSchema();
   const rows = await sql`SELECT COUNT(*)::int AS c FROM patents`;
   if ((rows[0] as { c: number }).c > 0) return;
   for (let i = 0; i < items.length; i++) {
-    await patentRepo.create({ imageUrl: items[i].image, title: items[i].title, registeredOn: null, fileUrl: items[i].file ?? null, fileName: items[i].fileName ?? null, sortOrder: i });
+    await patentRepo.create({ imageUrl: items[i].image, title: items[i].title, registeredOn: items[i].date ?? null, fileUrl: items[i].file ?? null, fileName: items[i].fileName ?? null, sortOrder: i });
   }
 }
 

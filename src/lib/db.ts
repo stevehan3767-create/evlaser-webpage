@@ -389,6 +389,7 @@ function createSchema(): Promise<void> {
     await ensureSswChinaCertKo();
     await ensureCladdingCert2018();
     await ensureDedupeCladdingPatents();
+    await ensureHeatTreatmentPatents();
     await ensureKitaMembershipCert();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
@@ -548,6 +549,29 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 국내 열처리 관련 특허증 3건을 등록일과 함께 한 번만 추가한다(등록일 최신순으로 상단 노출).
+async function ensureHeatTreatmentPatents(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'heat_treatment_patents_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM patents`) as { c: number }[];
+  if (cnt[0].c === 0) return;
+  const entries = [
+    { url: "/images/patents/kr-surface-heat-2016.jpg", title: "금속표면 경도측정장치를 채용한 레이저 금속 표면 열처리 시스템 (특허 제10-1652180호)", date: "2016-08-23" },
+    { url: "/images/patents/kr-vacuum-heat-2015.jpg", title: "레이저를 이용한 진공챔버에서의 금속표면 열처리장치 (특허 제10-1551498호)", date: "2015-09-02" },
+    { url: "/images/patents/kr-crankshaft-2012.jpg", title: "크랭크샤프트용 레이저 열처리장치 (특허 제10-1202117호)", date: "2012-11-09" },
+  ];
+  for (const e of entries) {
+    const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${e.url} LIMIT 1`;
+    if (exists.length === 0) {
+      await sql`
+        INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
+        VALUES (${newId()}, ${e.url}, ${e.title}, ${e.date}, 0, ${new Date().toISOString()})
+      `;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('heat_treatment_patents_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 중복된 "클래딩" 특허 항목을 한 번만 정리한다.
