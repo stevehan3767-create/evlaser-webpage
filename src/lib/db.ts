@@ -1,6 +1,7 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import { techPageSeeds, specOptionDefaults, specOptionLegacyDefaults } from "./data";
 import tidingsPosts from "./tidings-data.json";
+import exhibitionPosts from "./exhibition-data.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -411,6 +412,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2021Jan();
     await ensureSbsBizBroadcast2026();
     await ensureRemoveTidingsLogoImages();
+    await ensureExhibitionImport();
   })();
 }
 
@@ -653,6 +655,43 @@ async function ensureTidingsImport(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 구 홈페이지 전시회 게시판 전체를 뉴스·소식 > 전시회소식으로 한 번만 이관한다.
+// 제목·등록일·조회수·본문·이미지 보존(등록번호·작성자는 원본 목록에 없어 미사용).
+async function ensureExhibitionImport(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'exhibition_imported'`) as { value: string }[];
+  if (flag.length > 0) return;
+
+  type EPost = { postNo: string | null; title: string; date: string; author: string | null; views: number | null; body: string; images: string[] };
+  const posts = exhibitionPosts as EPost[];
+  if (!posts.length) return;
+
+  const ids: string[] = [], tags: string[] = [], titles: string[] = [], dates: string[] = [];
+  const bodies: string[] = [], authors: (string | null)[] = [], views: (number | null)[] = [], postNos: (string | null)[] = [];
+  const imgIds: string[] = [], imgNews: string[] = [], imgUrls: string[] = [], imgSort: number[] = [];
+
+  for (const p of posts) {
+    const id = newId();
+    ids.push(id); tags.push("전시회소식"); titles.push(p.title); dates.push(p.date);
+    bodies.push(p.body ?? ""); authors.push(p.author ?? null); views.push(p.views ?? null); postNos.push(p.postNo || null);
+    p.images.forEach((url, i) => { imgIds.push(newId()); imgNews.push(id); imgUrls.push(url); imgSort.push(i); });
+  }
+
+  await sql`
+    INSERT INTO news_items (id, tag, title, date, body, author, views, post_no)
+    SELECT * FROM UNNEST(
+      ${ids}::text[], ${tags}::text[], ${titles}::text[], ${dates}::text[],
+      ${bodies}::text[], ${authors}::text[], ${views}::int[], ${postNos}::text[]
+    )
+  `;
+  if (imgIds.length) {
+    await sql`
+      INSERT INTO news_images (id, news_id, url, sort_order)
+      SELECT * FROM UNNEST(${imgIds}::text[], ${imgNews}::text[], ${imgUrls}::text[], ${imgSort}::int[])
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('exhibition_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 이관한 사내소식 글 끝에 붙던 EV LASER 로고 이미지를 한 번만 제거한다.
