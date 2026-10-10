@@ -85,9 +85,9 @@ export default function Header() {
                   </svg>
                 </Link>
                 {section === "company" ? (
-                  <div className="absolute top-full left-0 bg-surface border border-line shadow-lg p-5 hidden group-hover:grid grid-cols-3 gap-x-7 gap-y-1">
+                  <div className="absolute top-full left-0 w-max bg-surface border border-line shadow-lg p-5 hidden group-hover:flex gap-8">
                     {companyMegaGroups.map((grp) => (
-                      <div key={grp.titleKey} className="min-w-[150px]">
+                      <div key={grp.titleKey} className="w-[150px] flex-none">
                         <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-red tracking-wide pb-2 mb-1 border-b border-line">
                           <span className="inline-block w-[7px] h-[7px] rounded-[2px] bg-red" />
                           {t(grp.titleKey)}
