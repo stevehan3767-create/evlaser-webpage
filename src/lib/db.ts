@@ -413,6 +413,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2021Jan();
     await ensureSbsBizBroadcast2026();
     await ensureRemoveTidingsLogoImages();
+    await ensureRemoveNewsLogoImagesV2();
     await ensureExhibitionImport();
     await ensureMetalWeek2026Views();
     await ensureMetalWeek2026ViewsAdjust();
@@ -795,6 +796,35 @@ async function ensureRemoveTidingsLogoImages(): Promise<void> {
   ];
   await sql`DELETE FROM news_images WHERE url = ANY(${urls}::text[])`;
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_logo_images_removed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 뉴스·소식 전반(회사소식·전시회소식)에 섞여 있던 흰 배경 EV LASER 로고 이미지를
+// 크기·색상 변형까지 모두 한 번에 제거한다(본문과 무관한 서명/장식용).
+async function ensureRemoveNewsLogoImagesV2(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'news_logo_images_removed_v2'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const urls = [
+    // 회사소식(tidings)
+    "/images/news/tidings/1_1.webp",
+    "/images/news/tidings/171_1.webp",
+    "/images/news/tidings/171_20.webp",
+    "/images/news/tidings/173_7.webp",
+    "/images/news/tidings/174_8.webp",
+    "/images/news/tidings/176_6.webp",
+    "/images/news/tidings/177_10.webp",
+    "/images/news/tidings/178_13.webp",
+    "/images/news/tidings/181_10.webp",
+    "/images/news/tidings/182_7.webp",
+    "/images/news/tidings/191_7.webp",
+    "/images/news/tidings/192_5.webp",
+    "/images/news/tidings/194_15.webp",
+    // 전시회소식(exhibition)
+    "/images/news/exhibition/105_16.webp",
+    "/images/news/exhibition/106_10.webp",
+    "/images/news/exhibition/107_7.webp",
+  ];
+  await sql`DELETE FROM news_images WHERE url = ANY(${urls}::text[])`;
+  await sql`INSERT INTO settings (key, value) VALUES ('news_logo_images_removed_v2', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 한국무역협회(KITA) 회원증을 인증서 목록 맨 끝에 한 번만 추가한다.
