@@ -11,6 +11,11 @@
         "directions": "交通指南",
         "organization": "组织架构",
         "press": "媒体·研究"
+      },
+      "groups": {
+        "about": "公司介绍",
+        "achievements": "成果·认证",
+        "careers": "招聘"
       }
     },
     "products": {
@@ -35,7 +40,8 @@
       "items": {
         "company": "公司新闻",
         "exhibition": "展会资讯",
-        "industry": "行业动态"
+        "industry": "行业动态",
+        "press": "媒体·研究"
       }
     },
     "careers": {

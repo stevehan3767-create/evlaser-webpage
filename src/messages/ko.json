@@ -11,6 +11,11 @@
         "directions": "오시는 길",
         "organization": "조직도",
         "press": "언론·연구활동"
+      },
+      "groups": {
+        "about": "기업 소개",
+        "achievements": "성과·인증",
+        "careers": "인재 채용"
       }
     },
     "products": {
@@ -35,14 +40,15 @@
       "items": {
         "company": "회사소식",
         "exhibition": "전시회소식",
-        "industry": "산업동향"
+        "industry": "산업동향",
+        "press": "언론·연구활동"
       }
     },
     "careers": {
       "label": "채용",
       "items": {
         "openings": "채용공고",
-        "culture": "인재상"
+        "culture": "인재상·기업문화"
       }
     },
     "global": {

@@ -11,6 +11,11 @@
         "directions": "Directions",
         "organization": "Organization",
         "press": "Press & Research"
+      },
+      "groups": {
+        "about": "About Us",
+        "achievements": "Achievements",
+        "careers": "Careers"
       }
     },
     "products": {
@@ -35,7 +40,8 @@
       "items": {
         "company": "Company News",
         "exhibition": "Exhibitions",
-        "industry": "Industry Trends"
+        "industry": "Industry Trends",
+        "press": "Press & Research"
       }
     },
     "careers": {

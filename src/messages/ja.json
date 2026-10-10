@@ -11,6 +11,11 @@
         "directions": "アクセス",
         "organization": "組織図",
         "press": "メディア・研究"
+      },
+      "groups": {
+        "about": "会社紹介",
+        "achievements": "実績·認証",
+        "careers": "採用"
       }
     },
     "products": {
@@ -35,7 +40,8 @@
       "items": {
         "company": "会社ニュース",
         "exhibition": "展示会情報",
-        "industry": "業界動向"
+        "industry": "業界動向",
+        "press": "メディア·研究"
       }
     },
     "careers": {

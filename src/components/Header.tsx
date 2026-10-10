@@ -7,10 +7,10 @@ import { routing } from "@/i18n/routing";
 import Logo from "./Logo";
 import {
   companyNav,
+  companyMegaGroups,
   productsNav,
   resourcesNav,
   newsNav,
-  careersNav,
   globalNav,
   supportNav,
 } from "@/lib/data";
@@ -20,7 +20,6 @@ const NAV_SECTIONS = [
   { section: "products", items: productsNav, href: "/products" },
   { section: "resources", items: resourcesNav, href: "/resources" },
   { section: "news", items: newsNav, href: "/news" },
-  { section: "careers", items: careersNav, href: "/careers" },
   { section: "global", items: globalNav, href: "/global" },
   { section: "support", items: supportNav, href: "/support" },
 ] as const;
@@ -92,17 +91,39 @@ export default function Header() {
                     <polyline points="5 8 12 16 19 8" fill="none" stroke="currentColor" strokeWidth="2.2" />
                   </svg>
                 </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 min-w-[220px] bg-surface border border-line shadow-lg p-2.5 hidden group-hover:block">
-                  {items.map((sub) => (
-                    <Link
-                      key={sub.key}
-                      href={sub.href}
-                      className="flex items-center gap-2 px-3 py-2.5 text-[13.5px] text-ink-soft whitespace-nowrap border-l-2 border-transparent hover:bg-surface-alt hover:text-blue hover:border-red"
-                    >
-                      {t(`${section}.items.${sub.key}`)}
-                    </Link>
-                  ))}
-                </div>
+                {section === "company" ? (
+                  <div className="absolute top-full left-0 bg-surface border border-line shadow-lg p-5 hidden group-hover:grid grid-cols-3 gap-x-7 gap-y-1">
+                    {companyMegaGroups.map((grp) => (
+                      <div key={grp.titleKey} className="min-w-[150px]">
+                        <p className="flex items-center gap-1.5 text-[11.5px] font-bold text-red tracking-wide pb-2 mb-1 border-b border-line">
+                          <span className="inline-block w-[7px] h-[7px] rounded-[2px] bg-red" />
+                          {t(grp.titleKey)}
+                        </p>
+                        {grp.items.map((sub) => (
+                          <Link
+                            key={sub.labelKey}
+                            href={sub.href}
+                            className="block px-2 py-2 text-[13.5px] text-ink-soft whitespace-nowrap rounded-sm hover:bg-surface-alt hover:text-blue"
+                          >
+                            {t(sub.labelKey)}
+                          </Link>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 min-w-[220px] bg-surface border border-line shadow-lg p-2.5 hidden group-hover:block">
+                    {items.map((sub) => (
+                      <Link
+                        key={sub.key}
+                        href={sub.href}
+                        className="flex items-center gap-2 px-3 py-2.5 text-[13.5px] text-ink-soft whitespace-nowrap border-l-2 border-transparent hover:bg-surface-alt hover:text-blue hover:border-red"
+                      >
+                        {t(`${section}.items.${sub.key}`)}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <div className="relative">
@@ -179,17 +200,33 @@ export default function Header() {
                     {t(`${section}.label`)}
                   </Link>
                 </summary>
-                <div>
-                  {items.map((sub) => (
-                    <Link
-                      key={sub.key}
-                      href={sub.href}
-                      onClick={() => setDrawerOpen(false)}
-                      className="block py-2.5 pl-7 pr-[18px] text-[13.3px] text-ink-soft"
-                    >
-                      {t(`${section}.items.${sub.key}`)}
-                    </Link>
-                  ))}
+                <div className="pb-2">
+                  {section === "company"
+                    ? companyMegaGroups.map((grp) => (
+                        <div key={grp.titleKey}>
+                          <p className="pt-2.5 pb-1 pl-7 pr-[18px] text-[11px] font-bold text-red tracking-wide">{t(grp.titleKey)}</p>
+                          {grp.items.map((sub) => (
+                            <Link
+                              key={sub.labelKey}
+                              href={sub.href}
+                              onClick={() => setDrawerOpen(false)}
+                              className="block py-2.5 pl-9 pr-[18px] text-[13.3px] text-ink-soft"
+                            >
+                              {t(sub.labelKey)}
+                            </Link>
+                          ))}
+                        </div>
+                      ))
+                    : items.map((sub) => (
+                        <Link
+                          key={sub.key}
+                          href={sub.href}
+                          onClick={() => setDrawerOpen(false)}
+                          className="block py-2.5 pl-7 pr-[18px] text-[13.3px] text-ink-soft"
+                        >
+                          {t(`${section}.items.${sub.key}`)}
+                        </Link>
+                      ))}
                 </div>
               </details>
             ))}

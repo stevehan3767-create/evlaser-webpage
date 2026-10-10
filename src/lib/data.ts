@@ -241,8 +241,37 @@ export const companyNav: NavItem[] = [
   { key: "business", href: "/company/business" },
   { key: "patents", href: "/company/patents" },
   { key: "clients", href: "/company/clients" },
-  { key: "press", href: "/company/press" },
   { key: "directions", href: "/company/directions" },
+];
+
+// 상단 "회사소개" 메가 드롭다운 — 비슷한 것끼리 묶어 섹션으로 표시.
+// 채용(인재 채용)을 회사소개 하위로 통합, 언론·연구활동은 뉴스·소식으로 이동.
+// labelKey/titleKey 는 nav.* 번역 키 경로.
+export const companyMegaGroups: { titleKey: string; items: { labelKey: string; href: string }[] }[] = [
+  {
+    titleKey: "company.groups.about",
+    items: [
+      { labelKey: "company.items.overview", href: "/company" },
+      { labelKey: "company.items.history", href: "/company/history" },
+      { labelKey: "company.items.organization", href: "/company/organization" },
+      { labelKey: "company.items.business", href: "/company/business" },
+      { labelKey: "company.items.directions", href: "/company/directions" },
+    ],
+  },
+  {
+    titleKey: "company.groups.achievements",
+    items: [
+      { labelKey: "company.items.patents", href: "/company/patents" },
+      { labelKey: "company.items.clients", href: "/company/clients" },
+    ],
+  },
+  {
+    titleKey: "company.groups.careers",
+    items: [
+      { labelKey: "careers.items.openings", href: "/careers" },
+      { labelKey: "careers.items.culture", href: "/careers#culture" },
+    ],
+  },
 ];
 
 export const productsNav: NavItem[] = [
@@ -262,6 +291,7 @@ export const newsNav: NavItem[] = [
   { key: "company", href: "/news?cat=company" },
   { key: "exhibition", href: "/news?cat=exhibition" },
   { key: "industry", href: "/news?cat=industry" },
+  { key: "press", href: "/company/press" },
 ];
 
 export const careersNav: NavItem[] = [
