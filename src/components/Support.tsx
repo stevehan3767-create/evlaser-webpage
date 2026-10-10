@@ -3,8 +3,72 @@ import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 import { faqRepo } from "@/lib/repo";
 import ContactForm from "./ContactForm";
+import supportInquiries from "@/lib/support-inquiries-data.json";
 
 const FAQ_KEYS = ["quote", "install", "access"] as const;
+
+type SupportInquiry = { no: string; title: string; author: string; date: string; status: "answered" | "received" };
+
+// 구 홈페이지 문의접수(공개 목록)에서 옮겨온 최근 문의 내역.
+// 번호·제목·작성자(마스킹)·작성일·상태만 표시(본문·관리자 답변 제외, 조회수 미표시). 최신순 5건.
+function RecentInquiries() {
+  const items = (supportInquiries as SupportInquiry[])
+    .slice()
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+    .slice(0, 5);
+  if (items.length === 0) return null;
+
+  const COLS = "grid grid-cols-[1fr_72px] sm:grid-cols-[52px_1fr_92px_104px_84px] gap-x-3 sm:gap-x-4 items-center";
+  return (
+    <div className="mt-12">
+      <h2 className="text-[15px] font-bold text-ink mb-3">최근 접수된 문의</h2>
+      <div className={`${COLS} hidden sm:grid py-2.5 border-t-2 border-ink/70 border-b border-line-strong text-[12px] font-bold text-ink-soft`}>
+        <span className="text-center">번호</span>
+        <span>제목</span>
+        <span className="text-center">작성자</span>
+        <span className="text-right">작성일</span>
+        <span className="text-center">상태</span>
+      </div>
+      <div className="border-t border-line sm:border-t-0">
+        {items.map((q) => {
+          const answered = q.status === "answered";
+          const badge = (
+            <span
+              className={`inline-block text-[10.5px] font-bold rounded-full px-2 py-0.5 border ${
+                answered ? "text-[#0a7d3c] bg-[#e4f6ec] border-[#bfe8cd]" : "text-[#9a6b00] bg-[#fdf3dc] border-[#f3e0a8]"
+              }`}
+            >
+              {answered ? "답변완료" : "접수"}
+            </span>
+          );
+          return (
+            <div key={q.no} className={`${COLS} py-3 border-b border-line`}>
+              <span className="hidden sm:block text-center font-mono text-[12.5px] text-ink-faint">{q.no}</span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <svg viewBox="0 0 24 24" className="flex-none w-3 h-3 text-ink-faint" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
+                  <span className="truncate text-[13.5px] text-ink">{q.title}</span>
+                </div>
+                {/* 모바일: 작성자·작성일을 제목 아래로 */}
+                <div className="sm:hidden mt-1 flex items-center gap-2 text-[11px] text-ink-faint">
+                  <span>{q.author}</span>
+                  <span className="font-mono">{q.date}</span>
+                </div>
+              </div>
+              <span className="hidden sm:block text-center text-[12.5px] text-ink-soft">{q.author}</span>
+              <span className="hidden sm:block text-right font-mono text-[12.5px] text-ink-faint">{q.date}</span>
+              <span className="text-right sm:text-center">{badge}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[11.5px] text-ink-faint">※ 고객 개인정보 보호를 위해 작성자명은 일부 가리고, 문의 내용은 비공개로 운영됩니다.</p>
+    </div>
+  );
+}
 
 export default async function Support({
   searchParams,
@@ -109,6 +173,8 @@ export default async function Support({
         <p className="text-ink-soft mt-3 mb-8">{desc}</p>
 
         <ContactForm />
+
+        {!isCeoChannel && <RecentInquiries />}
       </div>
     </section>
   );
