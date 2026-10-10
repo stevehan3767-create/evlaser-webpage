@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, newsImageRepo, seedIfEmpty } from "@/lib/repo";
 import type { NewsRow, NewsImageRow } from "@/lib/repo";
+import NewsCollapseButton from "./NewsCollapseButton";
 
 const CATEGORIES = [
   { key: "company", tag: "회사소식" },
@@ -35,55 +36,74 @@ function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
 
 // 목록 한 건: 썸네일 + 제목 + 3줄 미리보기 + 메타(번호·작성자·조회·등록일).
 // 클릭하면 본문 전체 + 사진 그리드가 펼쳐진다.
+const ROW_COLS = "grid grid-cols-[44px_48px_1fr] sm:grid-cols-[72px_56px_1fr_90px_110px] gap-x-3 sm:gap-x-4 items-center";
+
 function NewsRowItem({ n, images }: { n: NewsRow; images: NewsImageRow[] }) {
   const isNotice = n.postNo === "공지";
   const thumb = images[0]?.url ?? null;
   const hasDetail = Boolean(n.body) || images.length > 0;
 
-  const head = (
-    <div className="flex gap-4">
-      {/* 썸네일 (없으면 플레이스홀더) */}
-      <div className="relative flex-none w-[104px] sm:w-[132px] aspect-[4/3] rounded-md overflow-hidden border border-line bg-surface-alt">
-        {thumb ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={n.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-blue/40">
-            <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M4 5h16v14H4zM8 10h8M8 14h5" strokeLinecap="round" /></svg>
-          </div>
+  const no = (
+    <div className="text-center">
+      {isNotice ? (
+        <span className="inline-block text-[11px] font-bold text-white bg-red rounded-[5px] px-1.5 py-0.5">공지</span>
+      ) : (
+        <span className="font-mono text-[12.5px] text-ink-faint">{n.postNo ?? ""}</span>
+      )}
+    </div>
+  );
+  const thumbCell = (
+    <div className="flex justify-center">
+      {thumb ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={thumb} alt="" loading="lazy" className="w-11 h-11 object-cover rounded-md border border-line" />
+      ) : (
+        <span className="w-11 h-11 rounded-md border border-dashed border-line-strong bg-surface-alt" />
+      )}
+    </div>
+  );
+  const titleCell = (
+    <div className="min-w-0">
+      <div className="flex items-center gap-1.5">
+        <span className="truncate font-semibold text-[14px] sm:text-[14.5px] text-ink group-hover:text-blue">{n.title}</span>
+        {hasDetail && (
+          <svg viewBox="0 0 12 8" className="flex-none w-2.5 h-2 text-ink-faint transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 1.5 6 6.5 11 1.5" />
+          </svg>
         )}
       </div>
-      {/* 본문 요약 */}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          {isNotice && <span className="text-[10.5px] font-bold text-white bg-red rounded-sm px-1.5 py-0.5">공지</span>}
-          {!isNotice && n.postNo && <span className="font-mono text-[11px] text-ink-faint">#{n.postNo}</span>}
-          <h3 className="font-bold text-[14.5px] sm:text-[15px] text-ink min-w-0 truncate group-hover:text-blue">{n.title}</h3>
-        </div>
-        {n.body && (
-          <p className="mt-1.5 text-[12.8px] text-ink-soft leading-relaxed line-clamp-3">
-            {n.body}
-          </p>
-        )}
-        <div className="mt-2 flex items-center gap-x-3 gap-y-0.5 flex-wrap text-[11.5px] text-ink-faint font-mono">
-          {n.author && <span>{n.author}</span>}
-          <span>{n.date}</span>
-          {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
-          {images.length > 0 && <span className="text-blue">사진 {images.length}</span>}
-        </div>
+      {/* 모바일: 등록일·조회를 제목 아래로 */}
+      <div className="sm:hidden mt-1 flex gap-2.5 text-[11px] font-mono text-ink-faint">
+        <span>{n.date}</span>
+        {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
       </div>
     </div>
   );
+  const viewsCell = <div className="hidden sm:block text-right font-mono text-[12.5px] text-ink-faint">{n.views != null ? n.views.toLocaleString() : ""}</div>;
+  const dateCell = <div className="hidden sm:block text-right font-mono text-[12.5px] text-ink-faint">{n.date}</div>;
+
+  const summaryInner = (
+    <>
+      {no}
+      {thumbCell}
+      {titleCell}
+      {viewsCell}
+      {dateCell}
+    </>
+  );
 
   if (!hasDetail) {
-    return <div className="py-5 border-b border-line">{head}</div>;
+    return <div className={`${ROW_COLS} py-3 border-b border-line`}>{summaryInner}</div>;
   }
   return (
     <details className="group border-b border-line">
-      <summary className="py-5 cursor-pointer list-none marker:content-none">{head}</summary>
-      <div className="pb-6 pt-1">
+      <summary className={`${ROW_COLS} py-3 cursor-pointer list-none marker:content-none`}>{summaryInner}</summary>
+      <div className="pb-7 pt-2 sm:pl-[116px]">
         {n.body && <p className="mb-4 text-ink-soft text-[13.5px] leading-relaxed max-w-[80ch] whitespace-pre-line">{n.body}</p>}
         {images.length > 0 && <NewsImageGrid images={images} />}
+        <div className="mt-3 flex justify-center">
+          <NewsCollapseButton />
+        </div>
       </div>
     </details>
   );
@@ -135,7 +155,18 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           <p className="text-[12.5px] text-ink-faint mb-2">전체 {activeItems.length}건</p>
         )}
 
-        <div className="border-t border-line">
+        {/* 게시판 헤더 (PC) */}
+        {pageItems.length > 0 && (
+          <div className={`${ROW_COLS} hidden sm:grid py-2.5 border-t-2 border-ink/70 border-b border-line-strong text-[12.5px] font-bold text-ink-soft`}>
+            <span className="text-center">번호</span>
+            <span />
+            <span>제목</span>
+            <span className="text-right">조회</span>
+            <span className="text-right">등록일</span>
+          </div>
+        )}
+
+        <div className="border-t border-line sm:border-t-0">
           {pageItems.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
           ) : (
