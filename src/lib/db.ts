@@ -390,6 +390,8 @@ function createSchema(): Promise<void> {
     await ensureCladdingCert2018();
     await ensureDedupeCladdingPatents();
     await ensureHeatTreatmentPatents();
+    await ensureDeleteDupHeatPatents();
+    await ensureKnownPatentDates();
     await ensureKitaMembershipCert();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
@@ -549,6 +551,29 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 신규 열처리 특허증과 중복되는 기존 placeholder 항목(patent-12/15/18)을 한 번만 제거한다.
+async function ensureDeleteDupHeatPatents(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'dup_heat_patents_deleted'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`DELETE FROM patents WHERE image_url IN ('/images/patents/patent-12.jpg', '/images/patents/patent-15.jpg', '/images/patents/patent-18.jpg')`;
+  await sql`INSERT INTO settings (key, value) VALUES ('dup_heat_patents_deleted', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 등록일이 확실히 확인되는 특허 항목에 등록일을 지정해 등록일 최신순 정렬에 반영한다.
+async function ensureKnownPatentDates(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'known_patent_dates_set'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const map: { url: string; date: string }[] = [
+    { url: "/images/patents/ssw-china-cert.webp", date: "2025-12-09" },
+    { url: "/images/patents/ssw-china-cert-ko.webp", date: "2025-12-09" },
+    { url: "/images/patents/kr-cladding-2018.jpg", date: "2018-12-18" },
+  ];
+  for (const m of map) {
+    await sql`UPDATE patents SET registered_on = ${m.date} WHERE image_url = ${m.url} AND registered_on IS NULL`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('known_patent_dates_set', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 국내 열처리 관련 특허증 3건을 등록일과 함께 한 번만 추가한다(등록일 최신순으로 상단 노출).
