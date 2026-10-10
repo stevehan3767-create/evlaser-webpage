@@ -41,18 +41,11 @@ export default function Header() {
     <>
       <div className="bg-[#02070E] text-[#c9d6e8] text-[12.5px] border-b border-white/10">
         <div className="mx-auto max-w-[1240px] px-7 flex items-center justify-between h-[38px] gap-4">
+          {/* 메인 메뉴와 중복되지 않도록 빠른링크는 '대표이사 직속 소통센터' 하나만 눈에 띄게 둔다. */}
           <div className="flex gap-[18px]">
-            <Link href="/ceo-channel" className="font-bold text-[#ff7a90]">
+            <Link href="/ceo-channel" className="inline-flex items-center gap-1.5 font-bold text-white">
+              <span className="inline-block w-[7px] h-[7px] rounded-full bg-[#ff2d55]" />
               {tTop("ceo")}
-            </Link>
-            <Link href="/support" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              {tTop("support")}
-            </Link>
-            <Link href="/careers" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              {tTop("careers")}
-            </Link>
-            <Link href="/global" className="opacity-[.85] hover:opacity-100 hover:text-white">
-              {tTop("global")}
             </Link>
           </div>
           <div className="hidden sm:flex gap-0.5 bg-white/5 p-[3px] rounded-sm">
@@ -126,11 +119,6 @@ export default function Header() {
                 )}
               </div>
             ))}
-            <div className="relative">
-              <Link href="/ceo-channel" className="flex items-center h-[76px] px-2 font-semibold text-[13px] text-red whitespace-nowrap">
-                {t("ceo.label")}
-              </Link>
-            </div>
           </nav>
 
           <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1100px)]:ml-0">
