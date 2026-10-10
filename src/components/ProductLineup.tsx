@@ -44,13 +44,17 @@ export default async function ProductLineup() {
     }
   }
 
-  const lineupCards: FinderCard[] = lineupItems.map((item) => ({
-    itemKey: item.itemKey,
-    name: item.name,
-    icon: item.icon,
-    imageUrl: imageByKey.get(item.itemKey),
-    facetKeys: facetKeysByItem.get(item.itemKey) ?? {},
-  }));
+  const lineupCards: FinderCard[] = lineupItems.map((item) => {
+    const fk = facetKeysByItem.get(item.itemKey) ?? {};
+    return {
+      itemKey: item.itemKey,
+      name: item.name,
+      icon: item.icon,
+      imageUrl: imageByKey.get(item.itemKey),
+      facetKeys: fk,
+      count: Object.values(fk).reduce((s, arr) => s + arr.length, 0), // 연결된 기술+재료+산업 수
+    };
+  });
 
   // 값이 하나도 등록되지 않은 축은 필터에 표시하지 않는다.
   const facets: FacetGroup[] = facetData

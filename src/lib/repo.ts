@@ -1211,6 +1211,27 @@ export const contentLinkRepo = {
     `;
     return (rows as { from_key: string; to_key: string }[]).map((r) => ({ fromKey: r.from_key, toKey: r.to_key }));
   },
+  // 그룹의 각 카테고리(item_key)에 연결된 "정보" 개수를 Map으로 반환한다.
+  // - 기술/산업/재료: 해당 카테고리에 연결된 설비(lineup) 수
+  // - 설비 라인업(lineup): 이 설비가 연결된 카테고리(기술+산업+재료) 수
+  async countsForGroup(group: string): Promise<Record<string, number>> {
+    await ensureSchema();
+    const out: Record<string, number> = {};
+    if (group === "lineup") {
+      const rows = (await sql`
+        SELECT from_key AS k, COUNT(*)::int AS c
+        FROM content_item_links WHERE from_group = 'lineup' GROUP BY from_key
+      `) as { k: string; c: number }[];
+      for (const r of rows) out[r.k] = Number(r.c);
+    } else {
+      const rows = (await sql`
+        SELECT to_key AS k, COUNT(*)::int AS c
+        FROM content_item_links WHERE to_group = ${group} AND from_group = 'lineup' GROUP BY to_key
+      `) as { k: string; c: number }[];
+      for (const r of rows) out[r.k] = Number(r.c);
+    }
+    return out;
+  },
 };
 
 export async function seedContentItemsIfEmpty(

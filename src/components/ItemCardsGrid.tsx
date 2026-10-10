@@ -7,6 +7,7 @@ export interface ItemCard {
   name: string;
   icon: string;
   imageUrl?: string;
+  count?: number; // 이 카테고리에 연결된 정보(관련설비 등)의 개수. 지정 시 빨간 (NN) 뱃지로 표시
 }
 
 // Presentational-only (no data fetching), so it can be rendered from either a
@@ -50,6 +51,11 @@ export default function ItemCardsGrid({
             <div className="flex-1 px-3.5 py-3 flex items-center gap-2">
               <Icon name={item.icon as IconName} className={`w-5 h-5 flex-none ${active ? "text-white" : iconColorClass}`} strokeWidth={1.5} />
               <h3 className={`text-[13.5px] font-semibold leading-snug text-left ${active ? "text-white" : ""}`}>{item.name}</h3>
+              {item.count !== undefined && (
+                <span className={`ml-auto flex-none font-mono text-[12px] font-bold ${active ? "text-white" : "text-red"}`}>
+                  ({String(item.count).padStart(2, "0")})
+                </span>
+              )}
             </div>
           </Link>
         );

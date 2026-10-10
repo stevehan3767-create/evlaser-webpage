@@ -1,5 +1,5 @@
 import { contentGroups } from "@/lib/data";
-import { contentItemRepo, contentPageRepo, seedContentItemsIfEmpty } from "@/lib/repo";
+import { contentItemRepo, contentPageRepo, contentLinkRepo, seedContentItemsIfEmpty } from "@/lib/repo";
 import ItemCardsGrid from "./ItemCardsGrid";
 
 // Shared card grid for every static /products/[group] listing (기술종류별 /
@@ -18,9 +18,10 @@ export default async function GroupItemGrid({
 }) {
   const meta = contentGroups[group];
   await seedContentItemsIfEmpty(group, meta.itemSeeds);
-  const [items, pages] = await Promise.all([
+  const [items, pages, counts] = await Promise.all([
     contentItemRepo.listByGroup(group),
     contentPageRepo.listAll().catch(() => []),
+    contentLinkRepo.countsForGroup(group).catch(() => ({} as Record<string, number>)),
   ]);
   const imageByKey = new Map(
     pages.filter((p) => p.groupKey === group && p.imageUrl).map((p) => [p.itemKey, p.imageUrl as string])
@@ -31,6 +32,7 @@ export default async function GroupItemGrid({
     name: item.name,
     icon: item.icon,
     imageUrl: imageByKey.get(item.itemKey),
+    count: counts[item.itemKey] ?? 0,
   }));
 
   return (
