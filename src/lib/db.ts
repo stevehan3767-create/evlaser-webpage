@@ -387,6 +387,7 @@ function createSchema(): Promise<void> {
     await ensurePressInterview2025();
     await ensureSswChinaUsPatents();
     await ensureSswChinaCertKo();
+    await ensureCladdingCert2018();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
     await ensureMoveYtnResourceToPress();
@@ -545,6 +546,27 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 국내 특허증 "클래딩 장치"(제10-1932083호, 출원 2016.08.11)를 한 번만 추가한다.
+// 출원연도(2016)에 맞게 SSW(2023~) 그룹보다 앞, 기존 "클래딩장치" 항목 옆에 배치한다.
+async function ensureCladdingCert2018(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'cladding_cert_2018_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM patents`) as { c: number }[];
+  if (cnt[0].c === 0) return;
+  const url = "/images/patents/kr-cladding-2018.jpg";
+  const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${url} LIMIT 1`;
+  if (exists.length === 0) {
+    // 기존 "클래딩장치"(patent-07.jpg) 바로 뒤에 오도록 동일 sort_order로 삽입(최신 created_at → 뒤에 정렬).
+    const sib = (await sql`SELECT sort_order FROM patents WHERE image_url = '/images/patents/patent-07.jpg' LIMIT 1`) as { sort_order: number }[];
+    const order = sib.length ? sib[0].sort_order : 6;
+    await sql`
+      INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
+      VALUES (${newId()}, ${url}, '클래딩 장치 (특허 제10-1932083호)', ${null}, ${order}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('cladding_cert_2018_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 중국 특허증서의 한글 번역본(이미지 + 다운로드 PDF)을 중국어 원문 바로 옆에 한 번만 추가하고,

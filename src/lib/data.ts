@@ -648,6 +648,7 @@ export const patents = [
   { image: "/images/patents/patent-05.jpg", title: "레이저빔의 반사를 이용한 플라스틱 용접시스템" },
   { image: "/images/patents/patent-06.jpg", title: "타원궤적 추종형 레이저 융착장치" },
   { image: "/images/patents/patent-07.jpg", title: "클래딩장치" },
+  { image: "/images/patents/kr-cladding-2018.jpg", title: "클래딩 장치 (특허 제10-1932083호)" },
   { image: "/images/patents/patent-08.jpg", title: "지그 착탈식 레이저 융착장치" },
   { image: "/images/patents/patent-09.jpg", title: "레이저금속코팅장치" },
   { image: "/images/patents/patent-10.jpg", title: "대용량 배터리 케이스 레이저 융착장치" },
