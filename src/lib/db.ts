@@ -388,6 +388,7 @@ function createSchema(): Promise<void> {
     await ensureSswChinaUsPatents();
     await ensureSswChinaCertKo();
     await ensureCladdingCert2018();
+    await ensureDedupeCladdingPatents();
     await ensureKitaMembershipCert();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
@@ -547,6 +548,17 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 중복된 "클래딩" 특허 항목을 한 번만 정리한다.
+// - 기존 "클래딩장치"(patent-07, 제호 없음)는 실제 특허증과 겹치므로 제거.
+// - "클래딩 장치 (특허 제10-1932083호)"(kr-cladding-2018)는 1건만 남기고 중복 제거.
+async function ensureDedupeCladdingPatents(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'cladding_patents_deduped' `) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`DELETE FROM patents WHERE image_url = '/images/patents/patent-07.jpg'`;
+  await sql`DELETE FROM patents a USING patents b WHERE a.image_url = '/images/patents/kr-cladding-2018.jpg' AND b.image_url = '/images/patents/kr-cladding-2018.jpg' AND a.ctid > b.ctid`;
+  await sql`INSERT INTO settings (key, value) VALUES ('cladding_patents_deduped', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 한국무역협회(KITA) 회원증을 인증서 목록 맨 끝에 한 번만 추가한다.
