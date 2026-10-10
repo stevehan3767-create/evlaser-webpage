@@ -30,13 +30,17 @@ export async function saveNews(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const date = String(formData.get("date") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
+  const author = String(formData.get("author") ?? "").trim() || null;
+  const viewsRaw = String(formData.get("views") ?? "").replace(/[^\d]/g, "").trim();
+  const views = viewsRaw ? parseInt(viewsRaw, 10) : null;
+  const postNo = String(formData.get("postNo") ?? "").trim() || null;
   const staged = parseStagedImages(String(formData.get("images") ?? ""));
 
   if (!title || !date) return;
 
-  const newsId = id || (await newsRepo.create({ tag, title, date, body, published: true }));
+  const newsId = id || (await newsRepo.create({ tag, title, date, body, published: true, author, views, postNo }));
   if (id) {
-    await newsRepo.update(id, { tag, title, date, body });
+    await newsRepo.update(id, { tag, title, date, body, author, views, postNo });
   }
 
   if (staged.length > 0) {

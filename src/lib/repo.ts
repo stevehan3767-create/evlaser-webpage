@@ -31,6 +31,9 @@ export interface NewsRow {
   date: string;
   body: string;
   published: boolean;
+  author: string | null;
+  views: number | null;
+  postNo: string | null;
   createdAt: string;
 }
 
@@ -92,6 +95,9 @@ function rowToNews(r: Record<string, unknown>): NewsRow {
     date: r.date as string,
     body: (r.body as string) ?? "",
     published: Boolean(r.published),
+    author: (r.author as string) ?? null,
+    views: r.views == null ? null : Number(r.views),
+    postNo: (r.post_no as string) ?? null,
     createdAt: r.created_at as string,
   };
 }
@@ -619,24 +625,26 @@ export const resourceRepo = {
 export const newsRepo = {
   async list(onlyPublished = false): Promise<NewsRow[]> {
     await ensureSchema();
+    // 공지(post_no='공지')를 최상단에, 그 외는 등록일 최신순.
     const rows = onlyPublished
-      ? await sql`SELECT * FROM news_items WHERE published = true ORDER BY date DESC`
-      : await sql`SELECT * FROM news_items ORDER BY date DESC`;
+      ? await sql`SELECT * FROM news_items WHERE published = true ORDER BY (post_no = '공지') DESC NULLS LAST, date DESC`
+      : await sql`SELECT * FROM news_items ORDER BY (post_no = '공지') DESC NULLS LAST, date DESC`;
     return (rows as Record<string, unknown>[]).map(rowToNews);
   },
-  async create(input: { tag: string; title: string; date: string; body?: string; published: boolean }): Promise<string> {
+  async create(input: { tag: string; title: string; date: string; body?: string; published: boolean; author?: string | null; views?: number | null; postNo?: string | null }): Promise<string> {
     await ensureSchema();
     const id = newId();
     await sql`
-      INSERT INTO news_items (id, tag, title, date, body, published, created_at)
-      VALUES (${id}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${new Date().toISOString()})
+      INSERT INTO news_items (id, tag, title, date, body, published, author, views, post_no, created_at)
+      VALUES (${id}, ${input.tag}, ${input.title}, ${input.date}, ${input.body ?? ""}, ${input.published}, ${input.author ?? null}, ${input.views ?? null}, ${input.postNo ?? null}, ${new Date().toISOString()})
     `;
     return id;
   },
-  async update(id: string, input: { tag: string; title: string; date: string; body?: string }): Promise<void> {
+  async update(id: string, input: { tag: string; title: string; date: string; body?: string; author?: string | null; views?: number | null; postNo?: string | null }): Promise<void> {
     await ensureSchema();
     await sql`
-      UPDATE news_items SET tag = ${input.tag}, title = ${input.title}, date = ${input.date}, body = ${input.body ?? ""}
+      UPDATE news_items SET tag = ${input.tag}, title = ${input.title}, date = ${input.date}, body = ${input.body ?? ""},
+        author = ${input.author ?? null}, views = ${input.views ?? null}, post_no = ${input.postNo ?? null}
       WHERE id = ${id}
     `;
   },

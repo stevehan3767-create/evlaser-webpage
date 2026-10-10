@@ -47,6 +47,11 @@ export default async function AdminNewsPage({ searchParams }: { searchParams: Pr
             className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm"
           />
         </div>
+        <div className="grid grid-cols-3 gap-3.5">
+          <input name="postNo" placeholder="번호 (선택, 예: 120 또는 공지)" defaultValue={editing?.postNo ?? ""} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+          <input name="author" placeholder="작성자 (선택)" defaultValue={editing?.author ?? ""} className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+          <input name="views" placeholder="조회수 (선택)" defaultValue={editing?.views ?? ""} inputMode="numeric" className="border border-line-strong px-3 py-2.5 text-[13.5px] rounded-sm" />
+        </div>
         <textarea
           name="body"
           placeholder="본문 (선택) — 줄바꿈이 그대로 표시됩니다."

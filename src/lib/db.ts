@@ -1,5 +1,6 @@
 import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import { techPageSeeds, specOptionDefaults, specOptionLegacyDefaults } from "./data";
+import tidingsPosts from "./tidings-data.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -107,6 +108,11 @@ function createSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+
+    // 구 홈페이지 게시판 이관용: 작성자/조회수/원글번호(공지 포함) 보존.
+    await sql`ALTER TABLE news_items ADD COLUMN IF NOT EXISTS author TEXT`;
+    await sql`ALTER TABLE news_items ADD COLUMN IF NOT EXISTS views INT`;
+    await sql`ALTER TABLE news_items ADD COLUMN IF NOT EXISTS post_no TEXT`;
 
     // 뉴스 게시글에 첨부하는 사진(전시회 품목 사진 등). caption=제목, content=부가설명.
     await sql`
@@ -393,6 +399,7 @@ function createSchema(): Promise<void> {
     await ensureDeleteDupHeatPatents();
     await ensureKnownPatentDates();
     await ensureKitaMembershipCert();
+    await ensureTidingsImport();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
     await ensureMoveYtnResourceToPress();
@@ -608,6 +615,43 @@ async function ensureDedupeCladdingPatents(): Promise<void> {
   await sql`DELETE FROM patents WHERE image_url = '/images/patents/patent-07.jpg'`;
   await sql`DELETE FROM patents a USING patents b WHERE a.image_url = '/images/patents/kr-cladding-2018.jpg' AND b.image_url = '/images/patents/kr-cladding-2018.jpg' AND a.ctid > b.ctid`;
   await sql`INSERT INTO settings (key, value) VALUES ('cladding_patents_deduped', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 구 홈페이지(evlaser.co.kr) 사내소식 게시글 전체를 뉴스·소식 > 회사소식으로 한 번만 이관한다.
+// 번호·작성자·조회수·등록일·본문·이미지를 그대로 보존. 성능을 위해 UNNEST 다중행 삽입 사용.
+async function ensureTidingsImport(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tidings_imported'`) as { value: string }[];
+  if (flag.length > 0) return;
+
+  type TPost = { postNo: string; title: string; date: string; author: string | null; views: number | null; body: string; images: string[] };
+  const posts = tidingsPosts as TPost[];
+  if (!posts.length) return;
+
+  const ids: string[] = [], tags: string[] = [], titles: string[] = [], dates: string[] = [];
+  const bodies: string[] = [], authors: (string | null)[] = [], views: (number | null)[] = [], postNos: (string | null)[] = [];
+  const imgIds: string[] = [], imgNews: string[] = [], imgUrls: string[] = [], imgSort: number[] = [];
+
+  for (const p of posts) {
+    const id = newId();
+    ids.push(id); tags.push("회사소식"); titles.push(p.title); dates.push(p.date);
+    bodies.push(p.body ?? ""); authors.push(p.author ?? null); views.push(p.views ?? null); postNos.push(p.postNo || null);
+    p.images.forEach((url, i) => { imgIds.push(newId()); imgNews.push(id); imgUrls.push(url); imgSort.push(i); });
+  }
+
+  await sql`
+    INSERT INTO news_items (id, tag, title, date, body, author, views, post_no)
+    SELECT * FROM UNNEST(
+      ${ids}::text[], ${tags}::text[], ${titles}::text[], ${dates}::text[],
+      ${bodies}::text[], ${authors}::text[], ${views}::int[], ${postNos}::text[]
+    )
+  `;
+  if (imgIds.length) {
+    await sql`
+      INSERT INTO news_images (id, news_id, url, sort_order)
+      SELECT * FROM UNNEST(${imgIds}::text[], ${imgNews}::text[], ${imgUrls}::text[], ${imgSort}::int[])
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 한국무역협회(KITA) 회원증을 인증서 목록 맨 끝에 한 번만 추가한다.
