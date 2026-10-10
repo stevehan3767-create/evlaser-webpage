@@ -72,20 +72,20 @@ export default function Header() {
       </div>
 
       <header className="sticky top-0 z-50 bg-surface border-b border-line">
-        <div className="mx-auto max-w-[1240px] px-7 flex items-center gap-8 h-[76px]">
+        <div className="mx-auto max-w-[1240px] px-7 flex items-center gap-4 h-[76px]">
           <Link href="/" aria-label="EV Laser home" className="flex items-center flex-none text-ink">
             <Logo className="w-[150px] sm:w-[168px]" />
-            <span className="hidden md:inline-block font-mono text-[11px] font-bold tracking-wider text-red pl-3.5 ml-3.5 border-l border-line-strong whitespace-nowrap">
+            <span className="hidden [@media(min-width:1280px)]:inline-block font-mono text-[11px] font-bold tracking-wider text-red pl-3.5 ml-3.5 border-l border-line-strong whitespace-nowrap">
               SINCE 2002
             </span>
           </Link>
 
-          <nav aria-label="Primary" className="hidden [@media(min-width:1320px)]:flex items-stretch flex-1 min-w-0">
+          <nav aria-label="Primary" className="hidden [@media(min-width:1100px)]:flex items-stretch flex-1 min-w-0">
             {NAV_SECTIONS.map(({ section, items, href }) => (
               <div key={section} className="relative group">
                 <Link
                   href={href}
-                  className="flex items-center gap-1 h-[76px] px-2.5 font-semibold text-[13.6px] text-ink whitespace-nowrap border-b-[2.5px] border-transparent group-hover:text-blue group-hover:border-red"
+                  className="flex items-center gap-1 h-[76px] px-2 font-semibold text-[13px] text-ink whitespace-nowrap border-b-[2.5px] border-transparent group-hover:text-blue group-hover:border-red"
                 >
                   {t(`${section}.label`)}
                   <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 transition-transform group-hover:rotate-180">
@@ -106,17 +106,17 @@ export default function Header() {
               </div>
             ))}
             <div className="relative">
-              <Link href="/ceo-channel" className="flex items-center h-[76px] px-2.5 font-semibold text-[13.6px] text-red whitespace-nowrap">
+              <Link href="/ceo-channel" className="flex items-center h-[76px] px-2 font-semibold text-[13px] text-red whitespace-nowrap">
                 {t("ceo.label")}
               </Link>
             </div>
           </nav>
 
-          <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1320px)]:ml-0">
+          <div className="flex items-center gap-1.5 relative flex-none ml-auto [@media(min-width:1100px)]:ml-0">
             <button
               aria-label="Menu"
               onClick={() => setDrawerOpen(true)}
-              className="flex [@media(min-width:1320px)]:hidden w-[38px] h-[38px] items-center justify-center"
+              className="flex [@media(min-width:1100px)]:hidden w-[38px] h-[38px] items-center justify-center"
             >
               <svg viewBox="0 0 24 24" className="w-[22px] h-[22px]" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <line x1="4" y1="7" x2="20" y2="7" />
