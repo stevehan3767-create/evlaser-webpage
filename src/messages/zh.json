@@ -137,7 +137,7 @@
     "metalWelding": "金属·铝·铜焊接",
     "glassWelding": "玻璃焊接",
     "cutting": "激光切割",
-    "marking": "激光打标(雕刻·印刷)",
+    "marking": "激光打标(印刷·雕刻·刻印)",
     "cleaning": "激光清洗",
     "precisionMachining": "激光精密(微)加工",
     "drilling": "激光钻孔",
@@ -147,7 +147,7 @@
     "medical": "医疗器械",
     "safety": "激光安全",
     "other": "其他",
-    "etching": "激光蚀刻"
+    "etching": "激光蚀刻(烧蚀)"
   },
   "sitemap": {
     "eyebrow": "SITE STRUCTURE",

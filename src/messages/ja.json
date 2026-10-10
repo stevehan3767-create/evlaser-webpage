@@ -137,7 +137,7 @@
     "metalWelding": "金属・アルミ・銅溶接",
     "glassWelding": "ガラス溶接",
     "cutting": "レーザー切断",
-    "marking": "レーザーマーキング(彫刻・印刷)",
+    "marking": "レーザーマーキング(印刷・彫刻・刻印)",
     "cleaning": "レーザークリーニング",
     "precisionMachining": "レーザー精密(微細)加工",
     "drilling": "レーザードリリング",
@@ -147,7 +147,7 @@
     "medical": "医療機器",
     "safety": "レーザー安全",
     "other": "その他",
-    "etching": "レーザーエッチング"
+    "etching": "レーザーエッチング(アブレーション)"
   },
   "sitemap": {
     "eyebrow": "SITE STRUCTURE",

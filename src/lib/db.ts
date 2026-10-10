@@ -365,6 +365,10 @@ function createSchema(): Promise<void> {
     // 이미 시딩된 환경에서는 기본값인 'naver'로 남아있을 수 있어 바로잡는다.
     await sql`UPDATE offices SET map_provider = 'google' WHERE name LIKE '%쑤저우%' AND map_provider <> 'google'`;
 
+    // 기술종류별 항목명 변경(이미 시딩된 환경 보정) — 관리자가 바꾸지 않은 기본값만 갱신.
+    await sql`UPDATE content_items SET name = '레이저마킹(인쇄·조각·각인)' WHERE group_key = 'tech' AND item_key = 'marking' AND name = '레이저마킹(조각·인쇄)'`;
+    await sql`UPDATE content_items SET name = '레이저에칭(어블레이션)' WHERE group_key = 'tech' AND item_key = 'etching' AND name = '레이저에칭(각인)'`;
+
     // 언론보도·방송 카테고리를 "언론·방송"(media)으로 통합.
     await sql`UPDATE press_items SET category = 'media' WHERE category = 'broadcast'`;
     // SBS Biz <오굿데이> 방송 썸네일(캡처 이미지) 지정 — 썸네일 없이 시딩된 환경 보정.

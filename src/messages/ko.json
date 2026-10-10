@@ -137,7 +137,7 @@
     "metalWelding": "금속·알루미늄·동 용접",
     "glassWelding": "유리 용접",
     "cutting": "레이저 절단",
-    "marking": "레이저마킹(조각·인쇄)",
+    "marking": "레이저마킹(인쇄·조각·각인)",
     "cleaning": "레이저 클리닝(세정)",
     "precisionMachining": "레이저정밀(미세)가공",
     "drilling": "레이저드릴링",
@@ -147,7 +147,7 @@
     "medical": "의료기기",
     "safety": "레이저안전",
     "other": "기타",
-    "etching": "레이저에칭(각인)"
+    "etching": "레이저에칭(어블레이션)"
   },
   "sitemap": {
     "eyebrow": "SITE STRUCTURE",

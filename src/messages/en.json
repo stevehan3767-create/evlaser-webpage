@@ -137,7 +137,7 @@
     "metalWelding": "Metal / Aluminum / Copper Welding",
     "glassWelding": "Glass Welding",
     "cutting": "Laser Cutting",
-    "marking": "Laser Marking (Engraving/Printing)",
+    "marking": "Laser Marking (Printing/Engraving/Marking)",
     "cleaning": "Laser Cleaning",
     "precisionMachining": "Precision (Micro) Machining",
     "drilling": "Laser Drilling",
@@ -147,7 +147,7 @@
     "medical": "Medical Devices",
     "safety": "Laser Safety",
     "other": "Other",
-    "etching": "Laser Etching"
+    "etching": "Laser Etching (Ablation)"
   },
   "sitemap": {
     "eyebrow": "SITE STRUCTURE",
