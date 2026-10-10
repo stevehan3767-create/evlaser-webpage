@@ -29,11 +29,6 @@ function ThumbWrap({ href, children }: { href: string | null; children: ReactNod
   );
 }
 
-function excerpt(body: string, max = 180): string {
-  const clean = body.replace(/\s+/g, " ").trim();
-  return clean.length > max ? clean.slice(0, max) + "…" : clean;
-}
-
 function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }) {
   return (
     <article className="py-7 border-b border-line">
@@ -81,7 +76,20 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
 
           <h3 className="mt-2 text-[16px] sm:text-[17px] font-bold leading-snug text-ink">{item.title}</h3>
 
-          {item.body && <p className="mt-2 text-[13.5px] text-ink-soft leading-relaxed">{excerpt(item.body)}</p>}
+          {/* 본문: 클릭 전 3줄 미리보기 → 클릭 시 같은 본문이 그대로 펼쳐짐(중복 없음) */}
+          {item.body && (
+            <details className="group mt-2">
+              <summary className="list-none cursor-pointer marker:content-none [&::-webkit-details-marker]:hidden">
+                <span className="block whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] line-clamp-3 group-open:line-clamp-none">
+                  {item.body}
+                </span>
+                <span className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-bold text-blue">
+                  <span className="group-open:hidden">전문 보기 ▾</span>
+                  <span className="hidden group-open:inline">접기 ▴</span>
+                </span>
+              </summary>
+            </details>
+          )}
 
           <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
             {item.linkUrl && (
@@ -109,19 +117,6 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
               </a>
             )}
           </div>
-
-          {/* 전문(검색 가능) — 펼쳐 보기 */}
-          {item.body && (
-            <details className="group mt-3">
-              <summary className="cursor-pointer list-none text-[12.5px] font-bold text-blue inline-flex items-center gap-1">
-                <span className="group-open:hidden">전문 보기 ▾</span>
-                <span className="hidden group-open:inline">접기 ▴</span>
-              </summary>
-              <div className="mt-3 whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] border-t border-line pt-4">
-                {item.body}
-              </div>
-            </details>
-          )}
         </div>
       </div>
     </article>
