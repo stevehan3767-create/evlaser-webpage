@@ -1,1 +1,422 @@
-[]
+[
+  {
+    "no": "121",
+    "title": "레이저 용접 관련 문의",
+    "author": "이*현 책임",
+    "date": "2026.09.03",
+    "status": "answered"
+  },
+  {
+    "no": "119",
+    "title": "레이저",
+    "author": "김*헌 주임연구원",
+    "date": "2026.09.01",
+    "status": "answered"
+  },
+  {
+    "no": "117",
+    "title": "국제표준(ANSI)에 따른 레이저 안전설비설치 견적문의",
+    "author": "박**리",
+    "date": "2026.08.12",
+    "status": "answered"
+  },
+  {
+    "no": "115",
+    "title": "투과율 측정기 구매 문의",
+    "author": "방*형",
+    "date": "2026.08.04",
+    "status": "answered"
+  },
+  {
+    "no": "113",
+    "title": "견적 요청서",
+    "author": "최*호",
+    "date": "2026.07.16",
+    "status": "answered"
+  },
+  {
+    "no": "111",
+    "title": "레이저 컷팅 설비 문의",
+    "author": "박*찬",
+    "date": "2026.07.16",
+    "status": "answered"
+  },
+  {
+    "no": "109",
+    "title": "PET 부직포 합지",
+    "author": "이*희",
+    "date": "2026.07.09",
+    "status": "answered"
+  },
+  {
+    "no": "107",
+    "title": "레이저 용접관련",
+    "author": "김*길",
+    "date": "2026.06.16",
+    "status": "answered"
+  },
+  {
+    "no": "105",
+    "title": "마킹 솔루션 문의",
+    "author": "이*종",
+    "date": "2026.06.15",
+    "status": "answered"
+  },
+  {
+    "no": "103",
+    "title": "레이저 안전 솔루션 관련 문의",
+    "author": "김*혁",
+    "date": "2026.06.08",
+    "status": "answered"
+  },
+  {
+    "no": "101",
+    "title": "레이저 융착 문의드립니다.",
+    "author": "김*수",
+    "date": "2026.04.16",
+    "status": "answered"
+  },
+  {
+    "no": "99",
+    "title": "quartz 0.13mmT 에 홀 가공 문의드립니다.",
+    "author": "고*일",
+    "date": "2026.04.10",
+    "status": "answered"
+  },
+  {
+    "no": "97",
+    "title": "레이저 검사시스템 문의",
+    "author": "김*현",
+    "date": "2026.03.24",
+    "status": "answered"
+  },
+  {
+    "no": "95",
+    "title": "레이저 에칭 설비 제작 문의 件",
+    "author": "김*연",
+    "date": "2026.03.17",
+    "status": "answered"
+  },
+  {
+    "no": "93",
+    "title": "소형 스테인레스 플러그 레이저 용접 문의",
+    "author": "조*혁",
+    "date": "2026.03.13",
+    "status": "answered"
+  },
+  {
+    "no": "91",
+    "title": "Fiber Laser 100W",
+    "author": "S***h",
+    "date": "2026.02.23",
+    "status": "answered"
+  },
+  {
+    "no": "89",
+    "title": "레이저 크레딩 관련 문의",
+    "author": "김*욱",
+    "date": "2026.01.26",
+    "status": "answered"
+  },
+  {
+    "no": "87",
+    "title": "Si-PC 융착관련 문의",
+    "author": "이*승",
+    "date": "2026.01.21",
+    "status": "answered"
+  },
+  {
+    "no": "85",
+    "title": "레이져 검사 장비 제작 문의 件",
+    "author": "심*종",
+    "date": "2026.01.13",
+    "status": "answered"
+  },
+  {
+    "no": "83",
+    "title": "PBT플라스틱접합문의",
+    "author": "김*문",
+    "date": "2025.12.30",
+    "status": "answered"
+  },
+  {
+    "no": "80",
+    "title": "융착 가능 여부 문의",
+    "author": "장*빈",
+    "date": "2025.12.18",
+    "status": "answered"
+  },
+  {
+    "no": "78",
+    "title": "제품문의",
+    "author": "김*호",
+    "date": "2025.12.11",
+    "status": "answered"
+  },
+  {
+    "no": "76",
+    "title": "kW급 레이저 사용에 대한 안전 시스템(보안경 및 부착형 필터 등)에 대해 문의드립니...",
+    "author": "전*주",
+    "date": "2025.12.02",
+    "status": "answered"
+  },
+  {
+    "no": "74",
+    "title": "서스 경사로 보수 관련 문의드립니다.",
+    "author": "박*석",
+    "date": "2025.11.28",
+    "status": "answered"
+  },
+  {
+    "no": "72",
+    "title": "ETM 31 레이저 투과율 측정기 문의 건",
+    "author": "장*영",
+    "date": "2025.11.03",
+    "status": "answered"
+  },
+  {
+    "no": "70",
+    "title": "플라스틱 레이저 용접 설비 문의 건",
+    "author": "김*호",
+    "date": "2025.10.23",
+    "status": "answered"
+  },
+  {
+    "no": "68",
+    "title": "블루-IR 하이브리드 레이저 용접 시스템 검토가능여부 문의",
+    "author": "최*환",
+    "date": "2025.10.20",
+    "status": "answered"
+  },
+  {
+    "no": "66",
+    "title": "금속 레이저 용접 관련 문의사항",
+    "author": "이*협",
+    "date": "2025.10.16",
+    "status": "answered"
+  },
+  {
+    "no": "64",
+    "title": "레이저 클리너(아노다이징)",
+    "author": "정*태",
+    "date": "2025.10.02",
+    "status": "answered"
+  },
+  {
+    "no": "62",
+    "title": "레이저 융착 관련 문의 건",
+    "author": "이*용",
+    "date": "2025.09.25",
+    "status": "answered"
+  },
+  {
+    "no": "60",
+    "title": "레이저 가공 견적 문의",
+    "author": "이*주",
+    "date": "2025.09.22",
+    "status": "answered"
+  },
+  {
+    "no": "58",
+    "title": "안녕하세요 제품 사양에 대하여 문의 드립니다.",
+    "author": "이*섭",
+    "date": "2025.09.10",
+    "status": "answered"
+  },
+  {
+    "no": "56",
+    "title": "레이저 투과율 측정 문의",
+    "author": "정*구",
+    "date": "2025.09.09",
+    "status": "answered"
+  },
+  {
+    "no": "54",
+    "title": "레이저 융착 문의",
+    "author": "신*용",
+    "date": "2025.09.04",
+    "status": "answered"
+  },
+  {
+    "no": "52",
+    "title": "레이저 융착기 문의",
+    "author": "조*증",
+    "date": "2025.09.02",
+    "status": "answered"
+  },
+  {
+    "no": "50",
+    "title": "레이저 플라스틱 용접 공법문의드립니다.",
+    "author": "문*식",
+    "date": "2025.09.01",
+    "status": "answered"
+  },
+  {
+    "no": "48",
+    "title": "제작 가능 여부 및 견적 의뢰",
+    "author": "강*주",
+    "date": "2025.08.25",
+    "status": "answered"
+  },
+  {
+    "no": "46",
+    "title": "레이저 선정 문의의 건",
+    "author": "김*영",
+    "date": "2025.08.18",
+    "status": "answered"
+  },
+  {
+    "no": "44",
+    "title": "구매 가능 문의드립니다",
+    "author": "김*진",
+    "date": "2025.08.12",
+    "status": "answered"
+  },
+  {
+    "no": "42",
+    "title": "ETM-31 장비 문의 건.",
+    "author": "박*진",
+    "date": "2025.08.08",
+    "status": "answered"
+  },
+  {
+    "no": "40",
+    "title": "ELPW-SS1 자가조치방법 문의",
+    "author": "한*별",
+    "date": "2025.08.01",
+    "status": "answered"
+  },
+  {
+    "no": "38",
+    "title": "ETM-31 Technical datasheet 문의",
+    "author": "김*진",
+    "date": "2025.07.30",
+    "status": "answered"
+  },
+  {
+    "no": "36",
+    "title": "[ETM-series 제품 문의] grade별 정보 및 레이저 파장 조절 가능성",
+    "author": "김*찬",
+    "date": "2025.07.28",
+    "status": "answered"
+  },
+  {
+    "no": "34",
+    "title": "Warning 코드",
+    "author": "김*일",
+    "date": "2025.07.25",
+    "status": "answered"
+  },
+  {
+    "no": "32",
+    "title": "레이져용접기 문의",
+    "author": "정*일",
+    "date": "2025.07.22",
+    "status": "answered"
+  },
+  {
+    "no": "30",
+    "title": "플라스틱 용접 가능성 및 후가공 문의",
+    "author": "이*용",
+    "date": "2025.07.17",
+    "status": "answered"
+  },
+  {
+    "no": "28",
+    "title": "레이저 커튼 관련 문의드립니다.",
+    "author": "노*주",
+    "date": "2025.07.16",
+    "status": "answered"
+  },
+  {
+    "no": "26",
+    "title": "기술 문의 드립니다.",
+    "author": "김*호",
+    "date": "2025.07.01",
+    "status": "answered"
+  },
+  {
+    "no": "24",
+    "title": "태양전지 레이저 커팅",
+    "author": "김*성",
+    "date": "2025.06.30",
+    "status": "answered"
+  },
+  {
+    "no": "22",
+    "title": "제품 사양 스펙과 AS가능여부 여쭙겠습니다",
+    "author": "임*환",
+    "date": "2025.06.17",
+    "status": "answered"
+  },
+  {
+    "no": "20",
+    "title": "얇은 플라스틱 용접 가능 유무 확인 요청",
+    "author": "김*른",
+    "date": "2025.06.05",
+    "status": "answered"
+  },
+  {
+    "no": "18",
+    "title": "레이저 점검 요청 件",
+    "author": "손*석",
+    "date": "2025.05.29",
+    "status": "answered"
+  },
+  {
+    "no": "16",
+    "title": "레이저 플라스틱 용접 설비 도입 관련 미팅 요청 드립니다.",
+    "author": "심*우",
+    "date": "2025.05.19",
+    "status": "answered"
+  },
+  {
+    "no": "14",
+    "title": "레이저 플라스틱 용접 시스템 문의",
+    "author": "조*구",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "12",
+    "title": "레이저 융착 샘플 테스트 문의 드립니다",
+    "author": "권*혁",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "10",
+    "title": "신규 설비 도입위한 회사 방문 요청의 건",
+    "author": "심*우",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "8",
+    "title": "ETM-31 투과율측정기 견적 부탁 드립니다.",
+    "author": "박*환",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "6",
+    "title": "자동화 설비 도입건으로 문의 드립니다.",
+    "author": "정*철",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "4",
+    "title": "실험 문의 드립니다.",
+    "author": "박*현",
+    "date": "2025.04.17",
+    "status": "answered"
+  },
+  {
+    "no": "2",
+    "title": "플라스틱용접 관련 문의 드립니다.",
+    "author": "정*숙",
+    "date": "2025.03.19",
+    "status": "answered"
+  }
+]
