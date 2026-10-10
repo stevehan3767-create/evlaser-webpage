@@ -61,21 +61,31 @@ export default async function CompanyPatentsPage() {
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {patentList.map((p) => (
-            <a
-              key={p.id}
-              href={p.imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block border border-line-strong bg-surface hover:border-blue transition-colors"
-            >
-              <div className="relative aspect-[248/371] bg-surface-alt">
-                <Image src={p.imageUrl} alt={p.title} fill sizes="200px" className="object-contain" />
-              </div>
+            <div key={p.id} className="border border-line-strong bg-surface hover:border-blue transition-colors">
+              <a href={p.imageUrl} target="_blank" rel="noopener noreferrer" className="block">
+                <div className="relative aspect-[248/371] bg-surface-alt">
+                  <Image src={p.imageUrl} alt={p.title} fill sizes="200px" className="object-contain" />
+                </div>
+              </a>
               <div className="p-2 text-center">
                 <p className="text-[11px] text-ink-soft leading-snug line-clamp-3">{p.title}</p>
                 {p.registeredOn && <p className="text-[10.5px] text-ink-faint font-mono mt-0.5">{p.registeredOn}</p>}
+                {p.fileUrl && (
+                  <a
+                    href={p.fileUrl}
+                    download={p.fileName ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1.5 inline-flex items-center gap-1 text-[10.5px] font-bold text-blue hover:text-red"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" />
+                    </svg>
+                    한글 번역본 PDF
+                  </a>
+                )}
               </div>
-            </a>
+            </div>
           ))}
         </div>
       </div>

@@ -360,6 +360,8 @@ export interface PatentRow {
   imageUrl: string;
   title: string;
   registeredOn: string | null; // YYYY-MM-DD (등록일)
+  fileUrl: string | null; // 선택: 다운로드용 파일(예: 한글 번역본 PDF)
+  fileName: string | null;
   sortOrder: number;
   createdAt: string;
 }
@@ -371,6 +373,8 @@ function rowToPatent(r: Record<string, unknown>): PatentRow {
     imageUrl: r.image_url as string,
     title: r.title as string,
     registeredOn: reg ? String(reg).slice(0, 10) : null,
+    fileUrl: (r.file_url as string) ?? null,
+    fileName: (r.file_name as string) ?? null,
     sortOrder: Number(r.sort_order ?? 0),
     createdAt: r.created_at as string,
   };
@@ -383,16 +387,16 @@ export const patentRepo = {
     const rows = await sql`SELECT * FROM patents ORDER BY registered_on DESC NULLS LAST, sort_order ASC, created_at ASC`;
     return (rows as Record<string, unknown>[]).map(rowToPatent);
   },
-  async create(input: { imageUrl: string; title: string; registeredOn?: string | null; sortOrder?: number }): Promise<void> {
+  async create(input: { imageUrl: string; title: string; registeredOn?: string | null; fileUrl?: string | null; fileName?: string | null; sortOrder?: number }): Promise<void> {
     await ensureSchema();
     await sql`
-      INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
-      VALUES (${newId()}, ${input.imageUrl}, ${input.title}, ${input.registeredOn || null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+      INSERT INTO patents (id, image_url, title, registered_on, file_url, file_name, sort_order, created_at)
+      VALUES (${newId()}, ${input.imageUrl}, ${input.title}, ${input.registeredOn || null}, ${input.fileUrl || null}, ${input.fileName || null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
     `;
   },
-  async update(id: string, input: { imageUrl: string; title: string; registeredOn?: string | null }): Promise<void> {
+  async update(id: string, input: { imageUrl: string; title: string; registeredOn?: string | null; fileUrl?: string | null; fileName?: string | null }): Promise<void> {
     await ensureSchema();
-    await sql`UPDATE patents SET image_url = ${input.imageUrl}, title = ${input.title}, registered_on = ${input.registeredOn || null} WHERE id = ${id}`;
+    await sql`UPDATE patents SET image_url = ${input.imageUrl}, title = ${input.title}, registered_on = ${input.registeredOn || null}, file_url = ${input.fileUrl || null}, file_name = ${input.fileName || null} WHERE id = ${id}`;
   },
   async remove(id: string): Promise<void> {
     await ensureSchema();
@@ -400,12 +404,12 @@ export const patentRepo = {
   },
 };
 
-export async function seedPatentsIfEmpty(items: { image: string; title: string }[]): Promise<void> {
+export async function seedPatentsIfEmpty(items: { image: string; title: string; file?: string; fileName?: string }[]): Promise<void> {
   await ensureSchema();
   const rows = await sql`SELECT COUNT(*)::int AS c FROM patents`;
   if ((rows[0] as { c: number }).c > 0) return;
   for (let i = 0; i < items.length; i++) {
-    await patentRepo.create({ imageUrl: items[i].image, title: items[i].title, registeredOn: null, sortOrder: i });
+    await patentRepo.create({ imageUrl: items[i].image, title: items[i].title, registeredOn: null, fileUrl: items[i].file ?? null, fileName: items[i].fileName ?? null, sortOrder: i });
   }
 }
 

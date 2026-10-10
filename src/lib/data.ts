@@ -665,6 +665,7 @@ export const patents = [
   { image: "/images/patents/patent-22.jpg", title: "레이저 플라스틱 용접시스템" },
   { image: "/images/patents/patent-23.jpg", title: "플라스틱 레이저용접의 클램핑 방법" },
   { image: "/images/patents/ssw-china-cert.webp", title: "Super Scan Welding기술 중국특허등록" },
+  { image: "/images/patents/ssw-china-cert-ko.webp", title: "Super Scan Welding기술 중국특허등록 (한글 번역본)", file: "/patents/ssw-china-cert-ko.pdf", fileName: "SSW_중국특허증_한글번역본.pdf" },
   { image: "/images/patents/ssw-us-patent.webp", title: "Super Scan Welding기술 미국특허 출원" },
 ];
 

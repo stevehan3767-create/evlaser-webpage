@@ -305,6 +305,9 @@ function createSchema(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    // 선택: 특허 항목에 다운로드 파일(예: 한글 번역본 PDF) 첨부.
+    await sql`ALTER TABLE patents ADD COLUMN IF NOT EXISTS file_url TEXT`;
+    await sql`ALTER TABLE patents ADD COLUMN IF NOT EXISTS file_name TEXT`;
 
     // 사양서 옵션 마스터 목록. 관리자가 등록/삭제/정렬하며, 각 설비에서
     // 체크 선택한 항목이 사양서의 "옵션(Options)" 행으로 추가된다.
@@ -383,6 +386,7 @@ function createSchema(): Promise<void> {
     await ensureBusinessRegistrationCert();
     await ensurePressInterview2025();
     await ensureSswChinaUsPatents();
+    await ensureSswChinaCertKo();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
     await ensureMoveYtnResourceToPress();
@@ -541,6 +545,31 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 중국 특허증서의 한글 번역본(이미지 + 다운로드 PDF)을 중국어 원문 바로 옆에 한 번만 추가하고,
+// SSW 특허 3건(중국 원문 → 한글본 → 미국)을 특허 목록 맨 끝에 이 순서로 정렬한다.
+async function ensureSswChinaCertKo(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ssw_china_cert_ko_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM patents`) as { c: number }[];
+  if (cnt[0].c === 0) return;
+  const koUrl = "/images/patents/ssw-china-cert-ko.webp";
+  const pdf = "/patents/ssw-china-cert-ko.pdf";
+  const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${koUrl} LIMIT 1`;
+  if (exists.length === 0) {
+    await sql`
+      INSERT INTO patents (id, image_url, title, registered_on, file_url, file_name, sort_order, created_at)
+      VALUES (${newId()}, ${koUrl}, 'Super Scan Welding기술 중국특허등록 (한글 번역본)', ${null}, ${pdf}, 'SSW_중국특허증_한글번역본.pdf', 9002, ${new Date().toISOString()})
+    `;
+  } else {
+    await sql`UPDATE patents SET file_url = ${pdf}, file_name = 'SSW_중국특허증_한글번역본.pdf' WHERE image_url = ${koUrl}`;
+  }
+  // 중국 원문 → 한글본 → 미국 순서로 맨 끝에 배치.
+  await sql`UPDATE patents SET sort_order = 9001 WHERE image_url = '/images/patents/ssw-china-cert.webp'`;
+  await sql`UPDATE patents SET sort_order = 9002 WHERE image_url = ${koUrl}`;
+  await sql`UPDATE patents SET sort_order = 9003 WHERE image_url = '/images/patents/ssw-us-patent.webp'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('ssw_china_cert_ko_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 특허 목록 맨 뒤의 중국어 "통보서"(ssw-china-patent)를 제거하고, 그 자리에
