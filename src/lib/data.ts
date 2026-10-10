@@ -686,6 +686,7 @@ export const certifications = [
   { image: "/images/certifications/cert-11.jpg", title: "소재·부품전문기업확인서" },
   { image: "/images/certifications/cert-12.jpg", title: "기술혁신형 중소기업(Inno-Biz) 확인서" },
   { image: "/images/certifications/cert-13.jpg", title: "벤처기업확인서" },
+  { image: "/images/certifications/kita-membership.webp", title: "한국무역협회(KITA) 회원증", subtitle: "Certificate of Membership (KITA)" },
 ];
 
 // Initial 주요 고객사 name list, transcribed from the client-logo list the

@@ -388,6 +388,7 @@ function createSchema(): Promise<void> {
     await ensureSswChinaUsPatents();
     await ensureSswChinaCertKo();
     await ensureCladdingCert2018();
+    await ensureKitaMembershipCert();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
     await ensureMoveYtnResourceToPress();
@@ -546,6 +547,24 @@ async function ensureDedupeCeCerts(): Promise<void> {
     INSERT INTO settings (key, value) VALUES ('ce_certs_deduped', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
+}
+
+// 한국무역협회(KITA) 회원증을 인증서 목록 맨 끝에 한 번만 추가한다.
+async function ensureKitaMembershipCert(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'kita_membership_cert_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const cnt = (await sql`SELECT COUNT(*)::int AS c FROM certifications`) as { c: number }[];
+  if (cnt[0].c === 0) return;
+  const url = "/images/certifications/kita-membership.webp";
+  const exists = await sql`SELECT 1 FROM certifications WHERE image_url = ${url} LIMIT 1`;
+  if (exists.length === 0) {
+    const maxRow = (await sql`SELECT COALESCE(MAX(sort_order), 0) AS m FROM certifications`) as { m: number }[];
+    await sql`
+      INSERT INTO certifications (id, image_url, title, subtitle, sort_order, created_at)
+      VALUES (${newId()}, ${url}, '한국무역협회(KITA) 회원증', 'Certificate of Membership (KITA)', ${maxRow[0].m + 1}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('kita_membership_cert_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 국내 특허증 "클래딩 장치"(제10-1932083호, 출원 2016.08.11)를 한 번만 추가한다.
