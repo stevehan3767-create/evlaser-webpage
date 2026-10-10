@@ -382,7 +382,7 @@ function createSchema(): Promise<void> {
     await ensureMetalWeek2026News();
     await ensureBusinessRegistrationCert();
     await ensurePressInterview2025();
-    await ensureSswChinaPatent();
+    await ensureSswChinaUsPatents();
     await ensureDedupeCeCerts();
     await ensureYtnChoikangPress();
     await ensureMoveYtnResourceToPress();
@@ -543,24 +543,32 @@ async function ensureDedupeCeCerts(): Promise<void> {
   `;
 }
 
-// 이미 시딩된 환경의 특허 목록 맨 뒤에 "Super Scan Welding기술 중국특허등록"을 한 번만 추가한다.
-async function ensureSswChinaPatent(): Promise<void> {
-  const flag = (await sql`SELECT value FROM settings WHERE key = 'ssw_china_patent_seeded'`) as { value: string }[];
+// 특허 목록 맨 뒤의 중국어 "통보서"(ssw-china-patent)를 제거하고, 그 자리에
+// 실제 중국 특허증서 → 미국 특허 순으로 한 번만 추가한다.
+async function ensureSswChinaUsPatents(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ssw_china_us_patents_seeded'`) as { value: string }[];
   if (flag.length > 0) return;
   const cnt = (await sql`SELECT COUNT(*)::int AS c FROM patents`) as { c: number }[];
   // 비어 있으면 seedPatentsIfEmpty가 data.ts(맨 끝)로 시딩하므로 건드리지 않는다.
   if (cnt[0].c === 0) return;
-  const url = "/images/patents/ssw-china-patent.webp";
-  const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${url} LIMIT 1`;
-  if (exists.length === 0) {
-    const maxRow = (await sql`SELECT COALESCE(MAX(sort_order), 0) AS m FROM patents`) as { m: number }[];
-    await sql`
-      INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
-      VALUES (${newId()}, ${url}, 'Super Scan Welding기술 중국특허등록', ${null}, ${maxRow[0].m + 1}, ${new Date().toISOString()})
-    `;
+  // 이전에 등록된 통보서 항목 제거.
+  await sql`DELETE FROM patents WHERE image_url = '/images/patents/ssw-china-patent.webp'`;
+  const entries = [
+    { url: "/images/patents/ssw-china-cert.webp", title: "Super Scan Welding기술 중국특허등록" },
+    { url: "/images/patents/ssw-us-patent.webp", title: "Super Scan Welding기술 미국특허 출원" },
+  ];
+  for (const e of entries) {
+    const exists = await sql`SELECT 1 FROM patents WHERE image_url = ${e.url} LIMIT 1`;
+    if (exists.length === 0) {
+      const maxRow = (await sql`SELECT COALESCE(MAX(sort_order), 0) AS m FROM patents`) as { m: number }[];
+      await sql`
+        INSERT INTO patents (id, image_url, title, registered_on, sort_order, created_at)
+        VALUES (${newId()}, ${e.url}, ${e.title}, ${null}, ${maxRow[0].m + 1}, ${new Date().toISOString()})
+      `;
+    }
   }
   await sql`
-    INSERT INTO settings (key, value) VALUES ('ssw_china_patent_seeded', ${new Date().toISOString()})
+    INSERT INTO settings (key, value) VALUES ('ssw_china_us_patents_seeded', ${new Date().toISOString()})
     ON CONFLICT (key) DO NOTHING
   `;
 }
