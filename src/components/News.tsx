@@ -33,47 +33,54 @@ function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
   );
 }
 
-// 게시판형 한 행: 번호 · 제목 · 작성자 · 조회 · 등록일 (클릭 시 본문/사진 펼침)
+// 목록 한 건: 썸네일 + 제목 + 3줄 미리보기 + 메타(번호·작성자·조회·등록일).
+// 클릭하면 본문 전체 + 사진 그리드가 펼쳐진다.
 function NewsRowItem({ n, images }: { n: NewsRow; images: NewsImageRow[] }) {
   const isNotice = n.postNo === "공지";
-  const cols = "grid grid-cols-[48px_1fr_auto] sm:grid-cols-[64px_1fr_90px_70px_96px] gap-x-3 gap-y-1 items-center";
-  const no = isNotice ? (
-    <span className="text-[11px] font-bold text-white bg-red rounded-sm px-1.5 py-0.5 w-fit">공지</span>
-  ) : (
-    <span className="font-mono text-[12.5px] text-ink-faint">{n.postNo ?? ""}</span>
-  );
-  const meta = (
-    <>
-      <span className="hidden sm:block text-[12.5px] text-ink-soft text-center">{n.author ?? "-"}</span>
-      <span className="hidden sm:block text-[12px] text-ink-faint font-mono text-center">
-        {n.views != null ? n.views.toLocaleString() : "-"}
-      </span>
-      <span className="text-[12px] text-ink-faint font-mono sm:text-right">{n.date}</span>
-    </>
-  );
+  const thumb = images[0]?.url ?? null;
   const hasDetail = Boolean(n.body) || images.length > 0;
 
-  if (!hasDetail) {
-    return (
-      <div className={`${cols} py-3.5 border-b border-line`}>
-        {no}
-        <span className="font-semibold text-[13.5px] min-w-0 truncate">{n.title}</span>
-        {meta}
+  const head = (
+    <div className="flex gap-4">
+      {/* 썸네일 (없으면 플레이스홀더) */}
+      <div className="relative flex-none w-[104px] sm:w-[132px] aspect-[4/3] rounded-md overflow-hidden border border-line bg-surface-alt">
+        {thumb ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={thumb} alt={n.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-blue/40">
+            <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M4 5h16v14H4zM8 10h8M8 14h5" strokeLinecap="round" /></svg>
+          </div>
+        )}
       </div>
-    );
+      {/* 본문 요약 */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          {isNotice && <span className="text-[10.5px] font-bold text-white bg-red rounded-sm px-1.5 py-0.5">공지</span>}
+          {!isNotice && n.postNo && <span className="font-mono text-[11px] text-ink-faint">#{n.postNo}</span>}
+          <h3 className="font-bold text-[14.5px] sm:text-[15px] text-ink min-w-0 truncate group-hover:text-blue">{n.title}</h3>
+        </div>
+        {n.body && (
+          <p className="mt-1.5 text-[12.8px] text-ink-soft leading-relaxed line-clamp-3">
+            {n.body}
+          </p>
+        )}
+        <div className="mt-2 flex items-center gap-x-3 gap-y-0.5 flex-wrap text-[11.5px] text-ink-faint font-mono">
+          {n.author && <span>{n.author}</span>}
+          <span>{n.date}</span>
+          {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
+          {images.length > 0 && <span className="text-blue">사진 {images.length}</span>}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!hasDetail) {
+    return <div className="py-5 border-b border-line">{head}</div>;
   }
   return (
     <details className="group border-b border-line">
-      <summary className={`${cols} py-3.5 cursor-pointer list-none marker:content-none`}>
-        {no}
-        <span className="font-semibold text-[13.5px] min-w-0 group-hover:text-blue">
-          {n.title}
-          <svg viewBox="0 0 12 8" className="inline-block ml-1.5 w-2.5 h-2 text-ink-faint transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M1 1.5 6 6.5 11 1.5" />
-          </svg>
-        </span>
-        {meta}
-      </summary>
+      <summary className="py-5 cursor-pointer list-none marker:content-none">{head}</summary>
       <div className="pb-6 pt-1">
         {n.body && <p className="mb-4 text-ink-soft text-[13.5px] leading-relaxed max-w-[80ch] whitespace-pre-line">{n.body}</p>}
         {images.length > 0 && <NewsImageGrid images={images} />}
@@ -128,18 +135,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           <p className="text-[12.5px] text-ink-faint mb-2">전체 {activeItems.length}건</p>
         )}
 
-        {/* 게시판 헤더 (PC) */}
-        {pageItems.length > 0 && (
-          <div className="hidden sm:grid grid-cols-[64px_1fr_90px_70px_96px] gap-x-3 py-2.5 border-y-2 border-ink/70 text-[12px] font-bold text-ink-soft">
-            <span className="text-center">번호</span>
-            <span>제목</span>
-            <span className="text-center">작성자</span>
-            <span className="text-center">조회</span>
-            <span className="text-right">등록일</span>
-          </div>
-        )}
-
-        <div className="border-t border-line sm:border-t-0">
+        <div className="border-t border-line">
           {pageItems.length === 0 ? (
             <p className="py-8 text-ink-soft text-[13.5px]">{t("empty")}</p>
           ) : (
