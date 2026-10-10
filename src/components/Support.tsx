@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
-import { faqRepo } from "@/lib/repo";
+import { faqRepo, inquiryRepo } from "@/lib/repo";
 import ContactForm from "./ContactForm";
 import supportInquiries from "@/lib/support-inquiries-data.json";
 
@@ -9,12 +9,58 @@ const FAQ_KEYS = ["quote", "install", "access"] as const;
 
 type SupportInquiry = { no: string; title: string; author: string; date: string; status: "answered" | "received" };
 
+// 작성자 이름 마스킹: 첫·끝 글자만 남기고 가운데는 * (예: 홍길동 → 홍*동, 홍길동전 → 홍**전)
+function maskName(raw: string): string {
+  const name = (raw || "").trim().split(/\s+/)[0];
+  if (!name) return "비공개";
+  if (!/[가-힣]/.test(name)) {
+    const a = name.replace(/[^A-Za-z]/g, "");
+    return a.length <= 1 ? "비공개" : a[0] + "***" + a[a.length - 1];
+  }
+  if (name.length <= 1) return name;
+  if (name.length === 2) return name[0] + "*";
+  return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
+}
+
+// 폼에는 제목 칸이 없으므로 문의 내용(또는 구분)에서 간단한 제목을 만든다.
+function deriveTitle(message: string | null, industry: string | null): string {
+  const clean = (message || "").replace(/\s+/g, " ").trim();
+  if (clean) return clean.length > 40 ? clean.slice(0, 40) + "…" : clean;
+  return (industry || "문의").trim();
+}
+
 // 구 홈페이지 문의접수(공개 목록)에서 옮겨온 최근 문의 내역.
 // 번호·제목·작성자(마스킹)·작성일·상태만 표시(본문·관리자 답변 제외, 조회수 미표시). 최신순 5건.
-function RecentInquiries() {
-  const items = (supportInquiries as SupportInquiry[])
-    .slice()
-    .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+async function RecentInquiries() {
+  const archive = (supportInquiries as SupportInquiry[]).slice();
+  const maxNo = archive.reduce((m, s) => Math.max(m, parseInt(s.no) || 0), 0);
+
+  // 홈페이지 문의 접수 폼(일반 채널)으로 새로 들어온 문의를 DB에서 읽어 맨 위에 합친다.
+  // (민감한 CEO 직속 채널 접수는 공개 목록에서 제외)
+  let live: SupportInquiry[] = [];
+  try {
+    const rows = await inquiryRepo.list();
+    const general = rows.filter((r) => r.channel === "general");
+    live = general.map((q, i) => ({
+      no: String(maxNo + general.length - i),
+      title: deriveTitle(q.message, q.industry),
+      author: maskName(q.name),
+      date: fmtDate(q.createdAt),
+      status: "received" as const,
+    }));
+  } catch {
+    /* DB 미연결 시 아카이브만 표시 */
+  }
+
+  const items = [...live, ...archive]
+    .sort((a, b) => (b.date || "").localeCompare(a.date || "") || (parseInt(b.no) - parseInt(a.no)))
     .slice(0, 5);
   if (items.length === 0) return null;
 
