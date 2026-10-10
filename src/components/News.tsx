@@ -46,8 +46,7 @@ function NewsRowItem({ n, images }: { n: NewsRow; images: NewsImageRow[] }) {
 
   const meta = (
     <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[11.5px] sm:text-[12px] text-ink-faint">
-      {n.author && <span>{n.author}</span>}
-      <span className="font-mono">{n.date}</span>
+      <span>등록일: <span className="font-mono">{n.date}</span></span>
       {n.views != null && <span>조회 {n.views.toLocaleString()}</span>}
       {images.length > 0 && <span className="font-semibold text-blue">사진 {images.length}</span>}
     </div>

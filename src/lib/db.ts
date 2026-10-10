@@ -410,6 +410,7 @@ function createSchema(): Promise<void> {
     await ensurePressInterviewThumbnail();
     await ensureIntroVideo2021Jan();
     await ensureSbsBizBroadcast2026();
+    await ensureRemoveTidingsLogoImages();
   })();
 }
 
@@ -652,6 +653,21 @@ async function ensureTidingsImport(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_imported', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 이관한 사내소식 글 끝에 붙던 EV LASER 로고 이미지를 한 번만 제거한다.
+// (게시글 본문과 무관한 서명용 로고라 목록/본문 사진에서 삭제)
+async function ensureRemoveTidingsLogoImages(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tidings_logo_images_removed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const urls = [
+    "/images/news/tidings/185_18.webp",
+    "/images/news/tidings/188_21.webp",
+    "/images/news/tidings/189_12.webp",
+    "/images/news/tidings/190_5.webp",
+  ];
+  await sql`DELETE FROM news_images WHERE url = ANY(${urls}::text[])`;
+  await sql`INSERT INTO settings (key, value) VALUES ('tidings_logo_images_removed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 한국무역협회(KITA) 회원증을 인증서 목록 맨 끝에 한 번만 추가한다.
