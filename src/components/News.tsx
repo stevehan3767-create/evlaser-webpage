@@ -148,6 +148,13 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
               {tNav(c.key)}
             </Link>
           ))}
+          {/* 언론·연구활동은 별도 페이지(/company/press)로 연결 */}
+          <Link
+            href="/company/press"
+            className="px-4 py-2 text-[13.5px] font-bold border rounded-sm transition-colors bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red"
+          >
+            {tNav("press")}
+          </Link>
         </div>
 
         {activeItems.length > 0 && (
