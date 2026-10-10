@@ -75,6 +75,9 @@ export default async function ContentDetailPage({
   const item = items.find((i) => i.itemKey === key);
   if (!item) notFound();
 
+  // 같은 그룹 카드 그리드에 연결 정보 개수를 표시(설비 라인업 그룹은 제외).
+  const siblingCounts = group === "lineup" ? {} : await contentLinkRepo.countsForGroup(group).catch(() => ({} as Record<string, number>));
+
   const [page, images, videos, tp] = await Promise.all([
     contentPageRepo.get(group, key),
     contentImageRepo.listByKey(group, key),
@@ -144,7 +147,12 @@ export default async function ContentDetailPage({
       {/* 같은 그룹의 다른 항목으로 바로 이동 — 목록(기술종류별) 페이지와 100% 동일한 카드 그리드 */}
       <div className="mx-auto max-w-[1240px] px-7 mt-7">
         <ItemCardsGrid
-          items={items.map((it) => ({ itemKey: it.itemKey, name: it.name, icon: it.icon }))}
+          items={items.map((it) => ({
+            itemKey: it.itemKey,
+            name: it.name,
+            icon: it.icon,
+            count: group === "lineup" ? undefined : ((siblingCounts as Record<string, number>)[it.itemKey] ?? 0),
+          }))}
           hrefFor={(k) => `/products/${group}/${k}`}
           activeKey={key}
           minColWidth="190px"
