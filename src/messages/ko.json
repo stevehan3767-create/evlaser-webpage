@@ -38,7 +38,7 @@
     "news": {
       "label": "뉴스·소식",
       "items": {
-        "company": "회사소식",
+        "company": "사내소식",
         "exhibition": "전시회소식",
         "industry": "산업동향",
         "press": "언론·연구활동"
