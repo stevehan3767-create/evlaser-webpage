@@ -266,9 +266,6 @@ export default function LineupFinder({
                 </svg>
                 초기화
               </button>
-              <button type="button" onClick={() => setOpen(false)} className={`${btnRest} flex-1`}>
-                적용 ({hasSelection ? filtered.length : 0}개)
-              </button>
             </div>
           </aside>
         </div>
