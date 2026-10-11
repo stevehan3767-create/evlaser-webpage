@@ -69,7 +69,7 @@ export default function Header() {
         <div className="mx-auto max-w-[1240px] px-7 flex items-center gap-4 h-[76px]">
           <Link href="/" aria-label="EV Laser home" className="flex items-center flex-none text-ink">
             <Logo className="w-[150px] sm:w-[168px]" />
-            <span className="hidden [@media(min-width:1280px)]:inline-block font-mono text-[11px] font-bold tracking-wider text-red pl-3.5 ml-3.5 border-l border-line-strong whitespace-nowrap">
+            <span className="inline-flex items-center flex-none ml-2.5 sm:ml-3.5 font-mono text-[9.5px] sm:text-[11px] font-bold tracking-wider text-white bg-red rounded-full px-2.5 py-1 whitespace-nowrap">
               SINCE 2002
             </span>
           </Link>
