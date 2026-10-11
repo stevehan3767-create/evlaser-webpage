@@ -468,6 +468,7 @@ function createSchema(): Promise<void> {
     await ensureKoplas2023ToPress();
     await ensureMarketingJobRemoveFromNews();
     await ensurePressBodiesReformat();
+    await ensureWs46ReviewToPress();
   })();
 }
 
@@ -1098,6 +1099,53 @@ async function ensurePressBodiesReformat(): Promise<void> {
     await sql`UPDATE press_items SET body = ${u.body} WHERE title = ${u.title}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('press_bodies_reformatted_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제46회 용사기술 Workshop 참가 후기(#98)를 사내소식 → 논문·학술소식으로 이관한다.
+// 본문은 가독성 있게 재편집, 사진 6장은 그대로 복사.
+async function ensureWs46ReviewToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ws46_review_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "(주)이브이레이저 제 46회 용사기술 Workshop 참가 후기";
+  const newBody = [
+    "안녕하세요 여러분! ㈜이브이레이저입니다.",
+    "저희는 지난 6월 9~10일, 한국용사기술협회에서 개최한 제46회 용사기술 Workshop에 참가했습니다.",
+    "용사기술은 1910년대, 스위스의 M. U. Schoop가 별개의 연소 열원으로 가열된 압축공기의 제트 내에 용융된 납을 공급한 용탕식 용사법을 시작으로, 화염을 이용한 가스식 용사와 아크 열원을 이용한 전기식 용사가 실용화되며 발전해 왔습니다.",
+    "가장 최초의 용사법을 다룬 특허는 1882년 독일에서 등록된 German Patent No. 2446이며, 1902년 8월 12일 등록된 Thurston의 “a method for carrying out the process of coating one metal with another”와 M. U. Schoop의 1915년 3월 30일 등록 특허 등에서 현재의 용사기술과 매우 유사한 내용을 확인할 수 있습니다.",
+    "이번 워크샵은 이러한 기술에 대해 서로 교류함으로써, 국제 협력을 통한 국내 용사기술 활성화와 아시아·국제 용사기술 컨퍼런스 참가 및 국내 유치를 통한 국제교류의 장을 확대하는 기회가 되었습니다.",
+    "등록을 마치면 이름표를 받고 행사장에 입장할 수 있어, 저희는 일찍 도착해 등록을 먼저 진행했습니다. 발표 전 잠시 휴식을 가진 뒤, 레이저 클래딩 적용 샘플과 용사 불량 사례 등을 발표했습니다. 참석자 모두가 집중해 들어주신 덕분에 발표를 잘 마무리할 수 있었습니다.",
+    "㈜이브이레이저는 이러한 기술 워크샵에 항상 참석하여 다양한 용사기술 정보를 공유하고 산업 동향을 빠르게 파악하고 있습니다. 이번 워크샵 역시 참 유익하고 의미 있는 시간이었습니다.",
+    "레이저 설비 및 기술에 관해 궁금하신 점이 있으시면 편하게 문의해 주세요. 감사합니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2022.08.23";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '한국용사기술협회(KTSA)', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    } else {
+      await sql`UPDATE press_items SET body = ${newBody} WHERE id = ${exists[0].id}`;
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('ws46_review_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
