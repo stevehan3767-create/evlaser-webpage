@@ -237,8 +237,8 @@ export interface NavItem {
 export const companyNav: NavItem[] = [
   { key: "overview", href: "/company" },
   { key: "history", href: "/company/history" },
-  { key: "organization", href: "/company/organization" },
   { key: "business", href: "/company/business" },
+  { key: "organization", href: "/company/organization" },
   { key: "patents", href: "/company/patents" },
   { key: "clients", href: "/company/clients" },
   { key: "directions", href: "/company/directions" },
@@ -253,16 +253,17 @@ export const companyMegaGroups: { titleKey: string; items: { labelKey: string; h
     items: [
       { labelKey: "company.items.overview", href: "/company" },
       { labelKey: "company.items.history", href: "/company/history" },
-      { labelKey: "company.items.organization", href: "/company/organization" },
       { labelKey: "company.items.business", href: "/company/business" },
-      { labelKey: "company.items.directions", href: "/company/directions" },
+      { labelKey: "company.items.organization", href: "/company/organization" },
     ],
   },
   {
     titleKey: "company.groups.achievements",
+    // 그룹 표시는 현재 꺼져 있어 평면 목록으로 나오며, '오시는 길'은 맨 끝에 온다.
     items: [
       { labelKey: "company.items.patents", href: "/company/patents" },
       { labelKey: "company.items.clients", href: "/company/clients" },
+      { labelKey: "company.items.directions", href: "/company/directions" },
     ],
   },
 ];

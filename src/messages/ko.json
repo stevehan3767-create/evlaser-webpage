@@ -3,7 +3,7 @@
     "company": {
       "label": "회사소개",
       "items": {
-        "overview": "인사말·개요",
+        "overview": "인사말",
         "history": "연혁",
         "business": "사업분야",
         "patents": "특허·인증",

@@ -7,8 +7,8 @@ import { Link, usePathname } from "@/i18n/navigation";
 const TABS: { key: string; href: string }[] = [
   { key: "overview", href: "/company" },
   { key: "history", href: "/company/history" },
-  { key: "organization", href: "/company/organization" },
   { key: "business", href: "/company/business" },
+  { key: "organization", href: "/company/organization" },
   { key: "patents", href: "/company/patents" },
   { key: "clients", href: "/company/clients" },
   { key: "directions", href: "/company/directions" },
