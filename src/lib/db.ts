@@ -460,6 +460,7 @@ function createSchema(): Promise<void> {
     await ensureThermalSprayWs53();
     await ensureHidec28();
     await ensureHidec28Photo2Caption();
+    await ensureInvestnewsToPress();
   })();
 }
 
@@ -778,6 +779,50 @@ async function ensureHidec28Photo2Caption(): Promise<void> {
     WHERE url = '/images/press/hidec28/02.webp'
   `;
   await sql`INSERT INTO settings (key, value) VALUES ('hidec28_photo2_caption_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 인베스트뉴스 인터뷰(#118)를 사내소식 → 언론·방송소식으로 이관한다.
+// 인터뷰 사진 2장(191_1·191_2)만 사용, 기사 PDF 첨부(방문객 열람용), 원문 링크 연결.
+async function ensureInvestnewsToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'investnews_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const title = "[인터뷰] 레이저 기술로 국내를 넘어 해외로 — ㈜이브이레이저 한상배 대표";
+  const body = [
+    "㈜이브이레이저 한상배 대표의 인터뷰가 언론에 보도되었습니다.",
+    "이번 인터뷰에서는 레이저를 이용한 플라스틱 용접의 원리와 다양한 산업용 레이저 응용 기술이 소개되었으며, 24년간의 연구개발로 신뢰를 쌓아온 ㈜이브이레이저와 이 분야 최고의 베테랑인 한상배 대표가 집중 조명되었습니다.",
+    "기사에서는 레이저 기술로 국내 시장을 넘어 해외로 도약하려는 ㈜이브이레이저의 비전과 성장 전략, 준비 중인 신제품 및 향후 계획, 그리고 앞으로의 방향성이 상세히 다뤄졌습니다.",
+    "자세한 내용은 아래 ‘원문 보기’ 또는 첨부된 PDF에서 확인하실 수 있습니다.",
+  ].join("\n\n");
+
+  // 기존 사내소식(news_items) #118 및 사진 삭제
+  const olds = (await sql`SELECT id FROM news_items WHERE title = '인베스트뉴스 대표님 인터뷰 진행'`) as { id: string }[];
+  for (const o of olds) {
+    await sql`DELETE FROM news_images WHERE news_id = ${o.id}`;
+  }
+  await sql`DELETE FROM news_items WHERE title = '인베스트뉴스 대표님 인터뷰 진행'`;
+
+  // 언론·방송소식(press) 등록 (중복 방지)
+  const exists = (await sql`SELECT id FROM press_items WHERE title = ${title} LIMIT 1`) as { id: string }[];
+  if (exists.length === 0) {
+    const pressId = newId();
+    await sql`
+      INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+      VALUES (${pressId}, 'media', ${title}, '핸드메이커', '2025.07.11', ${body},
+        ${"https://www.handmk.com/news/articleView.html?idxno=31114"},
+        ${"/press/handmk-investnews-2025.pdf"}, ${"핸드메이커_이브이레이저_인터뷰.pdf"}, ${null}, true, 0, ${"2025-07-11T00:00:00.000Z"})
+    `;
+    const imgs: { url: string; caption: string }[] = [
+      { url: "/images/news/tidings/191_1.webp", caption: "㈜이브이레이저 한상배 대표 인터뷰" },
+      { url: "/images/news/tidings/191_2.webp", caption: "인터뷰 현장" },
+    ];
+    for (let i = 0; i < imgs.length; i++) {
+      await sql`
+        INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+        VALUES (${newId()}, ${pressId}, ${imgs[i].url}, ${imgs[i].caption}, ${null}, ${i}, ${new Date().toISOString()})
+      `;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('investnews_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
