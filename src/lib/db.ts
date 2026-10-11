@@ -476,6 +476,10 @@ function createSchema(): Promise<void> {
     await ensureHidec28ReviewToPress();
     await ensureDaejeonUspToPress();
     await ensureYongsa2015ToPress();
+    await ensureKomaf2015ToExhibition();
+    await ensureYongsa2013ToPress();
+    await ensureGwangjuSeminarToPress();
+    await ensureKyeongin2013ToPress();
   })();
 }
 
@@ -1371,6 +1375,141 @@ async function ensureYongsa2015ToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('yongsa2015_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// KOMAF 2015 기사(#67)를 사내소식 → 전시회소식(뉴스 내 카테고리)으로 이동 + 본문 재편집.
+async function ensureKomaf2015ToExhibition(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'komaf2015_to_exhibition'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "[KOMAF 2015] (주)유로비젼레이저, ‘행복한 기업, 최고의 기술’";
+  const newBody = [
+    "[산업일보] 원자재 상승 및 친환경 차량 개발로 자동차 업계에서는 플라스틱 소재의 중요성이 점점 커지고 있다. 여기에 레이저 플라스틱 융착 기술로 국내 자동차 산업 발전에 큰 역할을 하는 회사가 있다.",
+    "㈜유로비젼레이저(이하 유로비젼)가 지난 10월 28일~31일 개최된 ‘2015 한국기계전(Korea Machinery Fair 2015)’에서 플라스틱 작업을 선도할 제품을 선보였다.",
+    "유로비젼의 Laser Plastic Welding System ELW-200 모델은 Rotary Table 또는 고정형 Jig가 장착된 단독형 시스템으로, 클램프 가압력 측정 장치 및 파워 측정 장치가 탑재돼 있다. 직교좌표로봇을 이용해 레이저 빔을 이동시킬 수 있고, 일체화된 제어 프로그램으로 편리한 작업이 가능하다.",
+    "유로비젼은 매해 매출액의 20%를 신기술에 투자한다. 임직원 모두가 가족처럼 지내는 기업 문화를 자랑하는 유로비젼은 매월 회의를 통해 회사의 재무 상황을 직원들과 공유하며, 한마음으로 회사의 비전을 추구한다.",
+    "이 회사 관계자는 “구글보다 더 구글 같은 꿈의 직장이 됐으면 한다”라며 “행복한 기업 문화를 통해 세계 최고의 레이저 응용기술을 보유한 회사가 되도록 노력하겠다”라고 포부를 밝혔다.",
+    "박혜선 기자 (산업일보)",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('komaf2015_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2013년 용사협회 추계학술발표대회 단체사진(#30)을 사내소식 → 논문·학술소식으로 이관.
+// 제목 오타(용사헙회→용사협회) 교정, 본문 정리.
+async function ensureYongsa2013ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'yongsa2013_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "2013년 12월 용사헙회 추계학술발표대회 단체사진";
+  const newTitle = "2013년 12월 용사협회 추계학술발표대회 단체사진";
+  const newBody = [
+    "2013년 12월 열린 용사협회(한국용사기술협회) 추계학술발표대회 단체사진입니다.",
+    "둘째 줄 가운데에 저희 회사 사원과 대표님이 함께하고 있습니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.17";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${newTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${newTitle}, '한국용사기술협회', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('yongsa2013_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2014 광주 산업용 레이저 전문가 세미나(#33)를 사내소식 → 논문·학술소식으로 이관.
+async function ensureGwangjuSeminarToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'gwangju_seminar_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "전라도 광주_2014 산업용 레이저 고도화를 위한 전문가 세미나";
+  const newBody = [
+    "2014년 광주에서 열린 ‘산업용 레이저 고도화를 위한 전문가 세미나’에 참가했습니다.",
+    "산업용 레이저 분야의 전문가들이 모여 기술 고도화 방안과 최신 동향을 공유하는 자리였습니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.17";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '산업용 레이저 전문가 세미나(광주)', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('gwangju_seminar_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 경인일보 기사(#25)를 사내소식 → 언론·방송소식으로 이관 + 본문 재편집.
+async function ensureKyeongin2013ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'kyeongin2013_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "경인일보에 소개된 구글보다 더 구글같은 기업을 꿈꾸는 유로비젼(주)";
+  const newBody = [
+    "2013년 3월 경인일보에 소개된 당사에 관한 기사입니다.",
+    "“구글(Google)은 물론이고 국내 중견기업이나 대기업의 복지·급여·근무환경을 따라가려면 아직 많이 부족합니다. 그렇지만 ‘구글보다 더 구글 같은 회사’, ‘대기업보다 더 대기업 같은 중소기업’을 만드는 것이 가능하리라는 꿈을 꾸면서, 우리 회사의 모든 임직원은 오늘도 열심히 달립니다. 모두가 행복해질 수 있는 그날까지 말입니다.”",
+    "열심히 일한 만큼 좋은 성과를 내고, 그 성과를 모든 임직원이 함께 공유하며, 이를 통해 임직원과 그 가족 모두가 행복할 수 있는 좋은 회사가 되도록 노력하겠습니다.",
+    "유로비젼(주)",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.16";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'media', ${srcTitle}, '경인일보', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('kyeongin2013_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
