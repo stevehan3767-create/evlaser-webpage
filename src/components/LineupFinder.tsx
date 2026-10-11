@@ -111,30 +111,37 @@ export default function LineupFinder({
     return facets.find((f) => f.group === group)?.tiles.find((t) => t.itemKey === key)?.name ?? key;
   }
 
+  // 상단 3버튼을 하나의 통일된 디자인군으로 구성한다.
+  // 공통: 같은 크기·모서리·글자, 브랜드 레드를 기준 색으로.
+  const btnBase =
+    "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[12.5px] font-bold border transition-colors";
+  const allOn = showAll && !hasSelection;
+  const btnPrimary = `${btnBase} bg-red text-white border-red hover:bg-[#c40025]`; // 조건으로 찾기(주 버튼)
+  const btnAll = `${btnBase} ${allOn ? "bg-red-soft text-red border-red" : "bg-surface text-ink border-line-strong hover:border-red hover:text-red"}`; // 모든 설비 보기
+  const btnReset = `${btnBase} bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red`; // 초기화
+
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-ink text-white rounded-sm text-[12.5px] font-bold"
+          className={btnPrimary}
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
             <path d="M3 5h18M6 12h12M10 19h4" />
           </svg>
           조건으로 찾기
           {selectedCount > 0 && (
-            <span className="bg-red text-white rounded-full text-[10.5px] font-bold px-1.5 py-px">{selectedCount}</span>
+            <span className="bg-white text-red rounded-full text-[10.5px] font-bold px-1.5 py-px">{selectedCount}</span>
           )}
         </button>
 
         <button
           type="button"
           onClick={toggleShowAll}
-          aria-pressed={showAll && !hasSelection}
-          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-[12.5px] font-bold border transition-colors ${
-            showAll && !hasSelection ? "bg-blue text-white border-blue" : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
-          }`}
+          aria-pressed={allOn}
+          className={btnAll}
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -145,11 +152,7 @@ export default function LineupFinder({
           모든 설비 보기
         </button>
 
-        <button
-          type="button"
-          onClick={reset}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-[12.5px] font-bold border border-line-strong text-ink-soft hover:border-blue hover:text-blue transition-colors"
-        >
+        <button type="button" onClick={reset} className={btnReset}>
           <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
             <path d="M3 3v5h5" />
@@ -190,11 +193,13 @@ export default function LineupFinder({
           <p className="text-[13px] text-ink-soft mb-5">
             위의 <b className="text-ink">&quot;조건으로 찾기&quot;</b>에서 기술종류·재료·산업분야를 고르면(복수 선택 가능) 맞는 설비가 표시됩니다.
           </p>
-          <button
-            type="button"
-            onClick={toggleShowAll}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-red text-white rounded-sm text-[13px] font-bold"
-          >
+          <button type="button" onClick={toggleShowAll} className={btnAll}>
+            <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
             모든 설비 보기 ({lineupCards.length}개)
           </button>
         </div>
