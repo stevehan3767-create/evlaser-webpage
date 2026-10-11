@@ -6,6 +6,7 @@ import mainnewsPosts from "./mainnews-data.json";
 import supportInquirySeed from "./support-inquiries-data.json";
 import newsPlaceholderImages from "./news-placeholder-images.json";
 import eventDates from "./event-dates.json";
+import partnerLogos from "./partner-logos.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -491,6 +492,7 @@ function createSchema(): Promise<void> {
     await ensureKomaf2015Date();
     await ensureSafeTyposV3();
     await ensureEventDatesPlus7();
+    await ensurePartnerLogosImport();
   })();
 }
 
@@ -1715,6 +1717,36 @@ async function ensureEventDatesPlus7(): Promise<void> {
     await sql`UPDATE press_items SET date = ${date} WHERE title = ${title}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('event_dates_plus7_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 실제 홈페이지(evlaser.co.kr) 파트너사 로고를 주요고객사(client_logos)에 반영한다.
+// - 플레이스홀더(data: URI)만 교체, 이미 실제 로고가 등록된 항목은 그대로 유지.
+// - 수집된 파트너 목록을 로고와 함께 등록(이름 정규화로 기존 실제 로고와 중복 방지).
+async function ensurePartnerLogosImport(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'partner_logos_imported_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const partners = partnerLogos as { name: string; file: string }[];
+  if (!partners.length) return;
+  const norm = (s: string) => (s || "").replace(/[^0-9a-z가-힣]/gi, "").toLowerCase();
+
+  // 플레이스홀더(data:) 로고 삭제 — 실제 로고가 있는 항목은 보존
+  await sql`DELETE FROM client_logos WHERE logo_url LIKE 'data:%'`;
+
+  // 보존된(실제 로고) 항목의 이름 집합
+  const kept = (await sql`SELECT name FROM client_logos`) as { name: string }[];
+  const keptNames = new Set(kept.map((r) => norm(r.name)));
+
+  let order = 0;
+  for (const p of partners) {
+    const key = norm(p.name);
+    if (key && keptNames.has(key)) continue; // 이미 실제 로고가 있으면 건너뜀
+    await sql`
+      INSERT INTO client_logos (id, name, logo_url, sort_order, created_at)
+      VALUES (${newId()}, ${p.name}, ${p.file}, ${order}, ${new Date().toISOString()})
+    `;
+    order++;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('partner_logos_imported_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.

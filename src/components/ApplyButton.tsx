@@ -120,7 +120,7 @@ export default function ApplyButton({ jobTitle, label, className }: { jobTitle: 
                       </li>
                     </ul>
                   )}
-                  <p className="text-[11.5px] text-ink-faint mb-4">여러 파일을 선택할 수 있습니다. 전체 용량은 20MB 이하로 첨부해 주세요.</p>
+                  <p className="text-[11.5px] text-ink-faint mb-4">여러 파일을 선택할 수 있습니다. 전체 용량은 4MB 이하로 첨부해 주세요.</p>
 
                   <button
                     type="submit"

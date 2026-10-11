@@ -7,7 +7,7 @@ import { sendJobApplicationEmail, DEFAULT_CAREERS_EMAIL } from "@/lib/mail";
 // function with a raw (non-JSON) 504 before our own error handling runs.
 export const maxDuration = 20;
 
-const MAX_TOTAL_BYTES = 20 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 4 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
   let form: FormData;
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const files = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   const totalBytes = files.reduce((sum, f) => sum + f.size, 0);
   if (totalBytes > MAX_TOTAL_BYTES) {
-    return NextResponse.json({ error: "첨부파일 전체 용량은 20MB를 넘을 수 없습니다." }, { status: 400 });
+    return NextResponse.json({ error: "첨부파일 전체 용량은 4MB를 넘을 수 없습니다." }, { status: 400 });
   }
 
   const attachments = await Promise.all(
