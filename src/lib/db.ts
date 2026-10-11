@@ -481,6 +481,8 @@ function createSchema(): Promise<void> {
     await ensureGwangjuSeminarToPress();
     await ensureKyeongin2013ToPress();
     await ensureChinaSeminar2013ToPress();
+    await ensureHeatTreat2012ToPress();
+    await ensureBusanKoaashow2008ToExhibition();
   })();
 }
 
@@ -1549,6 +1551,59 @@ async function ensureChinaSeminar2013ToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('china_seminar2013_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 열처리공학회 기술논문발표(신소재경제신문 2012.10)(#)을 사내소식 → 논문·학술소식으로 이관.
+async function ensureHeatTreat2012ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'heattreat2012_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "신문_열처리공학회 기술논문발표(신소재경제신문2012년10월)";
+  const newBody = [
+    "사단법인 한국열처리공학회가 주최한 2012년 추계 열처리공학회에서 유로비젼(주)의 양승철 차장이 “레이저를 이용한 열처리”를 주제로 업체 사례를 발표했습니다.",
+    "발표 내용에 관해 궁금하신 사항은 당사로 문의해 주시기 바랍니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.18";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '한국열처리공학회 · 신소재경제신문', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('heattreat2012_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 부산국제용접전 및 KOAAshow 2008(#)을 사내소식 → 전시회소식(뉴스 내 카테고리)으로 이동 + 본문 재편집.
+async function ensureBusanKoaashow2008ToExhibition(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'busan_koaashow2008_to_exhibition'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "부산국제용접전 및 일산 KOAAshow 2008";
+  const newBody = [
+    "㈜유로비젼레이저는 제2회 부산국제 용접·절단·레이저설비산업전과 KOAAshow 2008에 참가했습니다.",
+    "· 부산국제 용접·절단·레이저설비산업전(Welding Busan Korea 2008): 2008년 11월 12일(수)~15일(토), 부산 BEXCO\n· KOAAshow 2008: 2008년 11월 20일(목)~23일(일), 4일간",
+    "두 전시회 모두 성황리에 마쳤습니다. 부스를 방문해 주신 모든 분들께 다시 한번 감사의 인사를 드립니다.",
+    "유로비젼 직원 일동",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('busan_koaashow2008_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
