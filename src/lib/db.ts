@@ -480,6 +480,7 @@ function createSchema(): Promise<void> {
     await ensureYongsa2013ToPress();
     await ensureGwangjuSeminarToPress();
     await ensureKyeongin2013ToPress();
+    await ensureChinaSeminar2013ToPress();
   })();
 }
 
@@ -1510,6 +1511,44 @@ async function ensureKyeongin2013ToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('kyeongin2013_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2013 해외 협력업체 기술교류 세미나(#15)를 사내소식 → 논문·학술소식으로 이관.
+async function ensureChinaSeminar2013ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'china_seminar2013_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "2013년 3월 18일 해외 협력업체와 기술교류 세미나";
+  const newBody = [
+    "2013년 3월 18일, 중국 출장 중 해외 협력업체와 기술교류 세미나를 가졌습니다.",
+    "레이저 관련 내용을 비롯한 다양한 기술 정보를 함께 공유하면서, 레이저 분야에 대한 시야를 한층 넓힐 수 있었던 뜻깊은 자리였습니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.16";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '해외 협력업체 기술교류 세미나', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('china_seminar2013_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
