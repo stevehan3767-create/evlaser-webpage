@@ -326,11 +326,12 @@ export const companyMegaGroups: { titleKey: string; items: { labelKey: string; h
   },
 ];
 
+// 제품·기술 메뉴는 "설비 찾기"(기술·재료·산업 조건으로 설비를 찾는 통합 파인더)와
+// "기술·재료 소개"(기술종류별·재료별 설명 모음) 2개로 단순화한다. 산업분야별은
+// 별도 메뉴에서 제외하고, 산업은 설비 찾기의 필터와 설비 상세의 태그로만 유지한다.
 export const productsNav: NavItem[] = [
-  { key: "byTech", href: "/products/tech" },
   { key: "lineup", href: "/products/lineup" },
-  { key: "byIndustry", href: "/products/industries" },
-  { key: "byMaterial", href: "/products/materials" },
+  { key: "guide", href: "/products/guide" },
 ];
 
 export const resourcesNav: NavItem[] = [
@@ -613,12 +614,12 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
     itemSeeds: lineupItems.map((i) => ({ key: i.key, name: i.name, icon: i.icon })),
     seeds: lineupPageSeeds,
     backHref: "/products/lineup",
-    labelKo: "설비 라인업",
+    labelKo: "설비 찾기",
   },
   tech: {
     itemSeeds: techItems.map((i) => ({ key: i.key, name: techLabelsKo[i.key], icon: i.icon })),
     seeds: techPageSeeds,
-    backHref: "/products/tech",
+    backHref: "/products/guide#tech",
     labelKo: "기술종류별",
   },
   industry: {
@@ -630,7 +631,7 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
   material: {
     itemSeeds: materialItems.map((i) => ({ key: i.key, name: materialLabelsKo[i.key], icon: i.icon })),
     seeds: [],
-    backHref: "/products/materials",
+    backHref: "/products/guide#material",
     labelKo: "재료별",
   },
 };

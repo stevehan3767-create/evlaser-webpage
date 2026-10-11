@@ -5,10 +5,8 @@ import type { IconName } from "@/lib/data";
 // 메인 화면의 4개 카테고리 "입구" 카드. 항목을 나열하지 않고 각 목록 페이지로
 // 바로 이동시켜 첫 화면을 깔끔하게 유지한다.
 const CARDS: { icon: IconName; title: string; desc: string; href: string }[] = [
-  { icon: "weld", title: "기술종류별", desc: "용접·절단·마킹 등 가공 기술로 찾기", href: "/products/tech" },
-  { icon: "machine", title: "설비 라인업", desc: "EV Laser의 전체 설비를 한눈에", href: "/products/lineup?finder=open" },
-  { icon: "build", title: "산업분야별", desc: "자동차·반도체·전자 등 산업으로 찾기", href: "/products/industries" },
-  { icon: "steel", title: "재료별", desc: "금속·플라스틱·유리 등 소재로 찾기", href: "/products/materials" },
+  { icon: "machine", title: "설비 찾기", desc: "기술·재료·산업 조건으로 원하는 설비를 바로 찾기", href: "/products/lineup?finder=open" },
+  { icon: "weld", title: "기술·재료 소개", desc: "용접·절단·마킹 등 가공 기술과 적용 재료 살펴보기", href: "/products/guide" },
 ];
 
 export default function CategoryShortcuts() {
@@ -19,7 +17,7 @@ export default function CategoryShortcuts() {
         <h2 className="mt-2.5 text-[22px] sm:text-[30px] font-[family-name:var(--font-display)] tracking-tight">무엇으로 찾으시겠어요?</h2>
         <p className="mt-3 text-ink-soft text-[14px]">원하는 방식을 선택하면 해당 목록으로 바로 이동합니다.</p>
 
-        <div className="mt-7 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CARDS.map((c) => (
             <Link
               key={c.title}

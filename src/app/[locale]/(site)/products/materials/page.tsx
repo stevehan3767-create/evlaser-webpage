@@ -1,23 +1,9 @@
-import type { Metadata } from "next";
-import Materials from "@/components/Materials";
-import Breadcrumb from "@/components/Breadcrumb";
+import { redirect } from "@/i18n/navigation";
+import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "재료별 | EV Laser",
-  description: "㈜이브이레이저의 레이저 기술이 적용되는 재료별 소개입니다.",
-};
-
-export default function MaterialsPage() {
-  return (
-    <>
-      <div className="mx-auto max-w-[1240px] px-7 pt-12">
-        <Breadcrumb items={[{ label: "제품·기술", href: "/products" }, { label: "재료별" }]} />
-        <span className="eyebrow">PRODUCTS & TECHNOLOGY</span>
-        <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-          재료별
-        </h1>
-      </div>
-      <Materials />
-    </>
-  );
+// 재료별 단독 페이지는 "기술·재료 소개"(/products/guide)로 통합되었다.
+// 기존 URL·북마크는 통합 페이지의 재료 섹션으로 자동 연결한다.
+export default async function MaterialsRedirect() {
+  const locale = await getLocale();
+  redirect({ href: "/products/guide#material", locale });
 }

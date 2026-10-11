@@ -24,7 +24,8 @@
         "byTech": "기술종류별",
         "byIndustry": "산업분야별",
         "byMaterial": "재료별",
-        "lineup": "설비 라인업"
+        "lineup": "설비 찾기",
+        "guide": "기술·재료 소개"
       }
     },
     "resources": {

@@ -1,23 +1,9 @@
-import type { Metadata } from "next";
-import Industries from "@/components/Industries";
-import Breadcrumb from "@/components/Breadcrumb";
+import { redirect } from "@/i18n/navigation";
+import { getLocale } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "산업분야별 | EV Laser",
-  description: "㈜이브이레이저의 레이저 기술이 적용되는 산업분야별 소개입니다.",
-};
-
-export default function IndustriesPage() {
-  return (
-    <>
-      <div className="mx-auto max-w-[1240px] px-7 pt-12">
-        <Breadcrumb items={[{ label: "제품·기술", href: "/products" }, { label: "산업분야별" }]} />
-        <span className="eyebrow">PRODUCTS & TECHNOLOGY</span>
-        <h1 className="mt-2.5 text-[28px] sm:text-[38px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-          산업분야별
-        </h1>
-      </div>
-      <Industries />
-    </>
-  );
+// 산업분야별 단독 페이지는 삭제되었다. 산업은 "설비 찾기"의 필터와 설비 상세의
+// 적용 산업 태그로만 유지한다. 기존 URL·북마크는 설비 찾기(필터 열림)로 연결한다.
+export default async function IndustriesRedirect() {
+  const locale = await getLocale();
+  redirect({ href: "/products/lineup?finder=open", locale });
 }
