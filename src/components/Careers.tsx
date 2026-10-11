@@ -1,5 +1,7 @@
+"use client";
+
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import Icon from "./Icon";
 import ApplyButton from "./ApplyButton";
 import { jobs, recruitFields } from "@/lib/data";
@@ -86,7 +88,9 @@ function DetailedJobCard({ j, closed = false }: { j: JobDetail; closed?: boolean
         <div className="flex flex-wrap gap-2">
           <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{j.type}</span>
           <span className="font-mono text-[10.5px] text-ink-soft border border-line-strong px-2 py-[3px] tracking-wide">{j.loc}</span>
-          <span className="font-mono text-[10.5px] text-red border border-red px-2 py-[3px] tracking-wide">{j.due}</span>
+          <span className={`font-mono text-[10.5px] px-2 py-[3px] tracking-wide border ${closed ? "text-ink-faint border-line-strong" : "text-red border-red"}`}>
+            {closed ? "채용 마감" : j.due}
+          </span>
         </div>
       </summary>
 
@@ -172,6 +176,8 @@ function DetailedJobCard({ j, closed = false }: { j: JobDetail; closed?: boolean
   );
 }
 
+const PROCESS_STEPS = ["서류전형", "1차 면접", "2차 면접", "최종합격"] as const;
+
 export default function Careers() {
   const t = useTranslations("careers");
   const benefits = (() => {
@@ -180,8 +186,17 @@ export default function Careers() {
   const notes = (() => {
     try { return (t.raw("jobs.techSales.notes") as string[]) ?? []; } catch { return [] as string[]; }
   })();
+
   // 수시채용 = 채용 사유 발생 시 개별 공고(상세). 상시채용(분야별)과 분리해 운영.
   const occasionalJobs = jobs.filter((job) => job.detailed);
+  // 진행 중(마감 아님) 수시공고가 있으면 수시채용을 기본 탭으로, 없으면 상시채용을 기본 탭으로.
+  const hasActiveOccasional = occasionalJobs.some((job) => !job.closed);
+  const [tab, setTab] = useState<"occasional" | "regular">(hasActiveOccasional ? "occasional" : "regular");
+
+  const tabBtn = (active: boolean) =>
+    `flex-1 sm:flex-none sm:min-w-[200px] px-6 py-3 text-[15px] font-bold rounded-t-md border-2 border-b-0 transition-colors ${
+      active ? "bg-red text-white border-red" : "bg-surface-alt text-ink-faint border-transparent hover:text-ink-soft"
+    }`;
 
   return (
     <section id="careers" className="py-16 sm:py-22 border-b border-line">
@@ -190,60 +205,73 @@ export default function Careers() {
           <span className="w-[7px] h-[7px] rounded-full bg-white animate-pulse" />
           인재채용
         </div>
-        <div className="flex flex-wrap justify-between items-end gap-6 mb-8">
-          <div className="max-w-[920px]">
-            <span className="eyebrow">{t("eyebrow")}</span>
-            <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
-              {t("title")}
-            </h1>
-            <p className="text-ink-soft mt-2.5 leading-relaxed">
-              ㈜이브이레이저는 레이저 기술의 미래를 함께 만들어갈 인재를 모집합니다. 채용은 <b className="text-ink">분야별 상시채용</b>과
-              <b className="text-ink"> 수시채용</b>으로 운영되며, 관심 있는 지원자는 홈페이지를 통해 <b className="text-ink">언제든지 지원</b>하실 수 있습니다.
-            </p>
-          </div>
-          <Link href="/support" className="inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]">
-            {t("viewAll")}
-          </Link>
-        </div>
-
-        {/* 전 분야 공통 우대사항 */}
-        <div className="flex items-start gap-2.5 border border-blue/30 bg-blue-soft/40 rounded-sm px-4 py-3 mb-10">
-          <span className="text-[15px] leading-none mt-0.5">🌐</span>
-          <p className="text-[13px] text-ink-soft leading-relaxed">
-            <b className="text-ink">공통 우대사항</b> — 활발한 해외 진출과 글로벌 파트너 협업이 이루어지는 만큼,
-            <b className="text-ink"> 전 분야에서 외국어(영어·중국어) 가능자를 우대</b>합니다.
+        <div className="max-w-[920px] mb-9">
+          <span className="eyebrow">{t("eyebrow")}</span>
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+            {t("title")}
+          </h1>
+          <p className="text-ink-soft mt-2.5 leading-relaxed">
+            ㈜이브이레이저는 레이저 기술의 미래를 함께 만들어갈 인재를 모집합니다. 채용은 <b className="text-ink">수시채용</b>과
+            <b className="text-ink"> 분야별 상시채용</b>으로 운영되며, 관심 있는 지원자는 홈페이지를 통해 <b className="text-ink">언제든지 지원</b>하실 수 있습니다.
           </p>
         </div>
 
-        {/* 1) 상시채용 — 분야별 */}
-        <span className="eyebrow">OPEN RECRUITMENT · 상시채용</span>
-        <h2 className="mt-2.5 mb-1.5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
-          상시채용 <span className="text-[14px] text-ink-faint font-sans">(분야별 · 신입/경력)</span>
-        </h2>
-        <p className="text-[13px] text-ink-soft mb-6">관심 분야에 언제든지 지원하실 수 있으며, 서류는 인재풀로 관리되어 채용 시 우선 검토됩니다.</p>
-        <div className="grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-          {recruitFields.map((f) => (
-            <FieldCard key={f.name} name={f.name} icon={f.icon} desc={f.desc} applyLabel={t("apply")} />
-          ))}
+        {/* 전 분야 공통 우대사항 */}
+        <div
+          className="flex items-center gap-3 rounded-md border px-5 py-4 mb-10"
+          style={{ borderColor: "#f0cf8a", borderLeft: "4px solid #e8a400", background: "linear-gradient(90deg,#fff7e6,#fffdf7)" }}
+        >
+          <span className="text-[22px] leading-none flex-none">🌐</span>
+          <div>
+            <p className="font-bold text-[14px] text-ink">공통 우대사항</p>
+            <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
+              활발한 해외 진출과 글로벌 파트너 협업이 이루어지는 만큼, <b className="text-ink">전 분야에서 외국어(영어·중국어) 가능자를 우대</b>합니다.
+            </p>
+          </div>
         </div>
 
-        {/* 2) 수시채용 — 개별 공고 */}
-        <div className="mt-16">
-          <span className="eyebrow">POSITIONS · 수시채용</span>
-          <h2 className="mt-2.5 mb-1.5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
-            수시채용 <span className="text-[14px] text-ink-faint font-sans">(채용 사유 발생 시 개별 공고)</span>
-          </h2>
-          <p className="text-[13px] text-ink-soft mb-6">결원·증원 등 채용 사유가 발생하면 아래와 같이 개별 공고로 모집합니다.</p>
-          {occasionalJobs.length > 0 ? (
-            <div className="flex flex-col gap-[18px]">
-              {occasionalJobs.map((job) => (
-                <DetailedJobCard key={job.key} j={t.raw(`jobs.${job.key}`) as JobDetail} closed={job.closed} />
-              ))}
+        {/* 탭 — 수시채용(왼쪽) · 상시채용(오른쪽) */}
+        <div className="flex gap-2 border-b-2 border-line-strong" role="tablist">
+          <button type="button" role="tab" aria-selected={tab === "occasional"} onClick={() => setTab("occasional")} className={tabBtn(tab === "occasional")}>
+            수시채용
+          </button>
+          <button type="button" role="tab" aria-selected={tab === "regular"} onClick={() => setTab("regular")} className={tabBtn(tab === "regular")}>
+            상시채용
+          </button>
+        </div>
+
+        {/* 탭 내용 */}
+        <div className="pt-8">
+          {tab === "occasional" ? (
+            <div role="tabpanel">
+              <h2 className="mb-1.5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
+                수시채용 <span className="text-[14px] text-ink-faint font-sans">(채용 사유 발생 시 개별 공고)</span>
+              </h2>
+              <p className="text-[13px] text-ink-soft mb-6">결원·증원 등 채용 사유가 발생하면 아래와 같이 개별 공고로 모집합니다.</p>
+              {occasionalJobs.length > 0 ? (
+                <div className="flex flex-col gap-[18px]">
+                  {occasionalJobs.map((job) => (
+                    <DetailedJobCard key={job.key} j={t.raw(`jobs.${job.key}`) as JobDetail} closed={job.closed} />
+                  ))}
+                </div>
+              ) : (
+                <p className="py-10 text-center text-[13.5px] text-ink-faint border border-line rounded-sm bg-surface-alt">
+                  현재 진행 중인 수시채용 공고가 없습니다. 상시채용으로 언제든지 지원해 주세요.
+                </p>
+              )}
             </div>
           ) : (
-            <p className="py-8 text-center text-[13.5px] text-ink-faint border border-line rounded-sm bg-surface-alt">
-              현재 진행 중인 수시채용 공고가 없습니다. 상시채용으로 언제든지 지원해 주세요.
-            </p>
+            <div role="tabpanel">
+              <h2 className="mb-1.5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
+                상시채용 <span className="text-[14px] text-ink-faint font-sans">(분야별 · 신입/경력)</span>
+              </h2>
+              <p className="text-[13px] text-ink-soft mb-6">관심 분야에 언제든지 지원하실 수 있으며, 서류는 인재풀로 관리되어 채용 시 우선 검토됩니다.</p>
+              <div className="grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+                {recruitFields.map((f) => (
+                  <FieldCard key={f.name} name={f.name} icon={f.icon} desc={f.desc} applyLabel={t("apply")} />
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -254,44 +282,53 @@ export default function Careers() {
             <h2 className="mt-2.5 mb-6 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">복지 및 혜택</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((b) => (
-                <div key={b.heading} className="border border-line p-3.5">
-                  <p className="font-bold text-[12.5px] mb-1.5">{b.heading}</p>
-                  <p className="text-[12px] text-ink-soft leading-relaxed">{b.items.join(" · ")}</p>
+                <div key={b.heading} className="rounded-md border border-line-strong bg-surface-alt p-4">
+                  <p className="flex items-center gap-2 font-bold text-[13px] text-red mb-2 before:content-[''] before:w-[7px] before:h-[7px] before:rounded-full before:bg-red before:flex-none">
+                    {b.heading}
+                  </p>
+                  <p className="text-[12.5px] text-ink-soft leading-relaxed">{b.items.join(" · ")}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 전형절차 · 유의사항 */}
-        <div className="mt-14 grid gap-10 md:grid-cols-2">
-          <div>
-            <span className="eyebrow">PROCESS</span>
-            <h2 className="mt-2.5 mb-4 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">전형절차</h2>
-            <div className="flex flex-wrap items-center gap-2 text-[13px]">
-              {["서류전형", "1차 면접", "2차 면접", "최종합격"].map((s, i) => (
-                <span key={s} className="inline-flex items-center gap-2">
-                  {i > 0 && <span className="text-ink-faint">→</span>}
-                  <span className="border border-line-strong rounded-full px-3.5 py-1.5 bg-surface">{s}</span>
+        {/* 전형절차 */}
+        <div className="mt-14">
+          <span className="eyebrow">PROCESS</span>
+          <h2 className="mt-2.5 mb-5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">전형절차</h2>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0">
+            {PROCESS_STEPS.map((s, i) => (
+              <div key={s} className="relative flex-1 flex sm:block items-center gap-3 rounded-md border border-line-strong bg-surface-alt px-4 py-5 sm:text-center sm:mr-3 last:mr-0">
+                <span className="w-8 h-8 flex-none inline-flex items-center justify-center rounded-full bg-red text-white font-bold text-[14px] sm:mx-auto sm:mb-2.5">
+                  {i + 1}
                 </span>
-              ))}
-            </div>
-            <dl className="mt-5 flex flex-col gap-1.5 text-[13px]">
-              <div className="flex gap-2">
-                <dt className="text-ink-faint w-[72px] flex-none">지원방법</dt>
-                <dd className="text-ink-soft">홈페이지 상시 지원 (신입·경력)</dd>
+                <span className="font-bold text-[14px]">{s}</span>
+                {i < PROCESS_STEPS.length - 1 && (
+                  <span className="hidden sm:block absolute -right-[11px] top-1/2 -translate-y-1/2 text-line-strong text-[18px] z-10">›</span>
+                )}
               </div>
-              <div className="flex gap-2">
-                <dt className="text-ink-faint w-[72px] flex-none">제출서류</dt>
-                <dd className="text-ink-soft">이력서·자기소개서 (자유양식, 포트폴리오 등 첨부 가능)</dd>
-              </div>
-            </dl>
+            ))}
           </div>
-          {notes.length > 0 && (
-            <div>
-              <span className="eyebrow">NOTICE</span>
-              <h2 className="mt-2.5 mb-4 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">유의사항</h2>
-              <ul className="flex flex-col gap-1.5">
+          <dl className="mt-6 flex flex-col gap-1.5 text-[13px]">
+            <div className="flex gap-2">
+              <dt className="text-ink-faint w-[72px] flex-none">지원방법</dt>
+              <dd className="text-ink-soft">홈페이지 상시 지원 (신입·경력)</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="text-ink-faint w-[72px] flex-none">제출서류</dt>
+              <dd className="text-ink-soft">이력서·자기소개서 (자유양식, 포트폴리오 등 첨부 가능)</dd>
+            </div>
+          </dl>
+        </div>
+
+        {/* 유의사항 */}
+        {notes.length > 0 && (
+          <div className="mt-14">
+            <span className="eyebrow">NOTICE</span>
+            <h2 className="mt-2.5 mb-4 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">유의사항</h2>
+            <div className="rounded-md border border-line-strong bg-surface p-5">
+              <ul className="flex flex-col gap-2">
                 {notes.map((n, i) => (
                   <li key={i} className="text-[13px] text-ink-soft pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-blue">
                     {n}
@@ -302,8 +339,8 @@ export default function Careers() {
                 </li>
               </ul>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* 인재상 */}
         <div id="culture" className="mt-16 pt-16 border-t border-line scroll-mt-28">

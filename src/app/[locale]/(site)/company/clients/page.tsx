@@ -24,15 +24,16 @@ export default async function CompanyClientsPage() {
         <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("clients.desc")}</p>
 
         {clientLogos.length > 0 ? (
-          <div className="mt-9 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+          <div className="mt-9 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-x-7 gap-y-5 justify-items-center">
             {clientLogos.map((l) => (
               <div
                 key={l.id}
                 title={l.name}
-                className="flex items-center justify-center h-[84px] border border-line-strong bg-white p-3"
+                className="flex items-center justify-center w-[80%] h-[55px] border border-line-strong bg-white"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={l.logoUrl} alt={l.name} className="max-w-full max-h-full object-contain" />
+                {/* 로고는 박스 면적의 70% 이내(가로·세로 각 84%)로 배치해 여백을 둔다 */}
+                <img src={l.logoUrl} alt={l.name} className="max-w-[84%] max-h-[84%] object-contain" />
               </div>
             ))}
           </div>
