@@ -51,7 +51,8 @@ export default function ApplyButton({ jobTitle, label, className }: { jobTitle: 
                     setErrorMsg("");
                     const form = e.currentTarget;
                     const data = new FormData(form);
-                    data.set("jobTitle", jobTitle);
+                    const applicantType = String(data.get("applicantType") ?? "").trim();
+                    data.set("jobTitle", applicantType ? `${jobTitle} · ${applicantType}` : jobTitle);
                     try {
                       const res = await fetch("/api/careers/apply", { method: "POST", body: data });
                       const json = await res.json();
@@ -68,6 +69,17 @@ export default function ApplyButton({ jobTitle, label, className }: { jobTitle: 
                     }
                   }}
                 >
+                  <div className="flex flex-col gap-1.5 mb-4">
+                    <label className="text-[12.5px] font-bold text-ink-soft">지원 구분</label>
+                    <select
+                      name="applicantType"
+                      defaultValue="경력"
+                      className="border border-line-strong px-3 py-[11px] bg-surface text-[13.8px] rounded-sm"
+                    >
+                      <option value="신입">신입</option>
+                      <option value="경력">경력</option>
+                    </select>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <Field label="이름" name="name" required />
                     <Field label="연락처" name="phone" type="tel" required />
