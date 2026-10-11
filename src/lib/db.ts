@@ -487,6 +487,7 @@ function createSchema(): Promise<void> {
     await ensureKoplas2008ToExhibition();
     await ensureTradenameNoticeFix();
     await ensureKimes2014ToExhibition();
+    await ensureKomaf2015Date();
   })();
 }
 
@@ -1664,6 +1665,14 @@ async function ensureKimes2014ToExhibition(): Promise<void> {
   ].join("\n\n");
   await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
   await sql`INSERT INTO settings (key, value) VALUES ('kimes2014_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// KOMAF 2015 기사(#67) 등록일을 실제 개최 시기(2015.10.28)로 교정 → 날짜순 재배치.
+async function ensureKomaf2015Date(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'komaf2015_date_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`UPDATE news_items SET date = '2015.10.28' WHERE title = '[KOMAF 2015] (주)유로비젼레이저, ‘행복한 기업, 최고의 기술’'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('komaf2015_date_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
