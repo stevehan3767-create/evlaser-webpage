@@ -8,7 +8,6 @@ import NewsCollapseButton from "./NewsCollapseButton";
 const CATEGORIES = [
   { key: "company", tag: "회사소식" },
   { key: "exhibition", tag: "전시회소식" },
-  { key: "industry", tag: "산업동향" },
 ] as const;
 
 const PAGE_SIZE = 15;

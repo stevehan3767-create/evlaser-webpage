@@ -283,7 +283,6 @@ export const resourcesNav: NavItem[] = [
 export const newsNav: NavItem[] = [
   { key: "company", href: "/news?cat=company" },
   { key: "exhibition", href: "/news?cat=exhibition" },
-  { key: "industry", href: "/news?cat=industry" },
   { key: "press", href: "/news/press" },
 ];
 
