@@ -41,7 +41,9 @@
         "company": "Company News",
         "exhibition": "Exhibitions",
         "industry": "Industry Trends",
-        "press": "Press & Research"
+        "press": "Press & Research",
+        "paper": "Papers & Research",
+        "media": "Press & Media"
       }
     },
     "careers": {

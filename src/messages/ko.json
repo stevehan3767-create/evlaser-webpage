@@ -41,7 +41,9 @@
         "company": "사내소식",
         "exhibition": "전시회소식",
         "industry": "산업동향",
-        "press": "언론·연구활동"
+        "press": "언론·연구활동",
+        "paper": "논문·학술소식",
+        "media": "언론·방송소식"
       }
     },
     "careers": {

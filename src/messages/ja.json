@@ -41,7 +41,9 @@
         "company": "会社ニュース",
         "exhibition": "展示会情報",
         "industry": "業界動向",
-        "press": "メディア·研究"
+        "press": "メディア·研究",
+        "paper": "論文·学術",
+        "media": "メディア·放送"
       }
     },
     "careers": {

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
+import NewsTabs from "@/components/NewsTabs";
 import { pressRepo } from "@/lib/repo";
 import type { PressItemRow } from "@/lib/repo";
 
@@ -14,9 +14,6 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 // 언론보도와 방송을 "언론·방송"(media)으로 통합. (broadcast 레거시는 media로 표시)
-const CATEGORIES = ["all", "media", "paper"] as const;
-type Cat = (typeof CATEGORIES)[number];
-
 function catLabel(t: (k: string) => string, category: string): string {
   return t(`press.tabs.${category === "broadcast" ? "media" : category}`);
 }
@@ -126,38 +123,28 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
 
 export default async function NewsPressPage({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
   const { cat: rawCat } = await searchParams;
-  const activeCat: Cat = CATEGORIES.includes(rawCat as Cat) ? (rawCat as Cat) : "all";
+  // 논문·학술소식(paper) / 언론·방송소식(media) 두 카테고리. 기본은 언론·방송.
+  const activeCat: "media" | "paper" = rawCat === "paper" ? "paper" : "media";
 
   const tRaw = await getTranslations("company");
   const t = (k: string): string => tRaw(k);
+  const tNews = await getTranslations("news");
+  const tTab = await getTranslations("nav.news.items");
   const items = await pressRepo.list(true).catch(() => []);
-  const visible = activeCat === "all" ? items : items.filter((i) => i.category === activeCat);
+  const visible = items.filter((i) => i.category === activeCat);
 
   return (
-    <section className="pt-12 pb-16 sm:pb-22 border-b border-line">
+    <section className="pt-12 pb-16 sm:pb-22 border-b border-line bg-surface-alt">
       <div className="mx-auto max-w-[1240px] px-7">
-        <Breadcrumb items={[{ label: "뉴스·소식", href: "/news" }, { label: t("press.title") }]} />
-        <span className="eyebrow">{t("press.eyebrow")}</span>
-        <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{t("press.title")}</h1>
-        <p className="mt-4 max-w-[68ch] text-ink-soft text-[14px] leading-relaxed">{t("press.summary")}</p>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {CATEGORIES.map((c) => (
-            <Link
-              key={c}
-              href={c === "all" ? "/news/press" : `/news/press?cat=${c}`}
-              className={`px-4 py-2 text-[13px] font-bold border rounded-sm transition-colors ${
-                c === activeCat
-                  ? "bg-red text-white border-red"
-                  : "bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red"
-              }`}
-            >
-              {t(`press.tabs.${c}`)}
-            </Link>
-          ))}
+        <Breadcrumb items={[{ label: "뉴스·소식", href: "/news" }, { label: tTab(activeCat) }]} />
+        <div className="mt-2.5 mb-8">
+          <span className="eyebrow">{tNews("eyebrow")}</span>
+          <h1 className="mt-2.5 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight">{tNews("title")}</h1>
         </div>
 
-        <div className="mt-6 border-t border-line">
+        <NewsTabs active={activeCat} />
+
+        <div className="border-t-2 border-ink/70">
           {visible.length === 0 ? (
             <p className="py-10 text-ink-soft text-[13.5px]">{t("press.empty")}</p>
           ) : (

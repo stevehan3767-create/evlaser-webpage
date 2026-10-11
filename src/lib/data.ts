@@ -342,7 +342,8 @@ export const resourcesNav: NavItem[] = [
 export const newsNav: NavItem[] = [
   { key: "company", href: "/news?cat=company" },
   { key: "exhibition", href: "/news?cat=exhibition" },
-  { key: "press", href: "/news/press" },
+  { key: "paper", href: "/news/press?cat=paper" },
+  { key: "media", href: "/news/press?cat=media" },
 ];
 
 export const careersNav: NavItem[] = [

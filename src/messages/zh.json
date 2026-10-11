@@ -41,7 +41,9 @@
         "company": "公司新闻",
         "exhibition": "展会资讯",
         "industry": "行业动态",
-        "press": "媒体·研究"
+        "press": "媒体·研究",
+        "paper": "论文·学术",
+        "media": "媒体·报道"
       }
     },
     "careers": {

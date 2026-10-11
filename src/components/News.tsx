@@ -4,6 +4,7 @@ import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, newsImageRepo, seedIfEmpty } from "@/lib/repo";
 import type { NewsRow, NewsImageRow } from "@/lib/repo";
 import NewsCollapseButton from "./NewsCollapseButton";
+import NewsTabs from "./NewsTabs";
 
 const CATEGORIES = [
   { key: "company", tag: "회사소식" },
@@ -112,7 +113,6 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
   const activeCat = CATEGORIES.some((c) => c.key === rawCat) ? (rawCat as string) : CATEGORIES[0].key;
 
   const t = await getTranslations("news");
-  const tNav = await getTranslations("nav.news.items");
   await seedIfEmpty(seedNewsItems);
   const items = await newsRepo.list(true);
   const activeTag = CATEGORIES.find((c) => c.key === activeCat)!.tag;
@@ -133,28 +133,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           </h1>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-6">
-          {CATEGORIES.map((c) => (
-            <Link
-              key={c.key}
-              href={`/news?cat=${c.key}`}
-              className={`px-4 py-2 text-[13.5px] font-bold border rounded-sm transition-colors ${
-                c.key === activeCat
-                  ? "bg-red text-white border-red"
-                  : "bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red"
-              }`}
-            >
-              {tNav(c.key)}
-            </Link>
-          ))}
-          {/* 언론·연구활동은 별도 페이지(/news/press)로 연결 */}
-          <Link
-            href="/news/press"
-            className="px-4 py-2 text-[13.5px] font-bold border rounded-sm transition-colors bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red"
-          >
-            {tNav("press")}
-          </Link>
-        </div>
+        <NewsTabs active={activeCat} />
 
         {activeItems.length > 0 && (
           <p className="text-[12.5px] text-ink-faint mb-2">전체 {activeItems.length}건</p>
