@@ -483,6 +483,10 @@ function createSchema(): Promise<void> {
     await ensureChinaSeminar2013ToPress();
     await ensureHeatTreat2012ToPress();
     await ensureBusanKoaashow2008ToExhibition();
+    await ensureRenameNoticeFix();
+    await ensureKoplas2008ToExhibition();
+    await ensureTradenameNoticeFix();
+    await ensureKimes2014ToExhibition();
   })();
 }
 
@@ -1604,6 +1608,62 @@ async function ensureBusanKoaashow2008ToExhibition(): Promise<void> {
   ].join("\n\n");
   await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
   await sql`INSERT INTO settings (key, value) VALUES ('busan_koaashow2008_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 사명 변경 안내(#): 실제 변경일(2018.08.28)로 등록일 교정 + 본문 가독성 재편집.
+async function ensureRenameNoticeFix(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'rename_notice_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const newBody = [
+    "안녕하십니까, ㈜이브이레이저입니다.",
+    "2018년 8월 28일부로 기존 “유로비젼레이저”에서 새로운 사명 “이브이레이저”로 상호를 변경하였습니다.",
+    "단순 상호 변경으로, 기존 조직 구성과 연락 채널은 모두 동일하게 유지되오니 참고 부탁드립니다.",
+    "감사합니다.",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET date = '2018.08.28', body = ${newBody} WHERE title LIKE '%사명 변경 안내%'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('rename_notice_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// KOPLAS 2008 참가(#)를 사내소식 → 전시회소식(뉴스 내 카테고리)으로 이동 + 본문 재편집.
+async function ensureKoplas2008ToExhibition(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'koplas2008_to_exhibition'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "KOPLAS 2008 참가";
+  const newBody = [
+    "제19회 플라스틱&고무 전시회 ‘KOPLAS 2008’이 2008년 3월 26일부터 30일까지 5일간 개최됩니다.",
+    "당사는 KOPLAS 2008(부스번호 217)에 출품할 예정이오니, 관심 있는 관련 업체 여러분의 많은 참관 바랍니다.",
+    "전시회 상세 자료는 www.koplas.com 을 참조해 주시기 바랍니다. 감사합니다.",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('koplas2008_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 상호명 변경 공지(#): 본문 오류 수정 — (주)유로비젼 → (주)유로비젼레이저 (2014.10.01).
+async function ensureTradenameNoticeFix(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tradename_notice_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "※공지 상호명 변경 사항";
+  const newBody = [
+    "[공지사항] 상호명 변경 안내입니다.",
+    "· 변경일: 2014년 10월 1일\n· 변경 내용: (주)유로비젼 → (주)유로비젼레이저",
+    "단순 상호 변경으로 기존 조직 구성과 연락 채널은 동일하게 유지됩니다. 앞으로도 많은 관심 부탁드립니다.",
+    "유로비젼레이저(주) 임직원 일동",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET body = ${newBody} WHERE title = ${srcTitle}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('tradename_notice_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2014 KIMES 전시회 참가(#)를 사내소식 → 전시회소식(뉴스 내 카테고리)으로 이동 + 본문 재편집.
+async function ensureKimes2014ToExhibition(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'kimes2014_to_exhibition'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "2014년 kIMES_국제의료기기 & 병원 설비 전시회";
+  const newBody = [
+    "㈜유로비젼은 올해도 KIMES 전시회에 참가하게 되었습니다. 많은 관심 부탁드립니다.",
+    "· 전시회: KIMES 2014 (국제의료기기 & 병원설비 전시회)\n· 기간: 2014년 3월 13일(목)~16일(일), 4일간\n· 개장시간: 오전 10시~오후 6시\n· 장소: 코엑스(COEX) 전시장 1·3층 전관 (서울시 강남구 삼성동 159)\n· 참조: http://www.kimes.kr/kr/",
+  ].join("\n\n");
+  await sql`UPDATE news_items SET tag = '전시회소식', body = ${newBody} WHERE title = ${srcTitle}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('kimes2014_to_exhibition', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
