@@ -112,13 +112,15 @@ export default function LineupFinder({
   }
 
   // 상단 3버튼을 하나의 통일된 디자인군으로 구성한다.
-  // 공통: 같은 크기·모서리·글자, 브랜드 레드를 기준 색으로.
+  // 평상시: 연한 레드 틴트 / 마우스 오버: 살짝 진한 톤 / 활성(다른 모드): 진한 레드 솔리드.
   const btnBase =
     "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[12.5px] font-bold border transition-colors";
   const allOn = showAll && !hasSelection;
-  const btnPrimary = `${btnBase} bg-red text-white border-red hover:bg-[#c40025]`; // 조건으로 찾기(주 버튼)
-  const btnAll = `${btnBase} ${allOn ? "bg-red-soft text-red border-red" : "bg-surface text-ink border-line-strong hover:border-red hover:text-red"}`; // 모든 설비 보기
-  const btnReset = `${btnBase} bg-surface text-ink-soft border-line-strong hover:border-red hover:text-red`; // 초기화
+  const btnRest = `${btnBase} bg-[#fdecef] text-[#d10b2a] border-[#f3c3cc] hover:bg-[#f8cdd5] hover:text-[#b00020] hover:border-[#e79aa6]`;
+  const btnActive = `${btnBase} bg-[#c40025] text-white border-[#c40025] hover:bg-[#ad0021]`;
+  const btnPrimary = hasSelection ? btnActive : btnRest; // 조건으로 찾기: 조건 선택 시 활성
+  const btnAll = allOn ? btnActive : btnRest; // 모든 설비 보기: 전체보기 ON 시 활성
+  const btnReset = btnRest; // 초기화: 토글 아님(평상시/호버만)
 
   return (
     <div>
