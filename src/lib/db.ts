@@ -473,6 +473,7 @@ function createSchema(): Promise<void> {
     await ensureRaylaseTrainingFix();
     await ensureNewsCleanup();
     await ensureAllTextCleanupV2();
+    await ensureHidec28ReviewToPress();
   })();
 }
 
@@ -1240,6 +1241,51 @@ async function ensureAllTextCleanupV2(): Promise<void> {
     if (cleaned !== (r.body ?? "")) await sql`UPDATE press_items SET body = ${cleaned} WHERE id = ${r.id}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('all_text_cleanup_v2', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제28회 HiDEC 연구발표회 참가 후기(#105)를 사내소식 → 논문·학술소식으로 이관한다.
+// 본문은 가독성 있게 재편집, 사진 5장 복사.
+async function ensureHidec28ReviewToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'hidec28_review_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "제 28회 고에너지 연구위원회(HiDEC) 연구발표회에 다녀왔습니다.";
+  const newBody = [
+    "안녕하세요, 이브이레이저입니다.",
+    "오늘은 제28회 고에너지 연구위원회(HiDEC) 연구발표회에 다녀온 소식입니다. 올해는 “미래 산업 기술 선도를 위한 고에너지 적용 기술”이라는 주제로 열렸으며, 대한용접접합학회 고에너지연구위원회는 고에너지 연구 분야의 정보 공유와 네트워크 활성화를 위해 매년 이러한 정기 학술 발표회를 진행하고 있습니다.",
+    "회원분들과 후원기업, 그리고 다수의 관계자분들의 관심과 열기로 현장 분위기가 뜨거웠습니다. 이번 발표회에는 이브이레이저 한상배 대표님도 발표자로 참석하시어 “3D 스캐너와 CO₂ 레이저를 이용한 차량 조명용 반사필름의 레이저 펀칭 기술 개발 사례”를 직접 소개했습니다. 많은 학회 관계자분들이 집중해 들어주시고 관심을 표해주신 덕분에 발표를 잘 마무리했습니다.",
+    "저희 이브이레이저는 이러한 기술 관련 학회와 워크숍, 전시회 등을 통해 정보를 공유하고 산업 동향을 빠르게 파악하기 위한 행보를 계속 이어가고 있습니다.",
+    "기업부설연구소의 연구개발 및 양산기술 적용 과정에서 습득한 레이저 응용 기술의 성과물은, 관련 학회 활동과 연구 논문 발표를 통해 대학교·연구소 및 관련 업체의 전문가·사용자와 함께 공유하고 있습니다. 또한 레이저 산업 관련 인프라를 확대하고 전문가들과의 정보·신기술 교류를 위해 학회 활동에도 활발히 참여하고 있습니다.",
+    "레이저 설비 및 기술에 관한 모든 문의는 이브이레이저로 부탁드립니다. 감사합니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2024.07.24";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '대한용접접합학회 고에너지연구위원회', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    } else {
+      await sql`UPDATE press_items SET body = ${newBody} WHERE id = ${exists[0].id}`;
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('hidec28_review_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
