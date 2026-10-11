@@ -6,11 +6,13 @@ export default function ApplyButton({ jobTitle, label, className }: { jobTitle: 
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [files, setFiles] = useState<{ name: string; size: number }[]>([]);
 
   function close() {
     setOpen(false);
     setStatus("idle");
     setErrorMsg("");
+    setFiles([]);
   }
 
   return (
@@ -99,10 +101,26 @@ export default function ApplyButton({ jobTitle, label, className }: { jobTitle: 
                       type="file"
                       name="files"
                       multiple
+                      onChange={(e) =>
+                        setFiles(Array.from(e.target.files ?? []).map((f) => ({ name: f.name, size: f.size })))
+                      }
                       className="border border-line-strong px-3 py-[9px] bg-surface text-[12.5px] rounded-sm file:mr-3 file:px-3 file:py-1.5 file:border-0 file:bg-ink file:text-white file:text-[12px] file:font-bold file:rounded-sm"
                     />
                   </div>
-                  <p className="text-[11.5px] text-ink-faint mb-4">여러 파일을 선택할 수 있습니다. 전체 용량은 4MB 이하로 첨부해 주세요.</p>
+                  {files.length > 0 && (
+                    <ul className="mb-3 flex flex-col gap-1">
+                      {files.map((f, i) => (
+                        <li key={i} className="flex items-center justify-between gap-2 text-[12px] text-ink-soft border border-line rounded-sm px-2.5 py-1.5">
+                          <span className="truncate">{f.name}</span>
+                          <span className="flex-none font-mono text-[11px] text-ink-faint">{(f.size / 1024 / 1024).toFixed(2)}MB</span>
+                        </li>
+                      ))}
+                      <li className="text-[11.5px] text-ink-faint">
+                        선택한 파일 {files.length}개 · 총 {(files.reduce((s, f) => s + f.size, 0) / 1024 / 1024).toFixed(2)}MB
+                      </li>
+                    </ul>
+                  )}
+                  <p className="text-[11.5px] text-ink-faint mb-4">여러 파일을 선택할 수 있습니다. 전체 용량은 20MB 이하로 첨부해 주세요.</p>
 
                   <button
                     type="submit"
