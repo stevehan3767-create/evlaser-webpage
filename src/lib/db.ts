@@ -463,6 +463,8 @@ function createSchema(): Promise<void> {
     await ensureInvestnewsToPress();
     await ensureKslp2025ToPress();
     await ensureYtnFilmingToPress();
+    await ensureKsmeJournalToPress();
+    await ensureEconomyNewsToPress();
   })();
 }
 
@@ -897,6 +899,78 @@ async function ensureYtnFilmingToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('ytn_filming_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 대한기계학회 기계저널 CEO 인터뷰(#113)를 사내소식 → 언론·방송소식으로 이관한다.
+// 본문·사진 그대로 복사 후 사내소식에서 제거.
+async function ensureKsmeJournalToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ksme_journal_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "대한기계학회 기계저널 CEO 인터뷰 진행";
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2025.05.14";
+    const body = (n.body as string) || "";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'media', ${srcTitle}, '대한기계학회 기계저널', ${date}, ${body},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('ksme_journal_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 경제인뉴스 CEO 인터뷰(#111)를 사내소식 → 언론·방송소식으로 이관한다.
+// 본문·사진 그대로 복사 후 사내소식에서 제거.
+async function ensureEconomyNewsToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'economynews_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "경제인뉴스 CEO 인터뷰 진행";
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2024.11.25";
+    const body = (n.body as string) || "";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'media', ${srcTitle}, '경제인뉴스', ${date}, ${body},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('economynews_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
