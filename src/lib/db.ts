@@ -5,6 +5,7 @@ import exhibitionPosts from "./exhibition-data.json";
 import mainnewsPosts from "./mainnews-data.json";
 import supportInquirySeed from "./support-inquiries-data.json";
 import newsPlaceholderImages from "./news-placeholder-images.json";
+import eventDates from "./event-dates.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -489,6 +490,7 @@ function createSchema(): Promise<void> {
     await ensureKimes2014ToExhibition();
     await ensureKomaf2015Date();
     await ensureSafeTyposV3();
+    await ensureEventDatesPlus7();
   })();
 }
 
@@ -1700,6 +1702,19 @@ async function ensureSafeTyposV3(): Promise<void> {
     if (c !== (r.body ?? "")) await sql`UPDATE press_items SET body = ${c} WHERE id = ${r.id}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('safe_typos_v3', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 행사날짜가 명확한 전시회·학술 게시글의 등록일을 "행사 시작일 + 7일"로 설정한다.
+// (개최 전인 KOREA METAL WEEK 2026은 예외로 2026.09.10 지정) 목록은 등록일 최신순 정렬.
+async function ensureEventDatesPlus7(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'event_dates_plus7_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const map = eventDates as Record<string, string>;
+  for (const [title, date] of Object.entries(map)) {
+    await sql`UPDATE news_items SET date = ${date} WHERE title = ${title}`;
+    await sql`UPDATE press_items SET date = ${date} WHERE title = ${title}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('event_dates_plus7_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
