@@ -488,6 +488,7 @@ function createSchema(): Promise<void> {
     await ensureTradenameNoticeFix();
     await ensureKimes2014ToExhibition();
     await ensureKomaf2015Date();
+    await ensureSafeTyposV3();
   })();
 }
 
@@ -1673,6 +1674,32 @@ async function ensureKomaf2015Date(): Promise<void> {
   if (flag.length > 0) return;
   await sql`UPDATE news_items SET date = '2015.10.28' WHERE title = '[KOMAF 2015] (주)유로비젼레이저, ‘행복한 기업, 최고의 기술’'`;
   await sql`INSERT INTO settings (key, value) VALUES ('komaf2015_date_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 명백한 오탈자 + (주) 앞 공백만 안전하게 일괄 교정(news + press). (띄어쓰기 자동화는 오류 위험이 커 제외)
+function safeTypoFix(raw: string): string {
+  let s = raw || "";
+  const typos: [string, string][] = [
+    ["읍니다", "습니다"], ["괸심", "관심"], ["젼화", "전화"], ["춤품", "출품"], ["이였", "이었"],
+  ];
+  for (const [a, b] of typos) s = s.split(a).join(b);
+  s = s.replace(/([가-힣])(\(주\)|㈜)/g, "$1 $2");
+  return s;
+}
+async function ensureSafeTyposV3(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'safe_typos_v3'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const news = (await sql`SELECT id, body FROM news_items`) as { id: string; body: string }[];
+  for (const r of news) {
+    const c = safeTypoFix(r.body);
+    if (c !== (r.body ?? "")) await sql`UPDATE news_items SET body = ${c} WHERE id = ${r.id}`;
+  }
+  const press = (await sql`SELECT id, body FROM press_items`) as { id: string; body: string }[];
+  for (const r of press) {
+    const c = safeTypoFix(r.body);
+    if (c !== (r.body ?? "")) await sql`UPDATE press_items SET body = ${c} WHERE id = ${r.id}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('safe_typos_v3', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
