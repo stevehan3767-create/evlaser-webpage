@@ -18,12 +18,13 @@ export default function NewsCard({ n, images }: { n: NewsRow; images: NewsImageR
 
   const thumbEl = (
     <div className="flex-none">
-      {thumb ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={thumb} alt="" loading="lazy" className={`w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl ${IMG_SHADOW}`} />
-      ) : (
-        <span className="block w-24 h-24 sm:w-32 sm:h-32 rounded-xl border border-dashed border-line-strong bg-surface-alt" />
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={thumb ?? "/images/news/logo-thumb.webp"}
+        alt=""
+        loading="lazy"
+        className={`w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-xl bg-surface ${IMG_SHADOW}`}
+      />
     </div>
   );
 

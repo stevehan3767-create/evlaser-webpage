@@ -472,6 +472,7 @@ function createSchema(): Promise<void> {
     await ensureWs46ReviewToPress();
     await ensureRaylaseTrainingFix();
     await ensureNewsCleanup();
+    await ensureAllTextCleanupV2();
   })();
 }
 
@@ -1190,10 +1191,14 @@ function cleanNewsBody(raw: string): string {
   s = lines.join("\n");
   // 게시판 하단 네비게이션 제거 (목록 + 다음글/이전글 블록이 있을 때만)
   s = s.replace(/\n\s*목록\s*\n[\s\S]*$/u, (m) => (/다음글|이전글/.test(m) ? "" : m));
+  // 관리자 이동/안내 꼬리말 제거 (예: "[이 게시물은 최고관리자님에 의해 ... 이동 됨]")
+  s = s.replace(/\[[^\]]*이 게시물은[^\]]*\]/g, "");
   // 문장부호 뒤 공백(뒤 글자가 한글/여는따옴표/여는괄호/대문자일 때만 — 날짜·소수점 보호)
   s = s.replace(/([.!?])([가-힣“”"'(A-Z])/g, "$1 $2");
   // 쉼표 뒤 한글 공백
   s = s.replace(/([,])([가-힣])/g, "$1 $2");
+  // 한글 뒤에 영문 약어(대문자 2자 이상)가 바로 붙은 경우 공백 추가 (조사 보호를 위해 영문→한글은 제외)
+  s = s.replace(/([가-힣])([A-Z]{2,})/g, "$1 $2");
   // 공백·빈줄 정리
   s = s.replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
   return s;
@@ -1217,6 +1222,24 @@ async function ensureNewsCleanup(): Promise<void> {
     }
   }
   await sql`INSERT INTO settings (key, value) VALUES ('news_cleanup_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 사내소식·전시회소식(news) + 논문·학술·언론·방송(press) 전체 본문 가독성 정리(v2).
+// 관리자 이동 꼬리말 제거·문장부호 공백·한글↔약어 공백 등 강화 규칙을 일괄 재적용한다.
+async function ensureAllTextCleanupV2(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'all_text_cleanup_v2'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const news = (await sql`SELECT id, body FROM news_items`) as { id: string; body: string }[];
+  for (const r of news) {
+    const cleaned = cleanNewsBody(r.body);
+    if (cleaned !== (r.body ?? "")) await sql`UPDATE news_items SET body = ${cleaned} WHERE id = ${r.id}`;
+  }
+  const press = (await sql`SELECT id, body FROM press_items`) as { id: string; body: string }[];
+  for (const r of press) {
+    const cleaned = cleanNewsBody(r.body);
+    if (cleaned !== (r.body ?? "")) await sql`UPDATE press_items SET body = ${cleaned} WHERE id = ${r.id}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('all_text_cleanup_v2', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.

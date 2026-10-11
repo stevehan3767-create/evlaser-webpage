@@ -4,6 +4,7 @@ import { newsItems as seedNewsItems } from "@/lib/data";
 import { newsRepo, newsImageRepo, seedIfEmpty } from "@/lib/repo";
 import NewsCard from "./NewsCard";
 import NewsTabs from "./NewsTabs";
+import ScrollTopButton from "./ScrollTopButton";
 
 const CATEGORIES = [
   { key: "company", tag: "회사소식" },
@@ -69,6 +70,7 @@ export default async function News({ searchParams }: { searchParams: Promise<{ c
           </div>
         )}
       </div>
+      <ScrollTopButton />
     </section>
   );
 }

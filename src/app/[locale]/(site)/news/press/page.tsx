@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Breadcrumb from "@/components/Breadcrumb";
 import NewsTabs from "@/components/NewsTabs";
 import PressBody from "@/components/PressBody";
+import ScrollTopButton from "@/components/ScrollTopButton";
 import { pressRepo, pressImageRepo } from "@/lib/repo";
 import type { PressItemRow, PressImageRow } from "@/lib/repo";
 
@@ -131,6 +132,7 @@ export default async function NewsPressPage({ searchParams }: { searchParams: Pr
           )}
         </div>
       </div>
+      <ScrollTopButton />
     </section>
   );
 }
