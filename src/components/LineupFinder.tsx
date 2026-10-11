@@ -39,6 +39,8 @@ export default function LineupFinder({
   const [open, setOpen] = useState(false);
   // 초기 화면에는 설비를 보여주지 않는다. 조건을 고르거나 "모든 설비 보기"를 눌러야 표시.
   const [showAll, setShowAll] = useState(false);
+  // "모든 설비 보기"를 켜기 직전의 선택 상태(다시 누르면 이 상태로 복귀).
+  const [beforeAll, setBeforeAll] = useState<Record<string, string[]>>({});
 
   // 메인 화면의 "조건으로 설비 찾기"에서 넘어오면(?finder=open) 필터 패널을 자동으로 연다.
   useEffect(() => {
@@ -63,6 +65,8 @@ export default function LineupFinder({
   }, [open]);
 
   function toggle(group: string, key: string) {
+    // 조건을 직접 고르면 "모든 설비 보기" 모드는 해제한다.
+    setShowAll(false);
     setSelected((prev) => {
       const cur = prev[group] ?? [];
       const next = cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key];
@@ -85,9 +89,22 @@ export default function LineupFinder({
   // 표시할 설비: 조건이 있으면 필터 결과, 없고 "모든 설비 보기"면 전체, 둘 다 아니면 없음.
   const visible = hasSelection ? filtered : showAll ? lineupCards : [];
 
+  // "모든 설비 보기" 토글 — 켤 때 현재 선택을 기억하고, 다시 누르면 그 상태로 복귀한다.
+  function toggleShowAll() {
+    if (showAll) {
+      setShowAll(false);
+      setSelected(beforeAll);
+    } else {
+      setBeforeAll(selected);
+      setSelected({});
+      setShowAll(true);
+    }
+  }
+
   function reset() {
     setSelected({});
     setShowAll(false);
+    setBeforeAll({});
   }
 
   function nameOf(group: string, key: string) {
@@ -113,10 +130,8 @@ export default function LineupFinder({
 
         <button
           type="button"
-          onClick={() => {
-            setSelected({});
-            setShowAll(true);
-          }}
+          onClick={toggleShowAll}
+          aria-pressed={showAll && !hasSelection}
           className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-[12.5px] font-bold border transition-colors ${
             showAll && !hasSelection ? "bg-blue text-white border-blue" : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
           }`}
@@ -177,10 +192,7 @@ export default function LineupFinder({
           </p>
           <button
             type="button"
-            onClick={() => {
-              setSelected({});
-              setShowAll(true);
-            }}
+            onClick={toggleShowAll}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-red text-white rounded-sm text-[13px] font-bold"
           >
             모든 설비 보기 ({lineupCards.length}개)
@@ -242,8 +254,12 @@ export default function LineupFinder({
               <button
                 type="button"
                 onClick={reset}
-                className="flex-1 py-2.5 border border-line-strong rounded-sm text-[12.5px] font-bold text-ink-soft"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 border border-line-strong rounded-sm text-[12.5px] font-bold text-ink-soft"
               >
+                <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
                 초기화
               </button>
               <button
