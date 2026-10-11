@@ -119,8 +119,15 @@ async function buildDocs(): Promise<SearchDoc[]> {
   for (const f of faqs) {
     docs.push({ title: f.question, snippet: f.answer, category: "자주 묻는 질문", href: "/support?view=faq" });
   }
+  // 자료실 항목은 카테고리(기술자료/동영상자료실/적용사례)별 탭으로 직접 연결한다.
+  const resourceLabel: Record<string, string> = { doc: "자료실 · 기술자료", video: "자료실 · 동영상자료실", case: "자료실 · 적용사례" };
   for (const r of resources) {
-    docs.push({ title: r.title, snippet: r.description, category: "자료실", href: "/resources" });
+    docs.push({
+      title: r.title,
+      snippet: r.description,
+      category: resourceLabel[r.category] ?? "자료실",
+      href: `/resources?cat=${r.category}`,
+    });
   }
   for (const p of press) {
     docs.push({
