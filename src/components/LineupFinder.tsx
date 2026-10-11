@@ -116,7 +116,8 @@ export default function LineupFinder({
   const btnBase =
     "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md text-[12.5px] font-bold border transition-colors";
   const allOn = showAll && !hasSelection;
-  const btnRest = `${btnBase} bg-[#fdecef] text-[#d10b2a] border-[#f3c3cc] hover:bg-[#f8cdd5] hover:text-[#b00020] hover:border-[#e79aa6]`;
+  // 평상시(연한 틴트) → 호버(살짝 진한 톤) → 누름(진한 레드)로 이어지는 공통 상태.
+  const btnRest = `${btnBase} bg-[#fdecef] text-[#d10b2a] border-[#f3c3cc] hover:bg-[#f8cdd5] hover:text-[#b00020] hover:border-[#e79aa6] active:bg-[#c40025] active:text-white active:border-[#c40025]`;
   const btnActive = `${btnBase} bg-[#c40025] text-white border-[#c40025] hover:bg-[#ad0021]`;
   const btnPrimary = hasSelection ? btnActive : btnRest; // 조건으로 찾기: 조건 선택 시 활성
   const btnAll = allOn ? btnActive : btnRest; // 모든 설비 보기: 전체보기 ON 시 활성
@@ -265,7 +266,7 @@ export default function LineupFinder({
                 </svg>
                 초기화
               </button>
-              <button type="button" onClick={() => setOpen(false)} className={`${btnActive} flex-1`}>
+              <button type="button" onClick={() => setOpen(false)} className={`${btnRest} flex-1`}>
                 적용 ({hasSelection ? filtered.length : 0}개)
               </button>
             </div>
