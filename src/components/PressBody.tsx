@@ -24,9 +24,11 @@ export default function PressBody({
   return (
     <>
       {body && (
+        // 펼친 상태에서는 본문 아무 곳이나 클릭하면 닫힌다.
         <p
+          onClick={open ? () => setOpen(false) : undefined}
           className={`mt-2 whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] ${
-            open ? "" : "line-clamp-3"
+            open ? "cursor-pointer" : "line-clamp-3"
           }`}
         >
           {body}
@@ -43,7 +45,7 @@ export default function PressBody({
           >
             {open ? (
               <>
-                접기
+                닫기
                 <svg viewBox="0 0 12 8" className="w-2.5 h-2" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M1 6.5 6 1.5 11 6.5" />
                 </svg>

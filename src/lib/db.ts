@@ -431,6 +431,7 @@ function createSchema(): Promise<void> {
     await ensureSbsBizBroadcast2026();
     await ensureResourceVideosImport();
     await ensureMetalCutVideoUpdate();
+    await ensureRemoveSolderingVideo();
     await ensureRemoveTidingsLogoImages();
     await ensureRemoveNewsLogoImagesV2();
     await ensureFixPost111Images();
@@ -498,12 +499,6 @@ async function ensureResourceVideosImport(): Promise<void> {
       thumbnailUrl: "/images/resources/video/aluminum-diecasting-gate-laser-cut.webp",
       date: "2025-02-14T00:00:00.000Z",
     },
-    {
-      title: "레이저 솔더링 (Laser Soldering) 영상",
-      desc: "레이저를 이용한 비접촉 솔더링(납땜) 공정 영상입니다. 미세·고밀도 부품의 정밀 납땜을 열 영향 최소화로 구현합니다.",
-      url: "https://evlaser.co.kr/uploaded/board/data/8fa9d4b8d2075b6656e97e0e878142d20.mp4",
-      date: "2025-02-14T00:00:00.000Z",
-    },
   ];
   for (const v of vids) {
     const exists = await sql`SELECT 1 FROM resources WHERE url = ${v.url} LIMIT 1`;
@@ -534,6 +529,15 @@ async function ensureMetalCutVideoUpdate(): Promise<void> {
     WHERE category = 'video' AND url IN (${oldUrl}, ${newUrl})
   `;
   await sql`INSERT INTO settings (key, value) VALUES ('metal_cut_video_updated_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
+async function ensureRemoveSolderingVideo(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'soldering_video_removed_2025'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "https://evlaser.co.kr/uploaded/board/data/8fa9d4b8d2075b6656e97e0e878142d20.mp4";
+  await sql`DELETE FROM resources WHERE category = 'video' AND (url = ${url} OR title ILIKE '%솔더링%')`;
+  await sql`INSERT INTO settings (key, value) VALUES ('soldering_video_removed_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 async function ensureIntroVideo2025(): Promise<void> {
