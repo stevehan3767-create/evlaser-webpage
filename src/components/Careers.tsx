@@ -281,13 +281,13 @@ export default function Careers() {
           <div className="mt-16 pt-16 border-t border-line">
             <span className="eyebrow">BENEFITS</span>
             <h2 className="mt-2.5 mb-6 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">복지 및 혜택</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((b) => (
-                <div key={b.heading} className="rounded-md border border-line-strong bg-surface-alt p-4">
-                  <p className="flex items-center gap-2 font-bold text-[13px] text-red mb-2 before:content-[''] before:w-[7px] before:h-[7px] before:rounded-full before:bg-red before:flex-none">
+                <div key={b.heading} className="rounded-md border border-line-strong bg-surface-alt px-5 py-[22px]">
+                  <p className="flex items-center gap-2 font-bold text-[13.5px] text-red mb-3.5 before:content-[''] before:w-[7px] before:h-[7px] before:rounded-full before:bg-red before:flex-none">
                     {b.heading}
                   </p>
-                  <p className="text-[12.5px] text-ink-soft leading-relaxed">{b.items.join(" · ")}</p>
+                  <p className="text-[12.5px] text-ink-soft leading-[1.95]">{b.items.join(" · ")}</p>
                 </div>
               ))}
             </div>
