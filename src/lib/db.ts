@@ -469,6 +469,7 @@ function createSchema(): Promise<void> {
     await ensureMarketingJobRemoveFromNews();
     await ensurePressBodiesReformat();
     await ensureWs46ReviewToPress();
+    await ensureRaylaseTrainingFix();
   })();
 }
 
@@ -1146,6 +1147,30 @@ async function ensureWs46ReviewToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('ws46_review_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// RAYLASE사 제품 교육(#63): 의미 없는 첨부 placeholder 이미지(88_1~88_4) 삭제 +
+// 본문 가독성 재편집. (사내소식 유지, 첫 실제 사진이 썸네일이 됨)
+async function ensureRaylaseTrainingFix(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'raylase_training_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const title = "151026_해외 파트너 RAYLASE사의 제품 교육";
+  const newBody = [
+    "안녕하세요. ㈜유로비젼레이저입니다.",
+    "2015년 10월 26일, 해외 파트너사인 RAYLASE사의 트레이닝이 진행되었습니다. RAYLASE사가 한국을 직접 방문하여 자사 제품에 대한 교육을 진행해 주셨습니다.",
+    "저희는 이러한 교육을 꾸준히 이어감으로써, 고객 여러분께 항상 독창적인 아이디어와 전문 지식을 선보이겠습니다.",
+    "교육에 함께해 주신 유로비젼레이저 직원 여러분과 RAYLASE사의 Mr. Wolfgang 모두 수고 많으셨습니다. 항상 많은 관심 주셔서 감사합니다.",
+    "㈜유로비젼레이저 임직원 일동",
+  ].join("\n\n");
+  const drop = [
+    "/images/news/tidings/88_1.webp",
+    "/images/news/tidings/88_2.webp",
+    "/images/news/tidings/88_3.webp",
+    "/images/news/tidings/88_4.webp",
+  ];
+  await sql`DELETE FROM news_images WHERE url = ANY(${drop}::text[])`;
+  await sql`UPDATE news_items SET body = ${newBody} WHERE title = ${title}`;
+  await sql`INSERT INTO settings (key, value) VALUES ('raylase_training_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
