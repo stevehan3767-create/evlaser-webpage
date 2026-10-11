@@ -37,6 +37,8 @@ export default function LineupFinder({
 }) {
   const [selected, setSelected] = useState<Record<string, string[]>>({});
   const [open, setOpen] = useState(false);
+  // 초기 화면에는 설비를 보여주지 않는다. 조건을 고르거나 "모든 설비 보기"를 눌러야 표시.
+  const [showAll, setShowAll] = useState(false);
 
   // 메인 화면의 "조건으로 설비 찾기"에서 넘어오면(?finder=open) 필터 패널을 자동으로 연다.
   useEffect(() => {
@@ -79,6 +81,14 @@ export default function LineupFinder({
     })
   );
   const selectedCount = activeGroups.reduce((n, g) => n + selected[g].length, 0);
+  const hasSelection = selectedCount > 0;
+  // 표시할 설비: 조건이 있으면 필터 결과, 없고 "모든 설비 보기"면 전체, 둘 다 아니면 없음.
+  const visible = hasSelection ? filtered : showAll ? lineupCards : [];
+
+  function reset() {
+    setSelected({});
+    setShowAll(false);
+  }
 
   function nameOf(group: string, key: string) {
     return facets.find((f) => f.group === group)?.tiles.find((t) => t.itemKey === key)?.name ?? key;
@@ -101,6 +111,25 @@ export default function LineupFinder({
           )}
         </button>
 
+        <button
+          type="button"
+          onClick={() => {
+            setSelected({});
+            setShowAll(true);
+          }}
+          className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-[12.5px] font-bold border transition-colors ${
+            showAll && !hasSelection ? "bg-blue text-white border-blue" : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
+          }`}
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          모든 설비 보기
+        </button>
+
         {activeGroups.flatMap((g) =>
           selected[g].map((k) => (
             <button
@@ -116,24 +145,49 @@ export default function LineupFinder({
           ))
         )}
 
-        {selectedCount > 0 && (
-          <button type="button" onClick={() => setSelected({})} className="ml-auto text-[12px] font-bold text-blue hover:underline">
+        {(hasSelection || showAll) && (
+          <button type="button" onClick={reset} className="ml-auto text-[12px] font-bold text-blue hover:underline">
             초기화
           </button>
         )}
       </div>
 
-      <p className="text-[12.5px] text-ink-soft mb-4">
-        전체 {lineupCards.length}개 중 <b className="text-ink">{filtered.length}개</b>
-      </p>
+      {hasSelection ? (
+        <p className="text-[12.5px] text-ink-soft mb-4">
+          조건에 맞는 설비 <b className="text-ink">{filtered.length}개</b> <span className="text-ink-faint">/ 전체 {lineupCards.length}개</span>
+        </p>
+      ) : showAll ? (
+        <p className="text-[12.5px] text-ink-soft mb-4">
+          전체 설비 <b className="text-ink">{lineupCards.length}개</b>
+        </p>
+      ) : null}
 
-      <ItemCardsGrid
-        items={filtered}
-        hrefFor={(k) => `/products/lineup/${k}`}
-        minColWidth="190px"
-        iconColorClass="text-red"
-        emptyMessage={emptyMessage}
-      />
+      {!hasSelection && !showAll ? (
+        <div className="border border-dashed border-line-strong rounded-md bg-surface-alt/60 px-6 py-12 text-center">
+          <p className="text-[14px] font-bold text-ink mb-1.5">찾으시는 조건을 선택해 주세요</p>
+          <p className="text-[13px] text-ink-soft mb-5">
+            위의 <b className="text-ink">&quot;조건으로 찾기&quot;</b>에서 기술종류·재료·산업분야를 고르면(복수 선택 가능) 맞는 설비가 표시됩니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSelected({});
+              setShowAll(true);
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-red text-white rounded-sm text-[13px] font-bold"
+          >
+            모든 설비 보기 ({lineupCards.length}개)
+          </button>
+        </div>
+      ) : (
+        <ItemCardsGrid
+          items={visible}
+          hrefFor={(k) => `/products/lineup/${k}`}
+          minColWidth="220px"
+          iconColorClass="text-red"
+          emptyMessage={emptyMessage}
+        />
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50">

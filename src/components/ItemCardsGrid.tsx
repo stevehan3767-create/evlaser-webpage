@@ -8,6 +8,7 @@ export interface ItemCard {
   icon: string;
   imageUrl?: string;
   count?: number; // 이 카테고리에 연결된 정보(관련설비 등)의 개수. 지정 시 빨간 (NN) 뱃지로 표시
+  subLabel?: string; // 보조 라벨(예: 설비 모델코드). 이름 아래 작게 표시
 }
 
 // Presentational-only (no data fetching), so it can be rendered from either a
@@ -48,11 +49,16 @@ export default function ItemCardsGrid({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={item.imageUrl} alt="" className="w-full h-[72px] object-cover bg-surface-alt border-b border-line" />
             )}
-            <div className="flex-1 px-3.5 py-3 flex items-center gap-2">
-              <Icon name={item.icon as IconName} className={`w-5 h-5 flex-none ${active ? "text-white" : iconColorClass}`} strokeWidth={1.5} />
-              <h3 className={`text-[13.5px] font-semibold leading-snug text-left ${active ? "text-white" : ""}`}>{item.name}</h3>
+            <div className="flex-1 px-3.5 py-3 flex items-start gap-2">
+              <Icon name={item.icon as IconName} className={`w-5 h-5 flex-none mt-0.5 ${active ? "text-white" : iconColorClass}`} strokeWidth={1.5} />
+              <div className="min-w-0 flex-1">
+                <h3 className={`text-[13.5px] font-semibold leading-snug text-left ${active ? "text-white" : ""}`}>{item.name}</h3>
+                {item.subLabel && (
+                  <p className={`mt-0.5 font-mono text-[10.5px] leading-tight ${active ? "text-white/80" : "text-ink-faint"}`}>{item.subLabel}</p>
+                )}
+              </div>
               {item.count !== undefined && (
-                <span className={`ml-auto flex-none font-mono text-[12px] font-bold ${active ? "text-white" : "text-red"}`}>
+                <span className={`flex-none font-mono text-[12px] font-bold ${active ? "text-white" : "text-red"}`}>
                   ({String(item.count).padStart(2, "0")})
                 </span>
               )}

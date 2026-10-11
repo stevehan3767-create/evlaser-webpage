@@ -467,6 +467,38 @@ export const lineupItems: LineupItem[] = [
 
 export const lineupLabelsKo: Record<string, string> = Object.fromEntries(lineupItems.map((i) => [i.key, i.name]));
 
+// 설비 카드 박스에는 모델명(ELPW-LM Series)이 아니라 "설비명"(예: 자동차 램프용
+// 듀얼빔 레이저 플라스틱 용접 시스템)을 보여준다. 설비명은 설비 상세 설명
+// (description)의 첫 번째 의미 있는 줄에서 가져오고, 없으면 관리자가 입력한 항목명을
+// 사용한다. 모델코드는 카드에 작은 보조 라벨로 함께 표시한다.
+export function lineupNameFromDescription(description?: string | null): string | undefined {
+  if (!description) return undefined;
+  for (const raw of description.split(/\r?\n/)) {
+    const s = raw.trim();
+    if (!s) continue;
+    // 머리글/표/목록/구분기호 줄은 건너뛴다.
+    if (s.startsWith("[") || s.startsWith("|") || s.startsWith(">") || /^[-•*]/.test(s)) continue;
+    const cleaned = s.replace(/^#+\s*/, "").trim();
+    if (cleaned) return cleaned;
+  }
+  return undefined;
+}
+
+// 설비 카드에 쓸 표시명(설비명)과 보조 라벨(모델코드)을 계산한다.
+export function resolveLineupDisplay(opts: {
+  itemKey: string;
+  itemName: string;
+  model?: string | null;
+  description?: string | null;
+}): { name: string; subLabel?: string } {
+  const modelCode = (opts.model && opts.model.trim()) || lineupLabelsKo[opts.itemKey] || "";
+  // 관리자가 항목명을 모델코드와 다르게 바꿨으면 그 값을 설비명으로 우선 사용한다.
+  const adminRenamed = opts.itemName && modelCode && opts.itemName !== modelCode;
+  const name = adminRenamed ? opts.itemName : lineupNameFromDescription(opts.description) || opts.itemName;
+  const subLabel = modelCode && modelCode !== name ? modelCode : undefined;
+  return { name, subLabel };
+}
+
 export const lineupPageSeeds: { key: string; title: string; description: string; imageUrl?: string }[] = lineupItems.map(
   (i) => ({
     key: i.key,

@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { contentGroups } from "@/lib/data";
+import { contentGroups, resolveLineupDisplay } from "@/lib/data";
 import { contentItemRepo, contentPageRepo, contentLinkRepo, seedContentItemsIfEmpty } from "@/lib/repo";
 import LineupFinder, { type FinderCard, type FacetGroup } from "./LineupFinder";
 
@@ -33,6 +33,8 @@ export default async function ProductLineup() {
   const imageByKey = new Map(
     pages.filter((p) => p.groupKey === "lineup" && p.imageUrl).map((p) => [p.itemKey, p.imageUrl as string])
   );
+  // 설비명(설명 첫 줄)·모델코드 계산용으로 설비별 페이지를 키로 모은다.
+  const pageByKey = new Map(pages.filter((p) => p.groupKey === "lineup").map((p) => [p.itemKey, p]));
 
   // 설비별로 각 축에 연결된 값을 모은다: itemKey → { group → [key, ...] }
   const facetKeysByItem = new Map<string, Record<string, string[]>>();
@@ -45,13 +47,23 @@ export default async function ProductLineup() {
   }
 
   // 설비 라인업 카드에는 연결 개수 뱃지를 표시하지 않는다(count 미설정).
-  const lineupCards: FinderCard[] = lineupItems.map((item) => ({
-    itemKey: item.itemKey,
-    name: item.name,
-    icon: item.icon,
-    imageUrl: imageByKey.get(item.itemKey),
-    facetKeys: facetKeysByItem.get(item.itemKey) ?? {},
-  }));
+  const lineupCards: FinderCard[] = lineupItems.map((item) => {
+    const p = pageByKey.get(item.itemKey);
+    const { name, subLabel } = resolveLineupDisplay({
+      itemKey: item.itemKey,
+      itemName: item.name,
+      model: p?.model,
+      description: p?.description,
+    });
+    return {
+      itemKey: item.itemKey,
+      name,
+      subLabel,
+      icon: item.icon,
+      imageUrl: imageByKey.get(item.itemKey),
+      facetKeys: facetKeysByItem.get(item.itemKey) ?? {},
+    };
+  });
 
   // 값이 하나도 등록되지 않은 축은 필터에 표시하지 않는다.
   const facets: FacetGroup[] = facetData

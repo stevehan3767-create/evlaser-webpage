@@ -6,7 +6,8 @@ import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
 import ItemCardsGrid from "@/components/ItemCardsGrid";
-import { contentGroups, categoryNameEn, type IconName } from "@/lib/data";
+import ImageGallery from "@/components/ImageGallery";
+import { contentGroups, categoryNameEn, resolveLineupDisplay, type IconName } from "@/lib/data";
 import { resolveSpecRowsWithOptions } from "@/lib/spec";
 import {
   contentPageRepo,
@@ -71,12 +72,23 @@ export default async function ContentDetailPage({
   // 같은 그룹 카드 그리드에 연결 정보 개수를 표시(설비 라인업 그룹은 제외).
   const siblingCounts = group === "lineup" ? {} : await contentLinkRepo.countsForGroup(group).catch(() => ({} as Record<string, number>));
 
-  const [page, images, videos, tp] = await Promise.all([
+  const [page, images, videos, tp, allPages] = await Promise.all([
     contentPageRepo.get(group, key),
     contentImageRepo.listByKey(group, key),
     contentVideoRepo.listByKey(group, key),
     getTranslations("contentPage"),
+    // 설비 라인업 그룹은 형제 카드도 "설비명"으로 표시하기 위해 전체 페이지를 가져온다.
+    group === "lineup" ? contentPageRepo.listAll().catch(() => []) : Promise.resolve([]),
   ]);
+  // 설비 라인업 형제 카드용: itemKey → {설비명, 모델코드 보조라벨}
+  const lineupDisplayByKey = new Map<string, { name: string; subLabel?: string }>();
+  if (group === "lineup") {
+    const pageByKey = new Map(allPages.filter((p) => p.groupKey === "lineup").map((p) => [p.itemKey, p]));
+    for (const it of items) {
+      const p = pageByKey.get(it.itemKey);
+      lineupDisplayByKey.set(it.itemKey, resolveLineupDisplay({ itemKey: it.itemKey, itemName: it.name, model: p?.model, description: p?.description }));
+    }
+  }
 
   const title = page?.title || item.name;
   // 헤더(브레드크럼 현재 항목)에는 "한글(영문)"으로 표기. 카드/박스는 그대로 한글만.
@@ -134,15 +146,19 @@ export default async function ContentDetailPage({
       {/* 같은 그룹의 다른 항목으로 바로 이동 — 현재 항목은 빨간 활성 카드로 강조 */}
       <div className="mx-auto max-w-[1240px] px-7 mt-5">
         <ItemCardsGrid
-          items={items.map((it) => ({
-            itemKey: it.itemKey,
-            name: it.name,
-            icon: it.icon,
-            count: group === "lineup" ? undefined : ((siblingCounts as Record<string, number>)[it.itemKey] ?? 0),
-          }))}
+          items={items.map((it) => {
+            const d = lineupDisplayByKey.get(it.itemKey);
+            return {
+              itemKey: it.itemKey,
+              name: d?.name ?? it.name,
+              subLabel: d?.subLabel,
+              icon: it.icon,
+              count: group === "lineup" ? undefined : ((siblingCounts as Record<string, number>)[it.itemKey] ?? 0),
+            };
+          })}
           hrefFor={(k) => `/products/${group}/${k}`}
           activeKey={key}
-          minColWidth="190px"
+          minColWidth="220px"
           iconColorClass="text-red"
         />
       </div>
@@ -281,20 +297,11 @@ export default async function ContentDetailPage({
           ) : (
             <div className="flex flex-col gap-10">
               {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
-                  {images.map((img) => (
-                    <figure key={img.id} className="border border-line-strong bg-surface">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img.url} alt={img.caption ?? title} className="w-full aspect-square object-cover" />
-                      {(img.caption || img.content) && (
-                        <figcaption className="p-2 text-[12px] text-ink-soft border-t border-line text-center">
-                          {img.caption && <span className="block font-bold text-ink">{img.caption}</span>}
-                          {img.content && <span className="block mt-0.5 whitespace-pre-wrap">{img.content}</span>}
-                        </figcaption>
-                      )}
-                    </figure>
-                  ))}
-                </div>
+                // 적용사례 사진: 클릭하면 확대(라이트박스), 다시 클릭/ESC 시 원상태로.
+                <ImageGallery
+                  images={images.map((img) => ({ url: img.url, caption: img.caption, content: img.content }))}
+                  minWidth={200}
+                />
               )}
 
               {videos.length > 0 && (
