@@ -465,6 +465,7 @@ function createSchema(): Promise<void> {
     await ensureYtnFilmingToPress();
     await ensureKsmeJournalToPress();
     await ensureEconomyNewsToPress();
+    await ensureKoplas2023ToPress();
   })();
 }
 
@@ -971,6 +972,55 @@ async function ensureEconomyNewsToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('economynews_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// KOPLAS 2023 보도자료(#101)를 사내소식 → 언론·방송소식으로 이관한다.
+// 본문의 "강병길 팀장/강 팀장"은 "(이브이레이저의) 한상배 대표"로 치환한다.
+function replaceKangWithHan(body: string): string {
+  return body
+    .replaceAll("(주)이브이레이저 강병길 팀장", "이브이레이저의 한상배 대표")
+    .replaceAll("이브이레이저 강 팀장", "이브이레이저의 한상배 대표")
+    .replaceAll("강병길 팀장", "한상배 대표")
+    .replaceAll("강 팀장", "한상배 대표")
+    .replaceAll("강팀장", "한상배 대표")
+    .replaceAll("강병길", "한상배 대표");
+}
+
+async function ensureKoplas2023ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'koplas2023_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "[보도자료] EVLASER, KOPLAS 2023서 다양한 레이저 응용 기술들 전시";
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2023.03.20";
+    const body = replaceKangWithHan((n.body as string) || "");
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'media', ${srcTitle}, '산업일보', ${date}, ${body},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    } else {
+      // 이미 이관된 경우 본문만 정정(치환 반영)
+      await sql`UPDATE press_items SET body = ${body} WHERE id = ${exists[0].id}`;
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('koplas2023_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
