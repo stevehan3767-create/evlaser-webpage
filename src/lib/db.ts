@@ -429,6 +429,7 @@ function createSchema(): Promise<void> {
     await ensurePressInterviewThumbnail();
     await ensureIntroVideo2021Jan();
     await ensureSbsBizBroadcast2026();
+    await ensureResourceVideosImport();
     await ensureRemoveTidingsLogoImages();
     await ensureRemoveNewsLogoImagesV2();
     await ensureFixPost111Images();
@@ -470,6 +471,50 @@ async function ensureMoveYtnResourceToPress(): Promise<void> {
 }
 
 // 2025.04.15 유튜브 소개 영상을 동영상자료실(resources)에 한 번만 등록한다.
+// 구 홈페이지 고객지원>자료실 동영상을 동영상자료실(resources·video)로 한 번만 이관한다.
+// 이미 등록된 유튜브(홍보·플라스틱용접)는 제외, 신규 영상만 추가. 설명은 편집 작성.
+// 유튜브는 자동 썸네일, 업로드 mp4는 원본 URL로 연결(썸네일은 재생 버튼 placeholder).
+async function ensureResourceVideosImport(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'resource_videos_imported_2025'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const vids: { title: string; desc: string; url: string; date: string }[] = [
+    {
+      title: "레이저 플라스틱 커팅 (Laser Plastic Cutting) 영상",
+      desc: "플라스틱 소재를 레이저로 정밀 절단하는 공정 영상입니다. 버(burr) 없는 깔끔한 절단면과 복잡한 형상 가공을 비접촉 방식으로 구현합니다.",
+      url: "https://youtu.be/6O7svx7m--U",
+      date: "2025-03-28T00:00:00.000Z",
+    },
+    {
+      title: "레이저 클래딩 (Laser Cladding) 영상",
+      desc: "금속 표면에 다른 금속을 레이저로 용융·적층해 내마모성·내식성을 높이는 레이저 클래딩(코팅) 공정 영상입니다.",
+      url: "https://youtu.be/vU3OCgT3XJg",
+      date: "2025-02-17T00:00:00.000Z",
+    },
+    {
+      title: "레이저 금속 커팅 (Laser Metal Cutting) 영상",
+      desc: "금속 소재를 레이저로 고속·정밀 절단하는 공정 영상입니다. 비접촉 가공으로 공구 마모 없이 정밀한 절단면을 얻습니다.",
+      url: "https://evlaser.co.kr/uploaded/board/data/19f0781144ae17a4d1e3c483f016bd550.mp4",
+      date: "2025-02-14T00:00:00.000Z",
+    },
+    {
+      title: "레이저 솔더링 (Laser Soldering) 영상",
+      desc: "레이저를 이용한 비접촉 솔더링(납땜) 공정 영상입니다. 미세·고밀도 부품의 정밀 납땜을 열 영향 최소화로 구현합니다.",
+      url: "https://evlaser.co.kr/uploaded/board/data/8fa9d4b8d2075b6656e97e0e878142d20.mp4",
+      date: "2025-02-14T00:00:00.000Z",
+    },
+  ];
+  for (const v of vids) {
+    const exists = await sql`SELECT 1 FROM resources WHERE url = ${v.url} LIMIT 1`;
+    if (exists.length === 0) {
+      await sql`
+        INSERT INTO resources (id, category, title, description, url, thumbnail_url, created_at)
+        VALUES (${newId()}, 'video', ${v.title}, ${v.desc}, ${v.url}, ${null}, ${v.date})
+      `;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('resource_videos_imported_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
 async function ensureIntroVideo2025(): Promise<void> {
   const flag = (await sql`SELECT value FROM settings WHERE key = 'intro_video_2025_04_seeded'`) as { value: string }[];
   if (flag.length > 0) return;
