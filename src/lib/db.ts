@@ -431,6 +431,7 @@ function createSchema(): Promise<void> {
     await ensureSbsBizBroadcast2026();
     await ensureRemoveTidingsLogoImages();
     await ensureRemoveNewsLogoImagesV2();
+    await ensureFixPost111Images();
     await ensureExhibitionImport();
     await ensureMetalWeek2026Views();
     await ensureMetalWeek2026ViewsAdjust();
@@ -841,6 +842,16 @@ async function ensureRemoveTidingsLogoImages(): Promise<void> {
   ];
   await sql`DELETE FROM news_images WHERE url = ANY(${urls}::text[])`;
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_logo_images_removed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// '경제인뉴스 CEO 인터뷰 진행'(#111, idx 182) 글 보정: 무관한 텍스트 배너(182_1) 삭제,
+// 대표 사진(182_4)을 썸네일(맨 앞)로 지정. 한 번만 실행.
+async function ensureFixPost111Images(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'post111_images_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`DELETE FROM news_images WHERE url = '/images/news/tidings/182_1.webp'`;
+  await sql`UPDATE news_images SET sort_order = -1 WHERE url = '/images/news/tidings/182_4.webp'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('post111_images_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 뉴스·소식 전반(회사소식·전시회소식)에 섞여 있던 흰 배경 EV LASER 로고 이미지를
