@@ -258,22 +258,14 @@ export default function LineupFinder({
             </div>
 
             <div className="flex gap-2 px-4 py-3 border-t border-line flex-none">
-              <button
-                type="button"
-                onClick={reset}
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-md border border-line-strong bg-surface-alt text-ink text-[12.5px] font-bold hover:border-red hover:text-red transition-colors"
-              >
+              <button type="button" onClick={reset} className={`${btnRest} flex-1`}>
                 <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
                   <path d="M3 3v5h5" />
                 </svg>
                 초기화
               </button>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-md border border-red bg-red text-white text-[12.5px] font-bold hover:bg-[#c40025] transition-colors"
-              >
+              <button type="button" onClick={() => setOpen(false)} className={`${btnActive} flex-1`}>
                 적용 ({hasSelection ? filtered.length : 0}개)
               </button>
             </div>
