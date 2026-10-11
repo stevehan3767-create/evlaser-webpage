@@ -709,8 +709,9 @@ export const newsItems: { tag: string; title: string; date: string; body: string
 // 수시(상시)채용 모집 분야 — 신입·경력 공통, 홈페이지 상시 지원.
 // (외국어 우대는 전 분야 공통사항이라 분야별로 표기하지 않고 상단에 한 번만 안내)
 export const recruitFields: { name: string; icon: IconName; desc: string }[] = [
-  { name: "경영지원", icon: "people", desc: "인사·총무·재무·회계·구매 등 경영 전반을 지원하고 조직 운영의 효율을 높이는 업무입니다." },
-  { name: "제조기술", icon: "machine", desc: "레이저 설비 조립·생산, 품질관리, 공정 개선 및 설비 양산화를 담당합니다." },
+  { name: "경영지원", icon: "people", desc: "인사·총무·재무·회계·구매와 물류·수출입 등 경영 전반을 지원하고 조직 운영의 효율을 높이는 업무입니다." },
+  { name: "제조기술", icon: "machine", desc: "레이저 설비의 설계·제어·조립·셋업·품질 등 제조 전 공정을 담당합니다." },
+  { name: "기술지원", icon: "build", desc: "레이저 설비의 설치·시운전, 사용자 교육 및 사후관리(AS)를 담당합니다." },
   { name: "국내영업", icon: "briefcase", desc: "국내 고객 발굴과 기술영업, 견적·계약, 납품 및 사후관리를 수행합니다." },
   { name: "해외영업", icon: "globe", desc: "해외 고객·파트너 발굴, 수출입 및 해외 턴키(Turnkey) 사업을 추진합니다." },
   { name: "홍보마케팅", icon: "star", desc: "전시회·온라인 홍보 기획, 브랜드·콘텐츠 제작, 시장 조사 및 마케팅을 담당합니다." },
