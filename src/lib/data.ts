@@ -154,6 +154,64 @@ export const techLabelsKo: Record<string, string> = {
   other: "기타",
 };
 
+// 제품·기술 상세 페이지 헤더(브레드크럼 현재 항목)에 "한글(영문)"으로 함께 표기하기 위한
+// 영문명. 카드/박스 표시에는 쓰지 않는다. (lineup 설비는 자체 영문명이 있어 제외)
+export const categoryNameEn: Record<string, Record<string, string>> = {
+  tech: {
+    plasticWelding: "Plastic Welding",
+    metalWelding: "Metal Welding",
+    glassWelding: "Glass Welding",
+    cutting: "Laser Cutting",
+    marking: "Laser Marking",
+    etching: "Laser Etching",
+    cleaning: "Laser Cleaning",
+    precisionMachining: "Precision Machining",
+    drilling: "Laser Drilling",
+    soldering: "Laser Soldering",
+    heatTreatment: "Laser Heat Treatment",
+    cladding: "Laser Cladding",
+    print3d: "3D Printing",
+    medical: "Medical Devices",
+    safety: "Laser Safety",
+    laserOscillator: "Laser Oscillator",
+    beamDelivery: "Beam Delivery",
+    measurementDevice: "Measurement Device",
+    auxiliaryDevice: "Auxiliary Device",
+    other: "Others",
+  },
+  material: {
+    metalSteel: "Metal·Steel",
+    copperAluminum: "Copper·Aluminum",
+    plastic: "Plastic",
+    glass: "Glass",
+    ceramic: "Ceramic",
+    wood: "Wood",
+    paper: "Paper",
+    fabric: "Fabric",
+    leather: "Leather",
+    rubber: "Rubber",
+    preciousMetal: "Precious Metal",
+    pcb: "PCB",
+    other: "Others",
+  },
+  industry: {
+    automotive: "Automotive",
+    battery: "Battery",
+    semiconductor: "Semiconductor",
+    electronics3c: "Electronics·3C",
+    bioHealth: "Bio·Healthcare",
+    homeAppliance: "Home Appliance",
+    shipbuilding: "Shipbuilding",
+    aerospace: "Aerospace",
+    machinery: "Machinery",
+    steel: "Steel",
+    display: "Display",
+    defense: "Defense",
+    precisionMachining: "Precision Machining",
+    other: "Others",
+  },
+};
+
 export interface OrgUnit {
   icon: IconName;
   key: string;

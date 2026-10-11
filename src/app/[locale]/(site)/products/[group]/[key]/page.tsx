@@ -6,7 +6,7 @@ import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
 import ItemCardsGrid from "@/components/ItemCardsGrid";
-import { contentGroups, type IconName } from "@/lib/data";
+import { contentGroups, categoryNameEn, type IconName } from "@/lib/data";
 import { resolveSpecRowsWithOptions } from "@/lib/spec";
 import {
   contentPageRepo,
@@ -79,6 +79,9 @@ export default async function ContentDetailPage({
   ]);
 
   const title = page?.title || item.name;
+  // 헤더(브레드크럼 현재 항목)에는 "한글(영문)"으로 표기. 카드/박스는 그대로 한글만.
+  const nameEn = categoryNameEn[group]?.[item.itemKey];
+  const headerLabel = nameEn ? `${item.name}${item.name.endsWith(")") ? " " : ""}(${nameEn})` : item.name;
   const hasCases = images.length > 0 || videos.length > 0;
   const specRows = resolveSpecRowsWithOptions(page?.specTable, page?.description, page?.options);
 
@@ -123,7 +126,7 @@ export default async function ContentDetailPage({
           items={[
             { label: "제품·기술", href: "/products" },
             { label: meta.labelKo, href: meta.backHref },
-            { label: title },
+            { label: headerLabel },
           ]}
         />
       </div>
