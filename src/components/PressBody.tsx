@@ -1,8 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-
-const IMG_SHADOW = "shadow-[0_6px_18px_rgba(17,20,24,0.14),0_1px_3px_rgba(17,20,24,0.08)]";
+import ImageGallery from "./ImageGallery";
 
 // 링크가 영상(유튜브/비메오/영상 파일)인지 판별 → 버튼 라벨을 "영상 보기"로.
 function isVideoUrl(url: string | null): boolean {
@@ -29,27 +28,6 @@ export interface PressImage {
   url: string;
   caption?: string | null;
   content?: string | null;
-}
-
-function PressImageGrid({ images }: { images: PressImage[] }) {
-  return (
-    <div className="grid gap-4 pb-1" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}>
-      {images.map((img, i) => (
-        <figure key={i} className={`rounded-xl overflow-hidden bg-surface ${IMG_SHADOW}`}>
-          <div className="aspect-[4/3] bg-surface-alt overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.url} alt={img.caption ?? ""} loading="lazy" className="w-full h-full object-cover" />
-          </div>
-          {(img.caption || img.content) && (
-            <figcaption className="px-2.5 py-2">
-              {img.caption && <b className="block text-[12px] font-bold text-ink leading-snug">{img.caption}</b>}
-              {img.content && <span className="block mt-0.5 text-[11px] text-ink-faint leading-snug">{img.content}</span>}
-            </figcaption>
-          )}
-        </figure>
-      ))}
-    </div>
-  );
 }
 
 // 언론·방송 / 논문·학술 카드의 본문 + 사진 + 액션 버튼.
@@ -134,10 +112,10 @@ export default function PressBody({
         )}
       </div>
 
-      {/* 펼친 영역: 행사사진 그리드. 아무 곳이나 클릭하면 닫힌다. */}
+      {/* 펼친 영역: 행사사진 그리드(클릭 시 확대). 사진 클릭은 본문을 닫지 않는다. */}
       {open && images.length > 0 && (
-        <div onClick={() => setOpen(false)} className="cursor-pointer mt-4">
-          <PressImageGrid images={images} />
+        <div className="mt-4">
+          <ImageGallery images={images} />
         </div>
       )}
     </>

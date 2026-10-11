@@ -456,6 +456,7 @@ function createSchema(): Promise<void> {
     await ensureMainNewsIntegration();
     await ensureSupportPostsSeed();
     await ensureThermalSprayWs46();
+    await ensureWs46Rewrite();
     await ensureThermalSprayWs53();
     await ensureHidec28();
     await ensureHidec28Photo2Caption();
@@ -549,32 +550,68 @@ async function ensureMetalCutVideoUpdate(): Promise<void> {
   await sql`INSERT INTO settings (key, value) VALUES ('metal_cut_video_updated_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
+// 제46회 용사(Thermal Spray) 기술 워크샵 본문 — 일정표 포함(당사 발표 하이라이트).
+// 시드와 운영 DB 갱신 마이그레이션이 동일 내용을 쓰도록 공용 상수로 둔다.
+const WS46_BODY = [
+  "[행사 개요]",
+  "㈜이브이레이저 한상배 대표가 한국용사기술협회(KTSA, Korea Thermal Spray Association)가 주최한 ‘제46회 용사(Thermal Spray) 기술 워크샵’에 발표자로 참가했습니다.",
+  "· 행사명 : 제46회 용사(Thermal Spray) 기술 워크샵\n· 일정 : 2022년 6월 9일(목) ~ 6월 10일(금)\n· 장소 : 홍천 소노벨 비발디파크 (강원도 홍천군 서면 한치골길 264)\n· 주최 : 한국용사기술협회(KTSA)",
+  "코로나19 방역지침 완화로 사회적 거리두기가 해제되면서 약 2년 만에 정상적으로 개최된 이번 워크샵에는 용사·표면처리 분야 산·학·연 관계자들이 대거 참석해 성황을 이뤘습니다.",
+  "[발표 내용 — ㈜이브이레이저 한상배 대표]",
+  "㈜이브이레이저 한상배 대표는 ‘고출력 Fiber Laser를 이용한 레이저클래딩 복합 시스템의 개발 및 응용(Multi-purpose Fiber Laser Cladding System and its Application)’을 주제로 발표했습니다.",
+  "발표에서는 고출력 파이버 레이저를 기반으로 한 레이저 클래딩 복합 시스템의 구성과 개발 사례, 그리고 다양한 적용 분야를 소개했습니다. 하나의 시스템으로 여러 목적(Multi-purpose)의 클래딩·표면처리를 구현할 수 있는 복합 시스템의 장점과, 마모·부식 방지 및 부품 보수 등 산업 현장에서의 활용 가능성이 공유되어 참석 회원들의 큰 관심을 받았습니다.",
+  "㈜이브이레이저는 ‘더 좋은 레이저기술로 더 좋은 세상을 만듭니다(Better Laser Technology makes Better World)’라는 슬로건 아래, 레이저 기반 정밀 가공·표면처리 기술의 경쟁력과 확산 가능성을 강조했습니다.",
+  "[워크샵 일정]",
+  [
+    "■ 2022년 6월 9일(목)",
+    "12:30~13:30  참가자 등록",
+    "13:20~13:30  환영사 및 한국용사기술협회 총회 보고",
+    "〈Session 1〉 좌장 변응선",
+    "13:30~13:55  Cold spray 및 Powder bed fusion 공정을 이용한 CoCrFeMnNi 고엔트로피 합금 소재의 제조 및 그 미세조직과 물성 — 이기안 외 / 인하대학교·KIMS",
+    "13:55~14:20  고내마모/내부식 application용 철계 비정질 용사코팅 소재의 미세조직 연계 해석을 통한 용사코팅공정 최적화 연구 방향 — 함기수 외 / 코오롱미래기술원·아토메탈테크코리아",
+    "14:20~14:45  Synthesis of Spherical Metallic and Ceramic Powders and Their Applications — 백경호 외 / 충남대학교·㈜동양엠더블유",
+    "14:45~15:00  coffee break",
+    "〈Session 2〉 좌장 양병일",
+    "15:00~15:25  Thermal spray for Antimicrobial — 이지운 외 / 아토메탈테크코리아·코오롱미래기술원",
+    "15:25~15:50  열가소성 및 열경화성 복합소재 플라스틱의 표면 보호를 위한 대기 플라즈마 코팅 공정을 통한 금속 및 세라믹 적층 — 권한솔 / 한국재료연구원",
+    "[[15:50~16:15  고출력 Fiber Laser를 이용한 레이저클래딩 복합 시스템의 개발 및 응용 (Multi-purpose Fiber Laser Cladding System and its Application) — 한상배, 고주섭, 김현준 / ㈜이브이레이저]]",
+    "16:15~16:30  coffee break",
+    "〈Session 3〉 좌장 윤상훈",
+    "16:30~16:55  SPS법을 이용한 yttrium silicates EBC 코팅의 제조 및 특성분석 — 오윤석, 박수민 / 한국세라믹기술원",
+    "16:55~17:20  항공발전용 가스터빈 SiC복합체 내환경 코팅 기술 — 문흥수 외 / ㈜세원하드페이싱·한국세라믹기술원·국민대학교",
+    "17:20~  기념사진 촬영 및 간친회",
+    "■ 2022년 6월 10일(금)",
+    "〈Session 4〉 좌장 오윤석",
+    "09:00~09:20  Atmospheric plasma spray 공정을 이용한 반도체 공정 장비용 Y2O3, YOF 코팅층의 제조 및 그 미세조직과 화학적 안정성 — 황유진 외 / 인하대·EST",
+    "09:20~09:40  Direct energy deposition 적층 제조 공정을 이용한 고탄소 고크롬 공구강의 제조 및 후열처리에 따른 내마모 및 충격 특성 — 박정현 외 / 인하대학교·ADD·맥스로텍·㈜창성",
+    "09:40~10:00  스텔라이트계 코팅의 퓨징처리에 따른 미세조직 및 기계적 특성 변화 — 김종섭 외 / 창원대",
+    "10:00~10:20  Bond coat 형성 공정에 따른 산화 전후의 코팅층 기계적 특성 평가 — 김준성 외 / 창원대학교",
+    "10:20~10:35  coffee break",
+    "10:35~10:55  MoSi2-Gd2Zr2O7 열차폐 코팅의 고온 산화거동 및 단열특성 — 강상운, 백경호 / 충남대학교",
+    "10:55~11:15  수증기 분위기 하 열처리에 따른 열차폐 코팅의 물성 변화 — 편장혁 외 / 창원대학교",
+    "11:15~11:35  플라즈마 용사 몰리브데늄 코팅 반응용기의 고온 용융염 침식 특성 — 김범재 외 / 충남대학교",
+    "11:35~  NiCoCrAlY 본드코팅의 첨가원소가 고온 산화 및 기판-모재 상호확산에 미치는 영향 — 김동원 외 / 한국재료연구원·한국공학대학교",
+  ].join("\n"),
+].join("\n\n");
+
+const WS46_PHOTO3_CAPTION = "제46회 용사기술 워크샵 발표 세션";
+
 // 제46회 용사(Thermal Spray) 기술 워크샵(2022.06.09~10) 발표 소식을
 // 논문·학술소식(paper)에 한 번만 등록한다. 행사사진 5장 포함.
 async function ensureThermalSprayWs46(): Promise<void> {
   const flag = (await sql`SELECT value FROM settings WHERE key = 'thermal_spray_ws46_seeded'`) as { value: string }[];
   if (flag.length > 0) return;
   const title = "제46회 용사(Thermal Spray) 기술 워크샵 발표 — ㈜이브이레이저 한상배 대표";
-  const body = [
-    "[행사 개요]",
-    "㈜이브이레이저 한상배 대표가 한국용사기술협회(KTSA, Korea Thermal Spray Association)가 주최한 ‘제46회 용사(Thermal Spray) 기술 워크샵’에 발표자로 참가했습니다.",
-    "· 행사명 : 제46회 용사(Thermal Spray) 기술 워크샵\n· 일정 : 2022년 6월 9일(목) ~ 6월 10일(금)\n· 장소 : 홍천 소노벨 대명비발디파크 (강원도 홍천군 서면 한치골길 264)\n· 주최 : 한국용사기술협회(KTSA)",
-    "코로나19 방역지침 완화로 사회적 거리두기가 해제되면서 약 2년 만에 정상적으로 개최된 이번 워크샵에는 용사·표면처리 분야 산·학·연 관계자들이 대거 참석해 성황을 이뤘습니다.",
-    "[발표 내용 — ㈜이브이레이저 한상배 대표]",
-    "㈜이브이레이저는 ‘더 좋은 레이저기술로 더 좋은 세상을 만듭니다(Better Laser Technology makes Better World)’라는 슬로건 아래, 레이저를 활용한 표면처리·코팅 기술과 용사 공정에의 응용 가능성을 소개했습니다.",
-    "발표에서는 용사 코팅의 원료(feedstock) 소재 선정을 중심으로, 상용 알루미늄(Al) 분말(AAL-30SF, Changsung Co.)과 알루미나(Al₂O₃) 분말(AA-18, Sumitomo Chemical)의 입도 분포와 물성을 비교·분석한 실험 결과를 공유했습니다. 낮은 융점(약 660℃)과 높은 열전도도(약 210 W/m·K)를 갖는 Al 분말과, 높은 융점(약 2,054℃)의 범용 엔지니어링 세라믹인 Al₂O₃ 분말의 특성 차이를 바탕으로 최적의 코팅 조건을 도출하는 연구 방법을 제시했습니다.",
-    "㈜이브이레이저는 이번 발표를 통해 레이저 기반 정밀 가공·표면처리 기술이 기존 용사 공정과 상호 보완적으로 적용될 수 있음을 강조하고, 자동차·전자 등 다양한 산업 분야로의 확산 가능성을 공유했습니다.",
-  ].join("\n\n");
   const pressId = newId();
   await sql`
     INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
-    VALUES (${pressId}, 'paper', ${title}, '한국용사기술협회(KTSA)', '2022.06.09', ${body},
+    VALUES (${pressId}, 'paper', ${title}, '한국용사기술협회(KTSA)', '2022.06.09', ${WS46_BODY},
       ${null}, ${null}, ${null}, ${null}, true, 0, ${"2022-06-09T00:00:00.000Z"})
   `;
   const imgs: { url: string; caption: string }[] = [
-    { url: "/images/press/ws46/01.webp", caption: "제46회 용사기술 워크샵 발표 현장" },
+    { url: "/images/press/ws46/01.webp", caption: "㈜이브이레이저 한상배 대표 발표 현장" },
     { url: "/images/press/ws46/02.webp", caption: "㈜이브이레이저 발표 — ‘더 좋은 레이저기술로 더 좋은 세상을’" },
-    { url: "/images/press/ws46/03.webp", caption: "용사 코팅 원료(Al·Al₂O₃ 분말) 소재 선정 발표 슬라이드" },
+    { url: "/images/press/ws46/03.webp", caption: WS46_PHOTO3_CAPTION },
     { url: "/images/press/ws46/04.webp", caption: "워크샵 전경" },
     { url: "/images/press/ws46/05.webp", caption: "한국용사기술협회 이사진 확대 개편 안내" },
   ];
@@ -585,6 +622,16 @@ async function ensureThermalSprayWs46(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('thermal_spray_ws46_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제46회 본문을 실제 일정표 기반으로 다시 작성(당사 발표 하이라이트) → 운영 DB 갱신.
+async function ensureWs46Rewrite(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ws46_body_rewritten_2022'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`UPDATE press_items SET body = ${WS46_BODY} WHERE category = 'paper' AND date = '2022.06.09'`;
+  await sql`UPDATE press_images SET caption = ${WS46_PHOTO3_CAPTION} WHERE url = '/images/press/ws46/03.webp'`;
+  await sql`UPDATE press_images SET caption = '㈜이브이레이저 한상배 대표 발표 현장' WHERE url = '/images/press/ws46/01.webp'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('ws46_body_rewritten_2022', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 제53회 한국용사기술협회 워크샵(2026.06.17~18, 천안 소노벨) 발표 소식을

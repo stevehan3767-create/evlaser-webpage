@@ -2,30 +2,10 @@
 
 import { useState } from "react";
 import type { NewsRow, NewsImageRow } from "@/lib/repo";
+import ImageGallery from "./ImageGallery";
 
 // 이미지 테두리 스타일 A: 둥근 모서리 + 부드러운 그림자
 const IMG_SHADOW = "shadow-[0_6px_18px_rgba(17,20,24,0.14),0_1px_3px_rgba(17,20,24,0.08)]";
-
-function NewsImageGrid({ images }: { images: NewsImageRow[] }) {
-  return (
-    <div className="grid gap-4 pb-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
-      {images.map((img) => (
-        <figure key={img.id} className={`rounded-xl overflow-hidden bg-surface ${IMG_SHADOW}`}>
-          <div className="aspect-[4/3] bg-surface-alt overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.url} alt={img.caption ?? ""} loading="lazy" className="w-full h-full object-cover" />
-          </div>
-          {(img.caption || img.content) && (
-            <figcaption className="px-2.5 py-2">
-              {img.caption && <b className="block text-[12px] font-bold text-ink leading-snug">{img.caption}</b>}
-              {img.content && <span className="block mt-0.5 text-[11px] text-ink-faint leading-snug">{img.content}</span>}
-            </figcaption>
-          )}
-        </figure>
-      ))}
-    </div>
-  );
-}
 
 // 사내소식·전시회소식 한 건: 썸네일 + 제목/메타 + 2줄 미리보기.
 // "전문 보기"(파란 버튼)를 누르면 본문 전체 + 사진이 펼쳐지고,
@@ -102,10 +82,10 @@ export default function NewsCard({ n, images }: { n: NewsRow; images: NewsImageR
         </div>
       </div>
 
-      {/* 펼친 영역: 사진 그리드. 아무 곳이나 클릭하면 닫힌다. */}
+      {/* 펼친 영역: 사진 그리드(클릭 시 확대). 사진 클릭은 본문을 닫지 않는다. */}
       {open && images.length > 0 && (
-        <div onClick={() => setOpen(false)} className="cursor-pointer pt-4 sm:pl-[148px]">
-          <NewsImageGrid images={images} />
+        <div className="pt-4 sm:pl-[148px]">
+          <ImageGallery images={images} minWidth={160} />
         </div>
       )}
     </div>
