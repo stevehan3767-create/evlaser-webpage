@@ -13,6 +13,24 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
   const logos = await clientLogoRepo.list();
   const editing = edit ? logos.find((l) => l.id === edit) : undefined;
 
+  // ── 중복 탐지 ──────────────────────────────────────────────
+  // ① 회사명 중복(공백·괄호·㈜ 등 기호를 무시한 정규화 기준)
+  // ② 로고 이미지 중복(완전히 동일한 이미지 주소/데이터를 사용하는 경우)
+  const normName = (s: string) => (s || "").replace(/[^0-9a-z가-힣]/gi, "").toLowerCase();
+  const nameGroups = new Map<string, typeof logos>();
+  const urlGroups = new Map<string, typeof logos>();
+  for (const l of logos) {
+    const nk = normName(l.name);
+    if (nk) nameGroups.set(nk, [...(nameGroups.get(nk) ?? []), l]);
+    const uk = (l.logoUrl || "").trim();
+    if (uk) urlGroups.set(uk, [...(urlGroups.get(uk) ?? []), l]);
+  }
+  const dupNameGroups = [...nameGroups.values()].filter((g) => g.length > 1);
+  const dupUrlGroups = [...urlGroups.values()].filter((g) => g.length > 1);
+  const dupIds = new Set<string>();
+  dupNameGroups.forEach((g) => g.forEach((l) => dupIds.add(l.id)));
+  dupUrlGroups.forEach((g) => g.forEach((l) => dupIds.add(l.id)));
+
   return (
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-2">주요 고객사 로고 관리</h1>
@@ -24,6 +42,60 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
         아래 목록은 기존 고객사 명단을 기준으로 임시 등록된 항목이며, 회색 placeholder 로고로 표시된 항목은 아직 실제
         로고 파일이 등록되지 않은 상태입니다. &quot;수정&quot;을 눌러 실제 로고 이미지로 교체해 주세요.
       </p>
+
+      {/* 중복 의심 항목 리포트 */}
+      {dupNameGroups.length + dupUrlGroups.length > 0 ? (
+        <div className="border border-red bg-red-soft/50 rounded-sm p-4 mb-8">
+          <p className="font-bold text-[14px] text-red mb-2">
+            ⚠ 중복 의심 항목 — 회사명 {dupNameGroups.length}건 · 로고 이미지 {dupUrlGroups.length}건
+          </p>
+          {dupNameGroups.length > 0 && (
+            <div className="mb-3">
+              <p className="text-[12.5px] font-bold text-ink-soft mb-1.5">회사명이 겹치는 그룹</p>
+              <ul className="flex flex-col gap-1.5">
+                {dupNameGroups.map((g, gi) => (
+                  <li key={`n${gi}`} className="text-[12.5px] text-ink flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <span className="font-bold">{g.length}개:</span>
+                    {g.map((l, li) => (
+                      <span key={l.id} className="inline-flex items-center">
+                        {li > 0 && <span className="text-ink-faint mr-1.5">·</span>}
+                        <Link href={`/admin/clients?edit=${l.id}`} className="text-blue underline underline-offset-2">
+                          {l.name}
+                        </Link>
+                      </span>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {dupUrlGroups.length > 0 && (
+            <div>
+              <p className="text-[12.5px] font-bold text-ink-soft mb-1.5">로고 이미지(주소)가 동일한 그룹</p>
+              <ul className="flex flex-col gap-1.5">
+                {dupUrlGroups.map((g, gi) => (
+                  <li key={`u${gi}`} className="text-[12.5px] text-ink flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                    <span className="font-bold">{g.length}개:</span>
+                    {g.map((l, li) => (
+                      <span key={l.id} className="inline-flex items-center">
+                        {li > 0 && <span className="text-ink-faint mr-1.5">·</span>}
+                        <Link href={`/admin/clients?edit=${l.id}`} className="text-blue underline underline-offset-2">
+                          {l.name}
+                        </Link>
+                      </span>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <p className="text-[11.5px] text-ink-faint mt-3">
+            겹치는 항목 중 불필요한 쪽을 &quot;삭제&quot;하거나 &quot;수정&quot;으로 정리해 주세요. 아래 목록에서도 중복 항목에 빨간 &quot;중복&quot; 표시가 붙습니다.
+          </p>
+        </div>
+      ) : (
+        <p className="text-[12.5px] text-ink-faint mb-8">✓ 회사명·로고 이미지가 겹치는 중복 항목이 발견되지 않았습니다.</p>
+      )}
 
       <form
         key={editing?.id ?? "new"}
@@ -67,6 +139,9 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
                   <img src={l.logoUrl} alt={l.name} className="max-w-full max-h-full object-contain" />
                 </div>
                 <p className="font-bold truncate">{l.name}</p>
+                {dupIds.has(l.id) && (
+                  <span className="flex-none font-mono text-[10px] font-bold text-white bg-red rounded-sm px-1.5 py-0.5">중복</span>
+                )}
               </div>
               <div className="flex items-center gap-3 flex-none">
                 <div className="flex gap-1">
