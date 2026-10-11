@@ -695,10 +695,10 @@ export const resourceRepo = {
 export const newsRepo = {
   async list(onlyPublished = false): Promise<NewsRow[]> {
     await ensureSchema();
-    // 공지(post_no='공지')를 최상단에, 그 외는 등록일 최신순.
+    // 공지(post_no='공지')만 최상단 고정, 그 외는 post_no 유무와 무관하게 등록일 최신순.
     const rows = onlyPublished
-      ? await sql`SELECT * FROM news_items WHERE published = true ORDER BY (post_no = '공지') DESC NULLS LAST, date DESC`
-      : await sql`SELECT * FROM news_items ORDER BY (post_no = '공지') DESC NULLS LAST, date DESC`;
+      ? await sql`SELECT * FROM news_items WHERE published = true ORDER BY (COALESCE(post_no, '') = '공지') DESC, date DESC`
+      : await sql`SELECT * FROM news_items ORDER BY (COALESCE(post_no, '') = '공지') DESC, date DESC`;
     return (rows as Record<string, unknown>[]).map(rowToNews);
   },
   async create(input: { tag: string; title: string; date: string; body?: string; published: boolean; author?: string | null; views?: number | null; postNo?: string | null }): Promise<string> {
