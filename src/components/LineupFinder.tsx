@@ -130,6 +130,18 @@ export default function LineupFinder({
           모든 설비 보기
         </button>
 
+        <button
+          type="button"
+          onClick={reset}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm text-[12.5px] font-bold border border-line-strong text-ink-soft hover:border-blue hover:text-blue transition-colors"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4 flex-none" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          초기화
+        </button>
+
         {activeGroups.flatMap((g) =>
           selected[g].map((k) => (
             <button
@@ -145,11 +157,6 @@ export default function LineupFinder({
           ))
         )}
 
-        {(hasSelection || showAll) && (
-          <button type="button" onClick={reset} className="ml-auto text-[12px] font-bold text-blue hover:underline">
-            초기화
-          </button>
-        )}
       </div>
 
       {hasSelection ? (
@@ -234,7 +241,7 @@ export default function LineupFinder({
             <div className="flex gap-2 px-4 py-3 border-t border-line flex-none">
               <button
                 type="button"
-                onClick={() => setSelected({})}
+                onClick={reset}
                 className="flex-1 py-2.5 border border-line-strong rounded-sm text-[12.5px] font-bold text-ink-soft"
               >
                 초기화
@@ -244,7 +251,7 @@ export default function LineupFinder({
                 onClick={() => setOpen(false)}
                 className="flex-1 py-2.5 bg-red text-white rounded-sm text-[12.5px] font-bold"
               >
-                적용 ({filtered.length}개)
+                적용 ({hasSelection ? filtered.length : 0}개)
               </button>
             </div>
           </aside>
