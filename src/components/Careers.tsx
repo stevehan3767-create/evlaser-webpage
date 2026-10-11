@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Icon from "./Icon";
 import ApplyButton from "./ApplyButton";
-import { jobs, recruitFields } from "@/lib/data";
+import { jobs, recruitFields, isJobClosed } from "@/lib/data";
 import type { IconName } from "@/lib/data";
 
 const VALUE_KEYS = ["expertise", "integrity", "challenge"] as const;
@@ -188,7 +188,8 @@ export default function Careers() {
   })();
 
   // 수시채용 = 채용 사유 발생 시 개별 공고(상세). 상시채용(분야별)과 분리해 운영.
-  const occasionalJobs = jobs.filter((job) => job.detailed);
+  // 모집 마감일(applyUntil)이 지나면 자동으로 마감 처리.
+  const occasionalJobs = jobs.filter((job) => job.detailed).map((job) => ({ ...job, closed: isJobClosed(job) }));
   // 진행 중(마감 아님) 수시공고가 있으면 수시채용을 기본 탭으로, 없으면 상시채용을 기본 탭으로.
   const hasActiveOccasional = occasionalJobs.some((job) => !job.closed);
   const [tab, setTab] = useState<"occasional" | "regular">(hasActiveOccasional ? "occasional" : "regular");

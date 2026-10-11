@@ -718,15 +718,26 @@ export const recruitFields: { name: string; icon: IconName; desc: string }[] = [
   { name: "연구개발", icon: "shield", desc: "레이저 응용기술·신제품 R&D, 특허·논문, 양산기술 적용 연구를 수행합니다." },
 ];
 
-export const jobs: { key: string; detailed: boolean; closed?: boolean }[] = [
-  // Real, currently open posting (source: Saramin, provided by the user) — full detail.
-  { key: "techSales", detailed: true },
+// applyUntil: 모집 마감일(YYYY-MM-DD, 한국시간 당일 24:00까지 지원 가능).
+// 이 날짜가 지나면 자동으로 "채용 마감" 처리되고 지원하기 버튼도 비활성화된다.
+// closed: 날짜와 무관하게 강제 마감하고 싶을 때 사용.
+export const jobs: { key: string; detailed: boolean; closed?: boolean; applyUntil?: string }[] = [
+  // 수시채용 공고 — 2026.10.12 ~ 2026.11.11 (1개월) 모집, 이후 자동 마감.
+  { key: "techSales", detailed: true, applyUntil: "2026-11-11" },
   // Ongoing/rolling openings — summary only.
   { key: "laserEngineer", detailed: false },
   { key: "overseasSales", detailed: false },
-  // Past posting archived to the careers board (closed) — full detail.
-  { key: "marketingSpec", detailed: true, closed: true },
+  // 수시채용 공고 — 2026.10.12 ~ 2026.11.11 (1개월) 모집, 이후 자동 마감.
+  { key: "marketingSpec", detailed: true, applyUntil: "2026-11-11" },
 ];
+
+// 모집 마감 여부 — applyUntil(한국시간 당일 24:00)이 지났거나 closed 플래그가 켜져 있으면 마감.
+export function isJobClosed(job: { closed?: boolean; applyUntil?: string }): boolean {
+  if (job.closed) return true;
+  if (!job.applyUntil) return false;
+  const deadline = new Date(`${job.applyUntil}T23:59:59+09:00`).getTime();
+  return Date.now() > deadline;
+}
 
 export const ceoCards = [
   { id: "ethics", icon: "shield" as IconName },
