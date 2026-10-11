@@ -772,6 +772,69 @@ export const newsImageRepo = {
   },
 };
 
+// ---- 언론·연구활동 사진 (press_images) ----
+export interface PressImageRow {
+  id: string;
+  pressId: string;
+  url: string;
+  caption: string | null;
+  content: string | null;
+  sortOrder: number;
+}
+
+function rowToPressImage(r: Record<string, unknown>): PressImageRow {
+  return {
+    id: r.id as string,
+    pressId: r.press_id as string,
+    url: r.url as string,
+    caption: (r.caption as string) ?? null,
+    content: (r.content as string) ?? null,
+    sortOrder: Number(r.sort_order ?? 0),
+  };
+}
+
+export const pressImageRepo = {
+  async listByPress(pressId: string): Promise<PressImageRow[]> {
+    await ensureSchema();
+    const rows = await sql`
+      SELECT * FROM press_images WHERE press_id = ${pressId}
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    return (rows as Record<string, unknown>[]).map(rowToPressImage);
+  },
+  // 게시글 여러 개의 사진을 한 번에 모아 pressId별로 그룹화해서 반환(목록 렌더링용).
+  async mapForPress(pressIds: string[]): Promise<Record<string, PressImageRow[]>> {
+    await ensureSchema();
+    const map: Record<string, PressImageRow[]> = {};
+    if (pressIds.length === 0) return map;
+    const rows = await sql`
+      SELECT * FROM press_images WHERE press_id = ANY(${pressIds})
+      ORDER BY sort_order ASC, created_at ASC
+    `;
+    for (const r of rows as Record<string, unknown>[]) {
+      const img = rowToPressImage(r);
+      (map[img.pressId] ??= []).push(img);
+    }
+    return map;
+  },
+  async count(pressId: string): Promise<number> {
+    await ensureSchema();
+    const rows = await sql`SELECT COUNT(*)::int AS c FROM press_images WHERE press_id = ${pressId}`;
+    return (rows[0] as { c: number }).c;
+  },
+  async create(input: { pressId: string; url: string; caption?: string; content?: string; sortOrder?: number }): Promise<void> {
+    await ensureSchema();
+    await sql`
+      INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${input.pressId}, ${input.url}, ${input.caption ?? null}, ${input.content ?? null}, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
+    `;
+  },
+  async remove(id: string): Promise<void> {
+    await ensureSchema();
+    await sql`DELETE FROM press_images WHERE id = ${id}`;
+  },
+};
+
 // ---- 언론·연구활동 (press_items) ----
 export type PressCategory = "media" | "broadcast" | "paper";
 
@@ -834,13 +897,15 @@ export const pressRepo = {
     pdfName?: string | null;
     thumbnailUrl?: string | null;
     sortOrder?: number;
-  }): Promise<void> {
+  }): Promise<string> {
     await ensureSchema();
+    const id = newId();
     await sql`
       INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
-      VALUES (${newId()}, ${input.category}, ${input.title}, ${input.source || null}, ${input.date || null}, ${input.body ?? ""},
+      VALUES (${id}, ${input.category}, ${input.title}, ${input.source || null}, ${input.date || null}, ${input.body ?? ""},
         ${input.linkUrl || null}, ${input.pdfUrl || null}, ${input.pdfName || null}, ${input.thumbnailUrl || null}, true, ${input.sortOrder ?? 0}, ${new Date().toISOString()})
     `;
+    return id;
   },
   async update(id: string, input: {
     category: string;

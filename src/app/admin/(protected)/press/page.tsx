@@ -1,10 +1,13 @@
 import Link from "next/link";
 import SubmitButton from "@/components/SubmitButton";
 import FileUploadField from "@/components/FileUploadField";
-import { pressRepo } from "@/lib/repo";
-import { savePress, deletePress } from "./actions";
+import CaseImageStager from "@/components/CaseImageStager";
+import { pressRepo, pressImageRepo } from "@/lib/repo";
+import { savePress, deletePress, deletePressImage } from "./actions";
 
 export const dynamic = "force-dynamic";
+
+const MAX_IMAGES = 10;
 
 const CAT_LABEL: Record<string, string> = {
   media: "언론·방송",
@@ -16,6 +19,8 @@ export default async function AdminPressPage({ searchParams }: { searchParams: P
   const { edit } = await searchParams;
   const items = await pressRepo.list();
   const editing = edit ? items.find((i) => i.id === edit) : undefined;
+  const editingImages = editing ? await pressImageRepo.listByPress(editing.id) : [];
+  const imageMap = await pressImageRepo.mapForPress(items.map((i) => i.id));
 
   return (
     <div>
@@ -80,11 +85,35 @@ export default async function AdminPressPage({ searchParams }: { searchParams: P
 
         <FileUploadField
           name="thumbnailUrl"
-          label="썸네일 이미지 (선택)"
+          label="썸네일 이미지 (선택) — 비워두면 첫 번째 행사사진이 썸네일로 사용됩니다"
           defaultValue={editing?.thumbnailUrl ?? ""}
           accept="image/*"
           preview="image"
         />
+
+        {editing && editingImages.length > 0 && (
+          <div>
+            <label className="text-[12.5px] font-bold text-ink-soft block mb-1.5">등록된 행사사진 ({editingImages.length})</label>
+            <div className="border border-line-strong rounded-sm divide-y divide-line">
+              {editingImages.map((img) => (
+                <div key={img.id} className="flex items-center gap-3 p-2.5 text-[12.5px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.url} alt="" className="w-10 h-10 flex-none object-cover border border-line-strong bg-surface-alt" />
+                  <span className="flex-1 min-w-0 truncate">{img.caption || img.url}</span>
+                  <form action={deletePressImage}>
+                    <input type="hidden" name="imageId" value={img.id} />
+                    <button type="submit" className="text-red font-bold flex-none">삭제</button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className="text-[12.5px] font-bold text-ink-soft block mb-2">행사사진 추가 (선택, 최대 {MAX_IMAGES}장)</label>
+          <CaseImageStager fieldName="images" remaining={MAX_IMAGES - editingImages.length} />
+        </div>
 
         <div className="flex gap-3">
           <SubmitButton className="justify-self-start px-5 py-2.5 bg-red text-white font-bold text-[13px]">
@@ -113,6 +142,7 @@ export default async function AdminPressPage({ searchParams }: { searchParams: P
                   {[item.source, item.date].filter(Boolean).join(" · ")}
                   {item.pdfUrl && " · PDF"}
                   {item.linkUrl && " · 링크"}
+                  {(imageMap[item.id]?.length ?? 0) > 0 && ` · 사진 ${imageMap[item.id].length}장`}
                 </p>
               </div>
               <div className="flex gap-3 flex-none">

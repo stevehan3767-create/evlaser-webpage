@@ -4,8 +4,8 @@ import { getTranslations } from "next-intl/server";
 import Breadcrumb from "@/components/Breadcrumb";
 import NewsTabs from "@/components/NewsTabs";
 import PressBody from "@/components/PressBody";
-import { pressRepo } from "@/lib/repo";
-import type { PressItemRow } from "@/lib/repo";
+import { pressRepo, pressImageRepo } from "@/lib/repo";
+import type { PressItemRow, PressImageRow } from "@/lib/repo";
 
 export const metadata: Metadata = {
   title: "뉴스·소식 · 언론·연구활동 | EV Laser",
@@ -28,7 +28,8 @@ function ThumbWrap({ href, children }: { href: string | null; children: ReactNod
   );
 }
 
-function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }) {
+function PressCard({ item, t, images }: { item: PressItemRow; t: (k: string) => string; images: PressImageRow[] }) {
+  const thumbUrl = item.thumbnailUrl ?? images[0]?.url ?? null;
   return (
     <article className="py-7 border-b border-line">
       <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-5">
@@ -36,11 +37,11 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
         <div className="relative hidden sm:block">
           <ThumbWrap href={item.linkUrl ?? item.pdfUrl}>
             <div className="relative aspect-[4/3] overflow-hidden rounded-md border border-line bg-surface-alt">
-              {item.thumbnailUrl ? (
+              {thumbUrl ? (
                 <>
                   {/* 외부(YouTube 등) 썸네일 지원을 위해 일반 img 사용 */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.thumbnailUrl} alt={item.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                  <img src={thumbUrl} alt={item.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                   {item.linkUrl && (
                     <span className="absolute inset-0 flex items-center justify-center">
                       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white">
@@ -48,6 +49,12 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </span>
+                    </span>
+                  )}
+                  {!item.linkUrl && images.length > 1 && (
+                    <span className="absolute bottom-1.5 right-1.5 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10.5px] font-bold text-white">
+                      <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 5h16v14H4z" /><path d="m4 15 4-4 4 4 3-3 5 5" /></svg>
+                      {images.length}
                     </span>
                   )}
                 </>
@@ -83,6 +90,7 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
             pdfName={item.pdfName}
             viewOriginalLabel={t("press.viewOriginal")}
             downloadLabel={t("press.download")}
+            images={images.map((img) => ({ url: img.url, caption: img.caption, content: img.content }))}
           />
         </div>
       </div>
@@ -101,6 +109,7 @@ export default async function NewsPressPage({ searchParams }: { searchParams: Pr
   const tTab = await getTranslations("nav.news.items");
   const items = await pressRepo.list(true).catch(() => []);
   const visible = items.filter((i) => i.category === activeCat);
+  const imageMap = await pressImageRepo.mapForPress(visible.map((i) => i.id)).catch(() => ({} as Record<string, PressImageRow[]>));
 
   return (
     <section className="pt-12 pb-16 sm:pb-22 border-b border-line bg-surface-alt">
@@ -117,7 +126,7 @@ export default async function NewsPressPage({ searchParams }: { searchParams: Pr
           {visible.length === 0 ? (
             <p className="py-10 text-ink-soft text-[13.5px]">{t("press.empty")}</p>
           ) : (
-            visible.map((item) => <PressCard key={item.id} item={item} t={t} />)
+            visible.map((item) => <PressCard key={item.id} item={item} t={t} images={imageMap[item.id] ?? []} />)
           )}
         </div>
       </div>

@@ -131,6 +131,20 @@ function createSchema(): Promise<void> {
     `;
     await sql`CREATE INDEX IF NOT EXISTS news_images_news_idx ON news_images (news_id)`;
 
+    // 언론·연구활동(press) 게시글 사진(행사사진 등). caption=제목, content=부가설명.
+    await sql`
+      CREATE TABLE IF NOT EXISTS press_images (
+        id TEXT PRIMARY KEY,
+        press_id TEXT NOT NULL,
+        url TEXT NOT NULL,
+        caption TEXT,
+        content TEXT,
+        sort_order INT NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS press_images_press_idx ON press_images (press_id)`;
+
     // Admin-managed FAQ entries, shown on /support alongside the fixed
     // (translated) FAQ items already built into the page.
     await sql`
@@ -441,6 +455,7 @@ function createSchema(): Promise<void> {
     await ensureMetalWeek2026ViewsAdjust();
     await ensureMainNewsIntegration();
     await ensureSupportPostsSeed();
+    await ensureThermalSprayWs46();
   })();
 }
 
@@ -529,6 +544,44 @@ async function ensureMetalCutVideoUpdate(): Promise<void> {
     WHERE category = 'video' AND url IN (${oldUrl}, ${newUrl})
   `;
   await sql`INSERT INTO settings (key, value) VALUES ('metal_cut_video_updated_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제46회 용사(Thermal Spray) 기술 워크샵(2022.06.09~10) 발표 소식을
+// 논문·학술소식(paper)에 한 번만 등록한다. 행사사진 5장 포함.
+async function ensureThermalSprayWs46(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'thermal_spray_ws46_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const title = "제46회 용사(Thermal Spray) 기술 워크샵 발표 — ㈜이브이레이저 한상배 대표";
+  const body = [
+    "[행사 개요]",
+    "㈜이브이레이저 한상배 대표가 한국용사기술협회(KTSA, Korea Thermal Spray Association)가 주최한 ‘제46회 용사(Thermal Spray) 기술 워크샵’에 발표자로 참가했습니다.",
+    "· 행사명 : 제46회 용사(Thermal Spray) 기술 워크샵\n· 일정 : 2022년 6월 9일(목) ~ 6월 10일(금)\n· 장소 : 홍천 소노벨 대명비발디파크 (강원도 홍천군 서면 한치골길 264)\n· 주최 : 한국용사기술협회(KTSA)",
+    "코로나19 방역지침 완화로 사회적 거리두기가 해제되면서 약 2년 만에 정상적으로 개최된 이번 워크샵에는 용사·표면처리 분야 산·학·연 관계자들이 대거 참석해 성황을 이뤘습니다.",
+    "[발표 내용 — ㈜이브이레이저 한상배 대표]",
+    "㈜이브이레이저는 ‘더 좋은 레이저기술로 더 좋은 세상을 만듭니다(Better Laser Technology makes Better World)’라는 슬로건 아래, 레이저를 활용한 표면처리·코팅 기술과 용사 공정에의 응용 가능성을 소개했습니다.",
+    "발표에서는 용사 코팅의 원료(feedstock) 소재 선정을 중심으로, 상용 알루미늄(Al) 분말(AAL-30SF, Changsung Co.)과 알루미나(Al₂O₃) 분말(AA-18, Sumitomo Chemical)의 입도 분포와 물성을 비교·분석한 실험 결과를 공유했습니다. 낮은 융점(약 660℃)과 높은 열전도도(약 210 W/m·K)를 갖는 Al 분말과, 높은 융점(약 2,054℃)의 범용 엔지니어링 세라믹인 Al₂O₃ 분말의 특성 차이를 바탕으로 최적의 코팅 조건을 도출하는 연구 방법을 제시했습니다.",
+    "㈜이브이레이저는 이번 발표를 통해 레이저 기반 정밀 가공·표면처리 기술이 기존 용사 공정과 상호 보완적으로 적용될 수 있음을 강조하고, 자동차·전자 등 다양한 산업 분야로의 확산 가능성을 공유했습니다.",
+  ].join("\n\n");
+  const pressId = newId();
+  await sql`
+    INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+    VALUES (${pressId}, 'paper', ${title}, '한국용사기술협회(KTSA)', '2022.06.09', ${body},
+      ${null}, ${null}, ${null}, ${null}, true, 0, ${"2022-06-09T00:00:00.000Z"})
+  `;
+  const imgs: { url: string; caption: string }[] = [
+    { url: "/images/press/ws46/01.webp", caption: "제46회 용사기술 워크샵 발표 현장" },
+    { url: "/images/press/ws46/02.webp", caption: "㈜이브이레이저 발표 — ‘더 좋은 레이저기술로 더 좋은 세상을’" },
+    { url: "/images/press/ws46/03.webp", caption: "용사 코팅 원료(Al·Al₂O₃ 분말) 소재 선정 발표 슬라이드" },
+    { url: "/images/press/ws46/04.webp", caption: "워크샵 전경" },
+    { url: "/images/press/ws46/05.webp", caption: "한국용사기술협회 이사진 확대 개편 안내" },
+  ];
+  for (let i = 0; i < imgs.length; i++) {
+    await sql`
+      INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${pressId}, ${imgs[i].url}, ${imgs[i].caption}, ${null}, ${i}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('thermal_spray_ws46_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
