@@ -2,7 +2,7 @@ import Link from "next/link";
 import SubmitButton from "@/components/SubmitButton";
 import { clientLogoRepo, seedClientLogosIfEmpty } from "@/lib/repo";
 import { defaultClientNames } from "@/lib/data";
-import { saveClientLogo, deleteClientLogo } from "./actions";
+import { saveClientLogo, deleteClientLogo, moveClientLogo } from "./actions";
 import FileUploadField from "@/components/FileUploadField";
 
 export const dynamic = "force-dynamic";
@@ -17,9 +17,9 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
     <div>
       <h1 className="text-[22px] font-[family-name:var(--font-display)] tracking-tight mb-2">주요 고객사 로고 관리</h1>
       <p className="text-[13px] text-ink-soft mb-6">
-        회사소개 페이지의 &quot;주요 고객사&quot; 섹션(회사소개 메뉴 → 주요 고객사)에 표시되는 로고입니다. 등록된 순서대로
-        노출되며, 로고 이미지는 화면에서 동일한 크기 박스 안에
-        비율을 유지한 채 자동으로 맞춰집니다. 가급적 배경이 투명하거나 흰색인 고해상도 이미지를 등록해 주세요.
+        회사소개 페이지의 &quot;주요 고객사&quot; 섹션(회사소개 메뉴 → 주요 고객사)에 표시되는 로고입니다. 아래 목록에 보이는 순서대로
+        노출되며, 각 항목의 <b>▲(앞으로) / ▼(뒤로)</b> 버튼으로 표시 순서를 자유롭게 조정할 수 있습니다. 로고 이미지는 화면에서
+        동일한 크기 박스 안에 비율을 유지한 채 자동으로 맞춰집니다. 가급적 배경이 투명하거나 흰색인 고해상도 이미지를 등록해 주세요.
         <br />
         아래 목록은 기존 고객사 명단을 기준으로 임시 등록된 항목이며, 회색 placeholder 로고로 표시된 항목은 아직 실제
         로고 파일이 등록되지 않은 상태입니다. &quot;수정&quot;을 눌러 실제 로고 이미지로 교체해 주세요.
@@ -58,16 +58,33 @@ export default async function AdminClientsPage({ searchParams }: { searchParams:
         {logos.length === 0 ? (
           <p className="p-4 text-[13px] text-ink-soft">등록된 고객사 로고가 없습니다.</p>
         ) : (
-          logos.map((l) => (
+          logos.map((l, i) => (
             <div key={l.id} className="flex items-center justify-between gap-4 p-3.5 border-b border-line last:border-b-0 text-[13px]">
               <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                <span className="w-7 flex-none text-center font-mono text-[12px] text-ink-faint">{i + 1}</span>
                 <div className="w-[84px] h-[48px] flex-none flex items-center justify-center border border-line-strong bg-white p-1.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={l.logoUrl} alt={l.name} className="max-w-full max-h-full object-contain" />
                 </div>
                 <p className="font-bold truncate">{l.name}</p>
               </div>
-              <div className="flex gap-3 flex-none">
+              <div className="flex items-center gap-3 flex-none">
+                <div className="flex gap-1">
+                  <form action={moveClientLogo}>
+                    <input type="hidden" name="id" value={l.id} />
+                    <input type="hidden" name="direction" value="up" />
+                    <button type="submit" disabled={i === 0} className="px-2 py-1 border border-line-strong text-[12px] disabled:opacity-30" aria-label="앞으로">
+                      ▲
+                    </button>
+                  </form>
+                  <form action={moveClientLogo}>
+                    <input type="hidden" name="id" value={l.id} />
+                    <input type="hidden" name="direction" value="down" />
+                    <button type="submit" disabled={i === logos.length - 1} className="px-2 py-1 border border-line-strong text-[12px] disabled:opacity-30" aria-label="뒤로">
+                      ▼
+                    </button>
+                  </form>
+                </div>
                 <Link href={`/admin/clients?edit=${l.id}`} className="text-[12px] text-blue font-bold">
                   수정
                 </Link>

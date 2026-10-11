@@ -337,6 +337,23 @@ export const clientLogoRepo = {
     await ensureSchema();
     await sql`DELETE FROM client_logos WHERE id = ${id}`;
   },
+  // 표시 순서를 한 칸 앞/뒤로 이동 (인접 항목과 sort_order 교환)
+  async move(id: string, direction: "up" | "down"): Promise<void> {
+    await ensureSchema();
+    const rows = (await sql`SELECT id, sort_order FROM client_logos ORDER BY sort_order ASC, created_at ASC`) as {
+      id: string;
+      sort_order: number;
+    }[];
+    const idx = rows.findIndex((r) => r.id === id);
+    if (idx === -1) return;
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= rows.length) return;
+    const a = rows[idx];
+    const b = rows[swapIdx];
+    // sort_order가 동일한 레거시 데이터도 안전하게 교환되도록 인덱스 기반 값으로 재지정
+    await sql`UPDATE client_logos SET sort_order = ${swapIdx} WHERE id = ${a.id}`;
+    await sql`UPDATE client_logos SET sort_order = ${idx} WHERE id = ${b.id}`;
+  },
 };
 
 // Neutral "logo pending" placeholder shown until the admin uploads the real
