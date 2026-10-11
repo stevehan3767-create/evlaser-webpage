@@ -76,7 +76,7 @@ function SimpleJobCard({ job }: { job: SimpleJob }) {
   );
 }
 
-function DetailedJobCard({ j }: { j: JobDetail }) {
+function DetailedJobCard({ j, closed = false }: { j: JobDetail; closed?: boolean }) {
   const t = useTranslations("careers");
   return (
     <details className="group border border-line-strong border-l-4 border-l-red bg-surface open:bg-surface-alt">
@@ -175,11 +175,17 @@ function DetailedJobCard({ j }: { j: JobDetail }) {
                 </div>
               </div>
 
-              <ApplyButton
-                jobTitle={j.title}
-                label={t("apply")}
-                className="mt-8 inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]"
-              />
+              {closed ? (
+                <span className="mt-8 inline-flex items-center gap-2 px-[18px] py-2.5 bg-surface-alt text-ink-faint font-bold text-[13.5px] border border-line-strong cursor-not-allowed">
+                  채용 마감
+                </span>
+              ) : (
+                <ApplyButton
+                  jobTitle={j.title}
+                  label={t("apply")}
+                  className="mt-8 inline-flex items-center gap-2 px-[18px] py-2.5 bg-red text-white font-bold text-[13.5px] border border-red hover:bg-[#c40025]"
+                />
+              )}
             </div>
           </details>
   );
@@ -211,7 +217,7 @@ export default function Careers() {
         <div className="flex flex-col gap-[18px]">
           {jobs.map((job) =>
             job.detailed ? (
-              <DetailedJobCard key={job.key} j={t.raw(`jobs.${job.key}`) as JobDetail} />
+              <DetailedJobCard key={job.key} j={t.raw(`jobs.${job.key}`) as JobDetail} closed={job.closed} />
             ) : (
               <SimpleJobCard key={job.key} job={t.raw(`jobs.${job.key}`) as SimpleJob} />
             )

@@ -706,14 +706,14 @@ export const newsItems: { tag: string; title: string; date: string; body: string
   },
 ];
 
-export const jobs = [
+export const jobs: { key: string; detailed: boolean; closed?: boolean }[] = [
   // Real, currently open posting (source: Saramin, provided by the user) — full detail.
   { key: "techSales", detailed: true },
   // Ongoing/rolling openings — summary only.
   { key: "laserEngineer", detailed: false },
   { key: "overseasSales", detailed: false },
   // Past posting archived to the careers board (closed) — full detail.
-  { key: "marketingSpec", detailed: true },
+  { key: "marketingSpec", detailed: true, closed: true },
 ];
 
 export const ceoCards = [
