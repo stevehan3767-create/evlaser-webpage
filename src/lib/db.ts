@@ -458,6 +458,7 @@ function createSchema(): Promise<void> {
     await ensureThermalSprayWs46();
     await ensureThermalSprayWs53();
     await ensureHidec28();
+    await ensureHidec28Photo2Caption();
   })();
 }
 
@@ -707,7 +708,7 @@ async function ensureHidec28(): Promise<void> {
   `;
   const imgs: { url: string; caption: string }[] = [
     { url: "/images/press/hidec28/01.webp", caption: "㈜이브이레이저 한상배 대표 발표 — 반사필름 레이저펀칭 기술" },
-    { url: "/images/press/hidec28/02.webp", caption: "㈜이브이레이저 한상배 대표 발표 현장 (제주 라마다 플라자)" },
+    { url: "/images/press/hidec28/02.webp", caption: "㈜이브이레이저 한상배 대표 발표 자료 — 반사필름 레이저펀칭 기술(Abstract)" },
     { url: "/images/press/hidec28/03.webp", caption: "제28회 고에너지 연구위원회(HiDEC) 연구발표회 참석자 단체사진" },
     { url: "/images/press/hidec28/04.webp", caption: "연구발표회 전경" },
     { url: "/images/press/hidec28/05.webp", caption: "제28회 고에너지 연구위원회(HiDEC) 연구발표회 안내 포스터" },
@@ -719,6 +720,17 @@ async function ensureHidec28(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('hidec28_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// HiDEC 제28회 두 번째 사진을 발표 자료(슬라이드)로 교체 → 캡션도 맞게 수정(운영 DB용).
+async function ensureHidec28Photo2Caption(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'hidec28_photo2_caption_fixed'`) as { value: string }[];
+  if (flag.length > 0) return;
+  await sql`
+    UPDATE press_images SET caption = '㈜이브이레이저 한상배 대표 발표 자료 — 반사필름 레이저펀칭 기술(Abstract)'
+    WHERE url = '/images/press/hidec28/02.webp'
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('hidec28_photo2_caption_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
