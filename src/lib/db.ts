@@ -456,6 +456,7 @@ function createSchema(): Promise<void> {
     await ensureMainNewsIntegration();
     await ensureSupportPostsSeed();
     await ensureThermalSprayWs46();
+    await ensureThermalSprayWs53();
   })();
 }
 
@@ -582,6 +583,76 @@ async function ensureThermalSprayWs46(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('thermal_spray_ws46_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제53회 한국용사기술협회 워크샵(2026.06.17~18, 천안 소노벨) 발표 소식을
+// 논문·학술소식(paper)에 한 번만 등록한다. 일정표 포함(당사 발표는 하이라이트), 사진 5장.
+async function ensureThermalSprayWs53(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'thermal_spray_ws53_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const title = "제53회 용사(Thermal Spray) 기술 워크샵 발표 — ㈜이브이레이저 한상배 대표 (Laser Cladding)";
+  const body = [
+    "[행사 개요]",
+    "㈜이브이레이저 한상배 대표가 한국용사기술협회(KTSA)가 주최한 ‘제53회 용사(Thermal Spray) 기술 워크샵’에서 레이저 클래딩(Laser Cladding) 기술을 주제로 발표했습니다.",
+    "· 행사명 : 제53회 용사(Thermal Spray) 기술 워크샵\n· 일정 : 2026년 6월 17일(수) ~ 6월 18일(목)\n· 장소 : 천안 소노벨\n· 주최 : 한국용사기술협회(KTSA, Korea Thermal Spray Association)",
+    "[발표 내용 — ㈜이브이레이저 한상배 대표]",
+    "㈜이브이레이저 한상배 대표는 ‘금속와이어를 이용한 레이저클래딩 기술 동향 및 적용사례’를 주제로, 분말공급방식(Powder Cladding)과 와이어공급방식(Wire Cladding)의 원리·특성을 비교하고 각 방식의 최적 적용 분야를 심도 있게 소개했습니다.",
+    "발표에서는 Powder Cladding과 Wire Cladding의 원소재 형태, 재료 이용률, 기술적 특징, 장단점, 적용 분야를 항목별로 비교했습니다. 특히 레이저 빔 사이즈 제어를 통한 정밀 적층과 치수 정밀도, 후가공 최소화, 특수합금층 형성 등 레이저 클래딩만의 강점과, 두 공급방식의 실제 공정 시연 영상을 함께 제시해 참석 회원들의 큰 관심을 받았습니다.",
+    "㈜이브이레이저는 ‘더 좋은 레이저기술로 더 좋은 세상을 만듭니다(Better Laser Technology makes Better World)’라는 슬로건 아래, 레이저 클래딩 기술이 마모·부식 방지, 금형·부품 보수, 특수 기능성 코팅 등 다양한 산업 분야로 확산될 수 있음을 강조했습니다.",
+    "[워크샵 일정]",
+    [
+      "■ 2026년 6월 17일(수)",
+      "13:00~14:00  참가자 등록",
+      "14:00~14:20  환영사 및 한국용사기술협회 총회 보고",
+      "〈Session 1〉 좌장 오윤석",
+      "14:20~14:35  레이저 클래딩 공정 변수가 금속 및 WC계 코팅층의 미세조직 및 기계적 특성에 미치는 영향 분석 — 조재억 / 포항공과대학교",
+      "14:35~14:50  다양한 용사코팅 공정을 통해 적층된 FeCrAlY 코팅의 기계적 특성 평가 및 800℃ 산화 거동 분석 — 권한솔 외 / 한국재료연구원",
+      "14:50~15:05  Direct Energy Deposition으로 제조된 Fe–Si–Mn–Cr–W 중탄소 공구강에서 분말 산소 함량과 미세조직–기계적 특성 간 상관관계 연구 — 전민수 외 / 인하대학교",
+      "15:05~15:20  Heterocoagulation 기법을 통한 YSZ-LZO 복합 분말의 합성 및 특성 평가 — 편장혁 외 / 창원대학교",
+      "15:20~15:35  LLM을 활용한 Thermal Spray 연구 동향 분석 — 박훈관 / 한국재료연구원",
+      "15:35~16:00  coffee break",
+      "〈Session 2〉 좌장 이성훈",
+      "16:00~16:15  세원하드페이싱 회사소개 및 개발현황 — 문흥수, 김지유 / 세원하드페이싱",
+      "16:15~16:30  기능성 분말을 이용한 건식 디지털 프린팅 기술 개발 — 박순홍 / 옴니코트",
+      "[[16:30~16:45  금속와이어를 이용한 레이저클래딩 기술 동향 및 적용사례 — 한상배 / ㈜이브이레이저]]",
+      "16:45~17:00  분말을 이용한 레이저클래딩 기술 — Huirui",
+      "17:00~17:15  분말공급장치 소개 — JEOL",
+      "17:15~  기념사진 촬영, 숙소 체크인 후 간친회",
+      "",
+      "■ 2026년 6월 18일(목)",
+      "〈Session 3〉 좌장 문흥수",
+      "09:30~09:45  단일 이미지 기반 용사 코팅층 및 기공 자동 분석 — 전병륜 외 / 한국재료연구원",
+      "09:45~10:00  EURO 7 규제 대응 자동차 브레이크용 Fe-Cr 복합 코팅의 딥러닝 기반 마모 패턴 분석 — 박태준 외 / 한국세라믹기술원·고려대학교",
+      "10:00~10:15  암모니아 분위기에서 TBC Bond Coat의 질화 거동과 Pre-oxidation 효과 — 백소희 외 / 창원대학교",
+      "10:15~10:30  표면 개질을 통한 Y2O3 세라믹의 pre-seasoning 구현 및 특성 평가 — 장해성 외 / 고려대학교·한국세라믹기술원",
+      "10:30~10:50  coffee break",
+      "〈Session 4〉 좌장 권한솔",
+      "10:50~11:05  HVOF 공정으로 제조된 Fe계 metamorphic alloys의 고온 내마모특성 — 원경운 외 / 인하대학교·코오롱인더스트리",
+      "11:05~11:20  Failure Behavior and Interfacial Stability of Thermal Barrier Coatings with an Intermediate Layer — 청홍빈 외 / 창원대학교",
+      "11:20~11:35  대기 플라즈마 용사 공정에서 플라즈마 제트와 상호작용하는 비행 입자 거동의 수치 및 실험적 연구 — 민병일 외 / 한국재료연구원",
+      "11:35~  종합토론 및 폐회",
+    ].join("\n"),
+  ].join("\n\n");
+  const pressId = newId();
+  await sql`
+    INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+    VALUES (${pressId}, 'paper', ${title}, '한국용사기술협회(KTSA)', '2026.06.17', ${body},
+      ${"https://youtu.be/HDma8qDDxek"}, ${null}, ${null}, ${null}, true, 0, ${"2026-06-17T00:00:00.000Z"})
+  `;
+  const imgs: { url: string; caption: string }[] = [
+    { url: "/images/press/ws53/01.webp", caption: "㈜이브이레이저 한상배 대표 발표 — Powder/Wire Cladding 기술 비교" },
+    { url: "/images/press/ws53/02.webp", caption: "㈜이브이레이저 한상배 대표 발표 현장" },
+    { url: "/images/press/ws53/03.webp", caption: "제53회 용사기술 워크샵 간친회" },
+    { url: "/images/press/ws53/04.webp", caption: "제53회 용사기술 워크샵 전경" },
+    { url: "/images/press/ws53/05.webp", caption: "Powder Cladding·Wire Cladding 공정 시연 영상 발표" },
+  ];
+  for (let i = 0; i < imgs.length; i++) {
+    await sql`
+      INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${pressId}, ${imgs[i].url}, ${imgs[i].caption}, ${null}, ${i}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('thermal_spray_ws53_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.

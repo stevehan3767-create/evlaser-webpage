@@ -1,8 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 const IMG_SHADOW = "shadow-[0_6px_18px_rgba(17,20,24,0.14),0_1px_3px_rgba(17,20,24,0.08)]";
+
+// 본문 중 [[ ... ]]로 감싼 부분은 하이라이트(강조)로 표시한다. (예: 일정표의 당사 발표)
+function renderBody(text: string) {
+  const parts = text.split(/(\[\[[\s\S]*?\]\])/g);
+  return parts.map((p, i) => {
+    if (p.startsWith("[[") && p.endsWith("]]")) {
+      return (
+        <mark key={i} className="bg-[#fff2a8] text-ink font-bold rounded-[3px] px-1 py-0.5 box-decoration-clone">
+          {p.slice(2, -2)}
+        </mark>
+      );
+    }
+    return <Fragment key={i}>{p}</Fragment>;
+  });
+}
 
 export interface PressImage {
   url: string;
@@ -64,7 +79,7 @@ export default function PressBody({
             open ? "" : "line-clamp-3"
           }`}
         >
-          {body}
+          {renderBody(body)}
         </p>
       )}
 
