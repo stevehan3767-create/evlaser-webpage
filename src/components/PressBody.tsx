@@ -24,11 +24,11 @@ export default function PressBody({
   return (
     <>
       {body && (
-        // 펼친 상태에서는 본문 아무 곳이나 클릭하면 닫힌다.
+        // 본문 아무 곳이나 클릭하면 펼치기/닫기가 토글된다.
         <p
-          onClick={open ? () => setOpen(false) : undefined}
-          className={`mt-2 whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] ${
-            open ? "cursor-pointer" : "line-clamp-3"
+          onClick={() => setOpen((v) => !v)}
+          className={`mt-2 whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] cursor-pointer ${
+            open ? "" : "line-clamp-3"
           }`}
         >
           {body}

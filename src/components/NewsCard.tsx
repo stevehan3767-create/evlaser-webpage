@@ -73,11 +73,11 @@ export default function NewsCard({ n, images }: { n: NewsRow; images: NewsImageR
           </div>
 
           {n.body && (
-            // 펼친 상태에서는 본문 아무 곳이나 클릭하면 닫힌다.
+            // 본문 아무 곳이나 클릭하면 펼치기/닫기가 토글된다.
             <p
-              onClick={open ? () => setOpen(false) : undefined}
-              className={`mt-2 max-w-[85ch] text-ink-soft text-[13px] sm:text-[13.5px] leading-relaxed whitespace-pre-line ${
-                open ? "cursor-pointer" : "line-clamp-2"
+              onClick={() => setOpen((v) => !v)}
+              className={`mt-2 max-w-[85ch] text-ink-soft text-[13px] sm:text-[13.5px] leading-relaxed whitespace-pre-line cursor-pointer ${
+                open ? "" : "line-clamp-2"
               }`}
             >
               {n.body}
