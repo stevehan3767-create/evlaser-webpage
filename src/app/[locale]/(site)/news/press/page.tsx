@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import Breadcrumb from "@/components/Breadcrumb";
 import NewsTabs from "@/components/NewsTabs";
+import PressBody from "@/components/PressBody";
 import { pressRepo } from "@/lib/repo";
 import type { PressItemRow } from "@/lib/repo";
 
@@ -74,47 +75,15 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
 
           <h3 className="mt-2 text-[16px] sm:text-[17px] font-bold leading-snug text-ink">{item.title}</h3>
 
-          {/* 본문: 클릭 전 3줄 미리보기 → 클릭 시 같은 본문이 그대로 펼쳐짐(중복 없음) */}
-          {item.body && (
-            <details className="group mt-2">
-              <summary className="list-none cursor-pointer marker:content-none [&::-webkit-details-marker]:hidden">
-                <span className="whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] line-clamp-3 group-open:line-clamp-none">
-                  {item.body}
-                </span>
-                <span className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-bold text-blue">
-                  <span className="group-open:hidden">전문 보기 ▾</span>
-                  <span className="hidden group-open:inline">접기 ▴</span>
-                </span>
-              </summary>
-            </details>
-          )}
-
-          <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
-            {item.linkUrl && (
-              <a
-                href={item.linkUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-sm border border-line-strong px-3.5 py-2 text-[12.5px] font-bold text-ink-soft hover:border-blue hover:text-blue transition-colors"
-              >
-                {t("press.viewOriginal")} ↗
-              </a>
-            )}
-            {item.pdfUrl && (
-              <a
-                href={item.pdfUrl}
-                download={item.pdfName ?? undefined}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-sm bg-red px-3.5 py-2 text-[12.5px] font-bold text-white hover:bg-[#c40025] transition-colors"
-              >
-                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" />
-                </svg>
-                {t("press.download")}
-              </a>
-            )}
-          </div>
+          {/* 본문(클릭 전 3줄 미리보기) + 전문 보기·원문 보기·다운로드를 한 줄에 나란히 */}
+          <PressBody
+            body={item.body}
+            linkUrl={item.linkUrl}
+            pdfUrl={item.pdfUrl}
+            pdfName={item.pdfName}
+            viewOriginalLabel={t("press.viewOriginal")}
+            downloadLabel={t("press.download")}
+          />
         </div>
       </div>
     </article>
