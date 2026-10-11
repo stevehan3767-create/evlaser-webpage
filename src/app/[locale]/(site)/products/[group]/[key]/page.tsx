@@ -54,13 +54,6 @@ function stripSpecSection(text: string): string {
 
 export const dynamic = "force-dynamic";
 
-const GROUP_EYEBROWS: Record<string, string> = {
-  lineup: "EQUIPMENT LINEUP",
-  tech: "TECHNOLOGY",
-  industry: "INDUSTRY",
-  material: "MATERIAL",
-};
-
 export default async function ContentDetailPage({
   params,
 }: {
@@ -123,8 +116,9 @@ export default async function ContentDetailPage({
   }
 
   return (
-    <div className="py-16 sm:py-22">
+    <div className="pt-10 pb-16 sm:pb-22">
       <div className="mx-auto max-w-[1240px] px-7">
+        {/* 큰 제목 블록(목록으로·eyebrow·제목)은 생략. 현재 위치는 브레드크럼 끝 + 그리드의 활성 카드로 표시 */}
         <Breadcrumb
           items={[
             { label: "제품·기술", href: "/products" },
@@ -132,20 +126,10 @@ export default async function ContentDetailPage({
             { label: title },
           ]}
         />
-        <Link href={meta.backHref} className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-blue mb-6">
-          ← {tp("backToList")}
-        </Link>
-
-        {/* 1. 제목 */}
-        <span className="eyebrow">{GROUP_EYEBROWS[group]}</span>
-        <div className="flex items-center gap-3 mt-2.5">
-          <Icon name={item.icon as IconName} className="w-8 h-8 text-red flex-none" strokeWidth={1.5} />
-          <h1 className="text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">{title}</h1>
-        </div>
       </div>
 
-      {/* 같은 그룹의 다른 항목으로 바로 이동 — 목록(기술종류별) 페이지와 100% 동일한 카드 그리드 */}
-      <div className="mx-auto max-w-[1240px] px-7 mt-7">
+      {/* 같은 그룹의 다른 항목으로 바로 이동 — 현재 항목은 빨간 활성 카드로 강조 */}
+      <div className="mx-auto max-w-[1240px] px-7 mt-5">
         <ItemCardsGrid
           items={items.map((it) => ({
             itemKey: it.itemKey,
