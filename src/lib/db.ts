@@ -457,6 +457,7 @@ function createSchema(): Promise<void> {
     await ensureSupportPostsSeed();
     await ensureThermalSprayWs46();
     await ensureThermalSprayWs53();
+    await ensureHidec28();
   })();
 }
 
@@ -653,6 +654,71 @@ async function ensureThermalSprayWs53(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('thermal_spray_ws53_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 제28회 고에너지 연구위원회(HiDEC) 연구발표회(2024.07.18~19, 제주 라마다 플라자)
+// 발표 소식을 논문·학술소식(paper)에 한 번만 등록한다. 일정표 포함(당사 발표 하이라이트), 사진 5장.
+async function ensureHidec28(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'hidec28_seeded'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const title = "제28회 고에너지 연구위원회(HiDEC) 연구발표회 발표 — ㈜이브이레이저 한상배 대표 (레이저 펀칭)";
+  const body = [
+    "[행사 개요]",
+    "㈜이브이레이저 한상배 대표가 대한용접접합학회 고에너지연구위원회가 주최한 ‘제28회 고에너지 연구위원회(HiDEC) 연구발표회’에서 발표자로 참가했습니다.",
+    "· 행사명 : 제28회 고에너지 연구위원회(HiDEC) 연구발표회\n· 주제 : 미래 산업기술 선도를 위한 고에너지 적용기술\n· 일정 : 2024년 7월 18일(목) ~ 7월 19일(금)\n· 장소 : 제주 라마다 플라자 호텔\n· 주최 : 대한용접접합학회 고에너지연구위원회 (위원장 최해운 교수)",
+    "㈜이브이레이저는 이번 행사에 후원사 겸 발표사로 참가했습니다.",
+    "[발표 내용 — ㈜이브이레이저 한상배 대표]",
+    "㈜이브이레이저 한상배 대표는 ‘3D스캐너와 CO₂레이저를 이용한 차량조명용 반사필름의 레이저펀칭기술 개발사례 연구(A Case Study on the Development of Laser Punching for Vehicle Lighting Using 3D Scanner)’를 주제로 발표했습니다.",
+    "이번 발표에서는 차량 조명용 반사필름을 바닥에 고정하지 않고 공중(air)에서 레이저로 펀칭(드릴링·천공)하는 기술 개발 사례가 소개되었습니다. 얇은 필름을 공중 상태에서 가공하는 이 방식은 국내는 물론 전 세계적으로도 시도된 바 없는 매우 높은 난이도의 독자 기술로, 3D 스캐너로 필름의 형상을 실시간 인식하고 CO₂ 레이저로 정밀 펀칭함으로써 열 변형과 접촉 손상을 최소화하는 것이 핵심입니다.",
+    "㈜이브이레이저는 ‘더 좋은 레이저기술로 더 좋은 세상을 만듭니다(Better Laser Technology makes Better World)’라는 슬로건 아래, 이번 발표를 통해 레이저 정밀 가공 기술의 새로운 가능성과 차량 조명·전장 부품 분야로의 응용 확산을 제시했습니다.",
+    "[연구발표회 일정]",
+    [
+      "■ 2024년 7월 17일(수)",
+      "15:00~17:00  고에너지 산학협력협의회 — 라마다프라자 1층",
+      "■ 2024년 7월 18일(목)",
+      "12:30~13:10  등록 (아라홀, 8F)",
+      "13:10~13:20  인사말씀 — 최해운 교수/위원장",
+      "〈Session I〉 좌장 감동혁 박사(생기원)",
+      "13:20~13:40  원전 해체시 방사성 오염 물질 제거를 위한 레이저 제염 공정기술 및 전문인력양성 프로그램 안내 — 김종도 교수(한국해양대학교)",
+      "13:40~14:00  인텔리전트 센서 - 이모빌리티를 위한 해법 — Jens Reiser(프레씨텍)",
+      "14:00~14:20  광학 및 음향 신호 기반의 레이저 용접 특성 분석 및 실시간 품질 검사의 유효성 고찰 — 조용준 박사(모니텍)",
+      "14:20~14:40  Coffee break",
+      "〈Session II〉 좌장 김용 박사(고기원)",
+      "14:40~15:00  초고강도강과 알루미늄합금의 Laser assisted SPR 접합기술 — 이목영 박사(포스코)",
+      "[[15:00~15:20  3D스캐너와 CO₂레이저를 이용한 차량조명용 반사필름의 레이저펀칭기술 개발사례 연구 — 한상배 대표 / ㈜이브이레이저]]",
+      "15:20~15:40  고망간강 레이저 및 레이저-아크 하이브리드 용접부의 망간 기화 및 인장특성 거동 — 강남현 교수(부산대학교)",
+      "15:40~16:00  Coffee break",
+      "〈Session III〉 좌장 박창규 교수(서울과기대)",
+      "16:00~16:20  E-모빌리티 레이저 기술활용 제조장비 기반 고도화 — 서정 박사(한국기계연구원)",
+      "16:20~16:40  파이버 레이저를 이용한 구리용접의 스패터 프리 솔루션 — 오상진 이사(IPG)",
+      "16:40~17:00  실시간 용입 깊이 측정을 위한 트럼프 OCT 체크 — 정현섭 팀장(한국트럼프)",
+      "17:30~  Reception (제주 앞바다 횟집)",
+      "■ 2024년 7월 19일(금)",
+      "09:20~10:00  협력위원회 개최 및 기술교류회",
+      "10:00~11:00  프로그램 운영위원회",
+      "11:10  폐회",
+    ].join("\n"),
+  ].join("\n\n");
+  const pressId = newId();
+  await sql`
+    INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+    VALUES (${pressId}, 'paper', ${title}, '대한용접접합학회 고에너지연구위원회', '2024.07.18', ${body},
+      ${null}, ${null}, ${null}, ${null}, true, 0, ${"2024-07-18T00:00:00.000Z"})
+  `;
+  const imgs: { url: string; caption: string }[] = [
+    { url: "/images/press/hidec28/01.webp", caption: "㈜이브이레이저 한상배 대표 발표 — 반사필름 레이저펀칭 기술" },
+    { url: "/images/press/hidec28/02.webp", caption: "㈜이브이레이저 한상배 대표 발표 현장 (제주 라마다 플라자)" },
+    { url: "/images/press/hidec28/03.webp", caption: "제28회 고에너지 연구위원회(HiDEC) 연구발표회 참석자 단체사진" },
+    { url: "/images/press/hidec28/04.webp", caption: "연구발표회 전경" },
+    { url: "/images/press/hidec28/05.webp", caption: "제28회 고에너지 연구위원회(HiDEC) 연구발표회 안내 포스터" },
+  ];
+  for (let i = 0; i < imgs.length; i++) {
+    await sql`
+      INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+      VALUES (${newId()}, ${pressId}, ${imgs[i].url}, ${imgs[i].caption}, ${null}, ${i}, ${new Date().toISOString()})
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('hidec28_seeded', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
