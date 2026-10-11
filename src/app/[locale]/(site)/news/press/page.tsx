@@ -78,7 +78,7 @@ function PressCard({ item, t }: { item: PressItemRow; t: (k: string) => string }
           {item.body && (
             <details className="group mt-2">
               <summary className="list-none cursor-pointer marker:content-none [&::-webkit-details-marker]:hidden">
-                <span className="block whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] line-clamp-3 group-open:line-clamp-none">
+                <span className="whitespace-pre-line text-[13.5px] text-ink-soft leading-relaxed max-w-[75ch] line-clamp-3 group-open:line-clamp-none">
                   {item.body}
                 </span>
                 <span className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-bold text-blue">
