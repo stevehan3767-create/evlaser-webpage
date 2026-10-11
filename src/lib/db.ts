@@ -466,6 +466,8 @@ function createSchema(): Promise<void> {
     await ensureKsmeJournalToPress();
     await ensureEconomyNewsToPress();
     await ensureKoplas2023ToPress();
+    await ensureMarketingJobRemoveFromNews();
+    await ensurePressBodiesReformat();
   })();
 }
 
@@ -1021,6 +1023,81 @@ async function ensureKoplas2023ToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('koplas2023_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 레이저 설비 마케팅 담당 채용공고(#99)는 채용(careers) 섹션에 등록되었으므로
+// 사내소식(news)에서는 제거한다.
+async function ensureMarketingJobRemoveFromNews(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'marketing_job_removed_from_news'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const olds = (await sql`SELECT id FROM news_items WHERE title LIKE '%레이저 설비 마케팅 담당%'`) as { id: string }[];
+  for (const o of olds) {
+    await sql`DELETE FROM news_images WHERE news_id = ${o.id}`;
+  }
+  await sql`DELETE FROM news_items WHERE title LIKE '%레이저 설비 마케팅 담당%'`;
+  await sql`INSERT INTO settings (key, value) VALUES ('marketing_job_removed_from_news', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 사내소식에서 이관된 기사 본문(붙어 있던 텍스트)을 가독성 있게(띄어쓰기·문단) 재작성한다.
+async function ensurePressBodiesReformat(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'press_bodies_reformatted_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const updates: { title: string; body: string }[] = [
+    {
+      title: "대한기계학회 기계저널 CEO 인터뷰 진행",
+      body: [
+        "대한기계학회에서 발행하는 기계저널 5월호에 한상배 대표님의 인터뷰가 소개되었습니다.",
+        "대한기계학회는 우리나라 최초로 설립된, 국내에서 가장 큰 학회이며, 회원 수 3만 명이 넘는 기계 분야의 리더 역할을 하고 있습니다. 추계대회 시에는 등록자만 3천 명이 넘으며, 많은 기업들이 부스를 통해 홍보에 참여하고 있습니다.",
+        "이러한 대한기계학회에서 발행하는 기계저널은 전국 5,500여 개 회원사에 배포되고 있는 영향력 있는 채널입니다.",
+        "대표님의 인터뷰를 통해 24년의 연구와 개발로 완성한 이브이레이저의 기술력과 믿을 수 있는 품질의 설비들이 많은 분들께 소개될 수 있는 계기가 될 것입니다.",
+        "앞으로도 ㈜이브이레이저는 “더 좋은 레이저 기술로 더 좋은 세상을 만들기 위하여” 노력하겠습니다. 감사합니다.",
+      ].join("\n\n"),
+    },
+    {
+      title: "경제인뉴스 CEO 인터뷰 진행",
+      body: [
+        "경제인뉴스를 통한 대표님 인터뷰 진행 건이 기사화되었습니다.",
+        "여러 산업 분야에 폭넓고 다양하게 활용되고 있는 레이저 산업에서의 당사의 포지션과 주력 사업, 그리고 앞으로의 목표와 방향성에 대해 소개한 내용으로, 이브이레이저를 이해하시는 데 도움이 될 기사가 소개되었습니다.",
+        "앞으로도 ㈜이브이레이저의 행보에 많은 관심과 애정 부탁드립니다. 감사합니다.",
+      ].join("\n\n"),
+    },
+    {
+      title: "(주) 이브이레이저 x YTN 최강기업 촬영",
+      body: [
+        "안녕하세요, 이브이레이저입니다. 오늘은 YTN <최강기업> 방송 출연 소식을 가지고 왔습니다.",
+        "“대한민국 산업계를 이끄는 최강기업들의 생생한 현장 소식을 발빠르게 전하는 YTN <최강기업>”의 방송 출연 제안을 받은 후, 4월에 촬영을 진행했습니다.",
+        "사전 준비된 구성안을 리뷰하고, 현장 동선에 맞춰 조정하며 커뮤니케이션을 충분히 하니 촬영이 순조롭게 진행되었습니다.",
+        "24년 연구와 개발로 완성된 기술력과 믿을 수 있는 품질의 제품·샘플들을 몇 분짜리 영상에 담기란 참 어려운 일입니다만, 하나라도 더 멋진 영상과 좋은 정보를 담기 위한 촬영팀의 열정과 에너지에 박수를 보냈습니다.",
+        "본방송은 지난 5월 10일과 11일 두 차례 송출되었습니다. 미리보기로 주요 장면을 소개해 드리며, 풀 영상은 자료실과 유튜브 채널에서 확인하실 수 있습니다.",
+        "㈜이브이레이저의 앞으로의 행보에 많은 관심 부탁드립니다. 감사합니다.",
+      ].join("\n\n"),
+    },
+    {
+      title: "2025 한국레이저가공학회 춘계학술대회 참가",
+      body: [
+        "산업용 레이저 응용기술 전문기업 ㈜이브이레이저는 2025 한국레이저가공학회 춘계학술대회에 참가하였습니다.",
+        "3일간 진행된 춘계학술대회는 다양한 산업에 걸친 최신 레이저 기술의 학술 교류와 기술 발전을 도모하는 자리입니다. 매년 정기 학술대회와 심포지엄을 개최하여 연구자, 엔지니어, 산업계 전문가들이 협력할 수 있는 장을 마련하고, 국내외 연구 네트워크 확대에도 기여하고 있습니다.",
+        "㈜이브이레이저는 발표자로도 참석하여, 20일 오전 “플라스틱 소재의 정밀 용접을 위한 레이저 시스템 개발 연구”를 주제로 기술연구소 소장님이 발표를 진행했습니다. 컨퍼런스에 참여한 관계자분들이 당사의 발표 자료를 촬영하며 많은 관심을 표했습니다.",
+        "㈜이브이레이저는 앞으로도 활발한 컨퍼런스 활동을 통해 23년의 연구와 개발로 완성된 기술력과 전문성을 알리고, 최신 기술 및 시장 동향을 빠르게 파악해 나가겠습니다. 많은 관심과 애정 부탁드립니다. 감사합니다.",
+      ].join("\n\n"),
+    },
+    {
+      title: "[보도자료] EVLASER, KOPLAS 2023서 다양한 레이저 응용 기술들 전시",
+      body: [
+        "[산업일보] 기존 내연기관을 탈피한 친환경차 모델이 연이어 출시되고 있다. 관련 산업 시장도 빠르게 재편되고 있다. 특히 기존 내연기관 자동차의 부품 중 하나인 전면부 그릴은 과거처럼 수요가 많지 않다.",
+        "고양시 일산 킨텍스에서 개최된 ‘제26회 국제금형 및 관련기기전(INTERMOLD KOREA 2023)’에 참가한 이브이레이저의 한상배 대표는 “내연기관의 그릴이 없어져 그 자리를 대체하기 위한 익스테리어 시장이 클 것”이라 전망했다.",
+        "자동차·전자·반도체·철강·기계·항공·의료 등 다양한 산업 분야에서 필요한 레이저 응용 기술을 개발하는 ㈜이브이레이저는 전기차 부품 개발에 대한 검토 및 테스트도 진행 중에 있다고 한상배 대표는 밝혔다.",
+        "부품 업체를 주 고객사로 두고 있는 이브이레이저의 한상배 대표는 “자동차 업계는 기본적으로 대량생산을 하지만 사출의 결과물이 늘 일정한 것은 아니다”라며 레이저 플라스틱 투과율 측정 장비를 소개했다.",
+        "이어 “제조공정에서도 데이터 매니지먼트는 필수 요소다. ETM-31 모델은 플라스틱 투과 소재의 사출 품질 기준을 마련해 주고, 데이터 관리를 위한 Data-Log 기능도 포함하고 있다. 양산 전 품질 확인 및 관리에도 필수적인 장비”라고 설명했다.",
+        "전시 현장에는 다양한 플라스틱 용접 샘플들과 R&D 실험용, 다품종 소량 생산용 레이저 플라스틱 용접기 등이 전시됐다.",
+        "22개국 384개 기업이 참가한 ‘제27회 국제 플라스틱·고무산업 전시회(KOPLAS 2023)’는 14일 개막, 18일 폐막했다.",
+      ].join("\n\n"),
+    },
+  ];
+  for (const u of updates) {
+    await sql`UPDATE press_items SET body = ${u.body} WHERE title = ${u.title}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('press_bodies_reformatted_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.

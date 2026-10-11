@@ -712,6 +712,8 @@ export const jobs = [
   // Ongoing/rolling openings — summary only.
   { key: "laserEngineer", detailed: false },
   { key: "overseasSales", detailed: false },
+  // Past posting archived to the careers board (closed) — full detail.
+  { key: "marketingSpec", detailed: true },
 ];
 
 export const ceoCards = [
