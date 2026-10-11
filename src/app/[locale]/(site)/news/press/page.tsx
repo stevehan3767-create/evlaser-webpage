@@ -89,6 +89,7 @@ function PressCard({ item, t, images }: { item: PressItemRow; t: (k: string) => 
             pdfUrl={item.pdfUrl}
             pdfName={item.pdfName}
             viewOriginalLabel={t("press.viewOriginal")}
+            watchVideoLabel={t("press.watchVideo")}
             downloadLabel={t("press.download")}
             images={images.map((img) => ({ url: img.url, caption: img.caption, content: img.content }))}
           />

@@ -4,6 +4,12 @@ import { Fragment, useState } from "react";
 
 const IMG_SHADOW = "shadow-[0_6px_18px_rgba(17,20,24,0.14),0_1px_3px_rgba(17,20,24,0.08)]";
 
+// 링크가 영상(유튜브/비메오/영상 파일)인지 판별 → 버튼 라벨을 "영상 보기"로.
+function isVideoUrl(url: string | null): boolean {
+  if (!url) return false;
+  return /youtube\.com|youtu\.be|vimeo\.com|\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+}
+
 // 본문 중 [[ ... ]]로 감싼 부분은 하이라이트(강조)로 표시한다. (예: 일정표의 당사 발표)
 function renderBody(text: string) {
   const parts = text.split(/(\[\[[\s\S]*?\]\])/g);
@@ -55,6 +61,7 @@ export default function PressBody({
   pdfUrl,
   pdfName,
   viewOriginalLabel,
+  watchVideoLabel,
   downloadLabel,
   images = [],
 }: {
@@ -63,11 +70,13 @@ export default function PressBody({
   pdfUrl: string | null;
   pdfName: string | null;
   viewOriginalLabel: string;
+  watchVideoLabel: string;
   downloadLabel: string;
   images?: PressImage[];
 }) {
   const [open, setOpen] = useState(false);
   const hasDetail = Boolean(body) || images.length > 0;
+  const linkLabel = isVideoUrl(linkUrl) ? watchVideoLabel : viewOriginalLabel;
 
   return (
     <>
@@ -105,7 +114,7 @@ export default function PressBody({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-sm border border-line-strong px-3.5 py-2 text-[12.5px] font-bold text-ink-soft hover:border-blue hover:text-blue transition-colors"
           >
-            {viewOriginalLabel} ↗
+            {linkLabel} ↗
           </a>
         )}
 
