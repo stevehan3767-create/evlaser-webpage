@@ -432,6 +432,7 @@ function createSchema(): Promise<void> {
     await ensureRemoveTidingsLogoImages();
     await ensureRemoveNewsLogoImagesV2();
     await ensureFixPost111Images();
+    await ensureNoticeLogoThumbnail();
     await ensureExhibitionImport();
     await ensureMetalWeek2026Views();
     await ensureMetalWeek2026ViewsAdjust();
@@ -842,6 +843,22 @@ async function ensureRemoveTidingsLogoImages(): Promise<void> {
   ];
   await sql`DELETE FROM news_images WHERE url = ANY(${urls}::text[])`;
   await sql`INSERT INTO settings (key, value) VALUES ('tidings_logo_images_removed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 공지 글('방문해 주셔서 감사합니다')에 회사 로고 썸네일을 한 번만 추가한다.
+async function ensureNoticeLogoThumbnail(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'notice_logo_thumbnail_added'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const url = "/images/news/tidings/notice_logo.webp";
+  const rows = (await sql`SELECT id FROM news_items WHERE post_no = '공지' AND tag = '회사소식' LIMIT 1`) as { id: string }[];
+  if (rows.length > 0) {
+    const newsId = rows[0].id;
+    const exists = await sql`SELECT 1 FROM news_images WHERE news_id = ${newsId} AND url = ${url} LIMIT 1`;
+    if (exists.length === 0) {
+      await sql`INSERT INTO news_images (id, news_id, url, sort_order) VALUES (${newId()}, ${newsId}, ${url}, 0)`;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('notice_logo_thumbnail_added', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // '경제인뉴스 CEO 인터뷰 진행'(#111, idx 182) 글 보정: 무관한 텍스트 배너(182_1) 삭제,
