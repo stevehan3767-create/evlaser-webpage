@@ -394,6 +394,7 @@ function createSchema(): Promise<void> {
 
     // 기술종류별 항목명 변경(이미 시딩된 환경 보정) — 관리자가 바꾸지 않은 기본값만 갱신.
     await sql`UPDATE content_items SET name = '레이저마킹(인쇄·조각·각인)' WHERE group_key = 'tech' AND item_key = 'marking' AND name = '레이저마킹(조각·인쇄)'`;
+    await sql`UPDATE content_items SET name = '레이저마킹(인쇄·조각)' WHERE group_key = 'tech' AND item_key = 'marking' AND name = '레이저마킹(인쇄·조각·각인)'`;
     await sql`UPDATE content_items SET name = '레이저에칭(어블레이션)' WHERE group_key = 'tech' AND item_key = 'etching' AND name = '레이저에칭(각인)'`;
 
     // 언론보도·방송 카테고리를 "언론·방송"(media)으로 통합.

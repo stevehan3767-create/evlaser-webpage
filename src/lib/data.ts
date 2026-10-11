@@ -136,7 +136,7 @@ export const techLabelsKo: Record<string, string> = {
   metalWelding: "금속·알루미늄·동 용접",
   glassWelding: "유리 용접",
   cutting: "레이저 절단",
-  marking: "레이저마킹(인쇄·조각·각인)",
+  marking: "레이저마킹(인쇄·조각)",
   etching: "레이저에칭(어블레이션)",
   cleaning: "레이저 클리닝(세정)",
   precisionMachining: "레이저정밀(미세)가공",
