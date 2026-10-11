@@ -430,6 +430,7 @@ function createSchema(): Promise<void> {
     await ensureIntroVideo2021Jan();
     await ensureSbsBizBroadcast2026();
     await ensureResourceVideosImport();
+    await ensureMetalCutVideoUpdate();
     await ensureRemoveTidingsLogoImages();
     await ensureRemoveNewsLogoImagesV2();
     await ensureFixPost111Images();
@@ -477,7 +478,7 @@ async function ensureMoveYtnResourceToPress(): Promise<void> {
 async function ensureResourceVideosImport(): Promise<void> {
   const flag = (await sql`SELECT value FROM settings WHERE key = 'resource_videos_imported_2025'`) as { value: string }[];
   if (flag.length > 0) return;
-  const vids: { title: string; desc: string; url: string; date: string }[] = [
+  const vids: { title: string; desc: string; url: string; date: string; thumbnailUrl?: string }[] = [
     {
       title: "레이저 플라스틱 커팅 (Laser Plastic Cutting) 영상",
       desc: "플라스틱 소재를 레이저로 정밀 절단하는 공정 영상입니다. 버(burr) 없는 깔끔한 절단면과 복잡한 형상 가공을 비접촉 방식으로 구현합니다.",
@@ -491,9 +492,10 @@ async function ensureResourceVideosImport(): Promise<void> {
       date: "2025-02-17T00:00:00.000Z",
     },
     {
-      title: "레이저 금속 커팅 (Laser Metal Cutting) 영상",
-      desc: "금속 소재를 레이저로 고속·정밀 절단하는 공정 영상입니다. 비접촉 가공으로 공구 마모 없이 정밀한 절단면을 얻습니다.",
-      url: "https://evlaser.co.kr/uploaded/board/data/19f0781144ae17a4d1e3c483f016bd550.mp4",
+      title: "알루미늄 다이캐스팅제품 게이트의 레이저절단",
+      desc: "알루미늄 다이캐스팅 부품의 게이트(주조 주입구)를 레이저로 정밀 절단하는 공정 영상입니다. 비접촉 가공으로 공구 마모 없이 깔끔한 절단면을 얻으며, 복잡한 형상의 게이트도 고속으로 제거합니다.",
+      url: "https://youtu.be/8mH-yVyhBME",
+      thumbnailUrl: "/images/resources/video/aluminum-diecasting-gate-laser-cut.webp",
       date: "2025-02-14T00:00:00.000Z",
     },
     {
@@ -508,11 +510,30 @@ async function ensureResourceVideosImport(): Promise<void> {
     if (exists.length === 0) {
       await sql`
         INSERT INTO resources (id, category, title, description, url, thumbnail_url, created_at)
-        VALUES (${newId()}, 'video', ${v.title}, ${v.desc}, ${v.url}, ${null}, ${v.date})
+        VALUES (${newId()}, 'video', ${v.title}, ${v.desc}, ${v.url}, ${v.thumbnailUrl ?? null}, ${v.date})
       `;
     }
   }
   await sql`INSERT INTO settings (key, value) VALUES ('resource_videos_imported_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// "레이저 금속 커팅" 영상을 실제 콘텐츠(알루미늄 다이캐스팅 게이트 레이저절단)로 교체.
+// 제목·유튜브 링크·미리보기 이미지를 갱신한다. 기존 mp4 URL 또는 새 유튜브 URL로 매칭.
+async function ensureMetalCutVideoUpdate(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'metal_cut_video_updated_2025'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const oldUrl = "https://evlaser.co.kr/uploaded/board/data/19f0781144ae17a4d1e3c483f016bd550.mp4";
+  const newUrl = "https://youtu.be/8mH-yVyhBME";
+  const title = "알루미늄 다이캐스팅제품 게이트의 레이저절단";
+  const desc =
+    "알루미늄 다이캐스팅 부품의 게이트(주조 주입구)를 레이저로 정밀 절단하는 공정 영상입니다. 비접촉 가공으로 공구 마모 없이 깔끔한 절단면을 얻으며, 복잡한 형상의 게이트도 고속으로 제거합니다.";
+  const thumb = "/images/resources/video/aluminum-diecasting-gate-laser-cut.webp";
+  await sql`
+    UPDATE resources
+    SET title = ${title}, description = ${desc}, url = ${newUrl}, thumbnail_url = ${thumb}
+    WHERE category = 'video' AND url IN (${oldUrl}, ${newUrl})
+  `;
+  await sql`INSERT INTO settings (key, value) VALUES ('metal_cut_video_updated_2025', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 async function ensureIntroVideo2025(): Promise<void> {
