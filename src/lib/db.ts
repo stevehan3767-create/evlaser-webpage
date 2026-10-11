@@ -474,6 +474,8 @@ function createSchema(): Promise<void> {
     await ensureNewsCleanup();
     await ensureAllTextCleanupV2();
     await ensureHidec28ReviewToPress();
+    await ensureDaejeonUspToPress();
+    await ensureYongsa2015ToPress();
   })();
 }
 
@@ -1286,6 +1288,89 @@ async function ensureHidec28ReviewToPress(): Promise<void> {
     await sql`DELETE FROM news_items WHERE id = ${newsId}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('hidec28_review_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 대전 한국-독일 Ultra Short Pulse Laser 워크샵(#60)을 사내소식 → 논문·학술소식으로 이관.
+// 본문 가독성 재편집, 남은 실제 사진 복사.
+async function ensureDaejeonUspToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'daejeon_usp_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "대전기계연구원 한국-독일 Ultra Short Pulse Laser 워크샵";
+  const newBody = [
+    "안녕하세요, 유로비젼레이저입니다.",
+    "9월 16일 대전 기계연구원에서 개최된 ‘한국-독일 레이저 생산제조 국제기술교류회’에 독일의 파트너사인 AMPHOS사와 유로비젼레이저가 함께 참가하여 기술교류의 시간을 가졌습니다.",
+    "이번 교류회에서는 초단펄스(Ultra Short Pulse) 레이저를 비롯한 최신 레이저 생산제조 기술에 대한 정보를 공유하며, 한국과 독일 양국의 전문가들이 협력 방안을 논의했습니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.18";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '한국기계연구원(대전) · 한-독 국제기술교류회', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    } else {
+      await sql`UPDATE press_items SET body = ${newBody} WHERE id = ${exists[0].id}`;
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('daejeon_usp_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 2015.10.22~23 용사학회 워크샵(#62)을 사내소식 → 논문·학술소식으로 이관.
+async function ensureYongsa2015ToPress(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'yongsa2015_moved_to_press'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const srcTitle = "2015.10.22~23 용사학회 워크샵";
+  const newBody = [
+    "안녕하세요, 유로비젼레이저입니다.",
+    "10월 23일 용사학회 워크샵에서 유로비젼레이저 한상배 대표님의 클래딩(Cladding) 세미나가 진행되었습니다.",
+    "유로비젼레이저도 용사학회 워크샵에 참가하여 레이저 클래딩 기술을 소개하고 기술교류의 시간을 가졌습니다.",
+  ].join("\n\n");
+  const rows = (await sql`SELECT * FROM news_items WHERE title = ${srcTitle}`) as Record<string, unknown>[];
+  if (rows.length > 0) {
+    const n = rows[0];
+    const newsId = n.id as string;
+    const date = (n.date as string) || "2021.06.18";
+    const imgRows = (await sql`SELECT * FROM news_images WHERE news_id = ${newsId} ORDER BY sort_order ASC, created_at ASC`) as Record<string, unknown>[];
+    const exists = (await sql`SELECT id FROM press_items WHERE title = ${srcTitle} LIMIT 1`) as { id: string }[];
+    if (exists.length === 0) {
+      const createdAt = new Date(date.replace(/\./g, "-") + "T00:00:00.000Z").toISOString();
+      const pressId = newId();
+      await sql`
+        INSERT INTO press_items (id, category, title, source, date, body, link_url, pdf_url, pdf_name, thumbnail_url, published, sort_order, created_at)
+        VALUES (${pressId}, 'paper', ${srcTitle}, '한국용사기술협회', ${date}, ${newBody},
+          ${null}, ${null}, ${null}, ${null}, true, 0, ${createdAt})
+      `;
+      for (let i = 0; i < imgRows.length; i++) {
+        const img = imgRows[i];
+        await sql`
+          INSERT INTO press_images (id, press_id, url, caption, content, sort_order, created_at)
+          VALUES (${newId()}, ${pressId}, ${img.url as string}, ${(img.caption as string) ?? null}, ${(img.content as string) ?? null}, ${i}, ${new Date().toISOString()})
+        `;
+      }
+    } else {
+      await sql`UPDATE press_items SET body = ${newBody} WHERE id = ${exists[0].id}`;
+    }
+    await sql`DELETE FROM news_images WHERE news_id = ${newsId}`;
+    await sql`DELETE FROM news_items WHERE id = ${newsId}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('yongsa2015_moved_to_press', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
