@@ -4,6 +4,7 @@ import tidingsPosts from "./tidings-data.json";
 import exhibitionPosts from "./exhibition-data.json";
 import mainnewsPosts from "./mainnews-data.json";
 import supportInquirySeed from "./support-inquiries-data.json";
+import newsPlaceholderImages from "./news-placeholder-images.json";
 
 let sqlClient: NeonQueryFunction<false, false> | undefined;
 
@@ -470,6 +471,7 @@ function createSchema(): Promise<void> {
     await ensurePressBodiesReformat();
     await ensureWs46ReviewToPress();
     await ensureRaylaseTrainingFix();
+    await ensureNewsCleanup();
   })();
 }
 
@@ -1171,6 +1173,50 @@ async function ensureRaylaseTrainingFix(): Promise<void> {
   await sql`DELETE FROM news_images WHERE url = ANY(${drop}::text[])`;
   await sql`UPDATE news_items SET body = ${newBody} WHERE title = ${title}`;
   await sql`INSERT INTO settings (key, value) VALUES ('raylase_training_fixed', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 사내소식 본문을 가독성 있게 정리한다.
+// - 상단의 "첨부파일(N)" + 파일명(용량) 줄 제거
+// - 게시판 네비게이션(목록/다음글/이전글) 꼬리 제거
+// - 문장부호(.!?) 뒤·쉼표 뒤에 한글이 바로 붙은 경우 공백 추가(날짜·소수점은 보호)
+function cleanNewsBody(raw: string): string {
+  let s = (raw || "").replace(/\r/g, "");
+  const lines = s.split("\n").filter((l) => {
+    const t = l.trim();
+    if (/^첨부파일\(\d+\)$/.test(t)) return false;
+    if (/^.+\.(jpg|jpeg|png|gif|bmp|pdf|zip|hwp|docx?|xlsx?|pptx?)\s*\(\s*[\d.,]+\s*[KMG]?B\s*\)$/i.test(t)) return false;
+    return true;
+  });
+  s = lines.join("\n");
+  // 게시판 하단 네비게이션 제거 (목록 + 다음글/이전글 블록이 있을 때만)
+  s = s.replace(/\n\s*목록\s*\n[\s\S]*$/u, (m) => (/다음글|이전글/.test(m) ? "" : m));
+  // 문장부호 뒤 공백(뒤 글자가 한글/여는따옴표/여는괄호/대문자일 때만 — 날짜·소수점 보호)
+  s = s.replace(/([.!?])([가-힣“”"'(A-Z])/g, "$1 $2");
+  // 쉼표 뒤 한글 공백
+  s = s.replace(/([,])([가-힣])/g, "$1 $2");
+  // 공백·빈줄 정리
+  s = s.replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  return s;
+}
+
+// 사내소식 전체 정리: 반복되는 placeholder 아이콘 이미지 삭제 + 본문 가독성 정리.
+async function ensureNewsCleanup(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'news_cleanup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  // 1) 의미 없는 placeholder 이미지(극소 아이콘) 일괄 삭제
+  const ph = newsPlaceholderImages as string[];
+  if (ph.length > 0) {
+    await sql`DELETE FROM news_images WHERE url = ANY(${ph}::text[])`;
+  }
+  // 2) 본문 가독성 정리
+  const rows = (await sql`SELECT id, body FROM news_items`) as { id: string; body: string }[];
+  for (const r of rows) {
+    const cleaned = cleanNewsBody(r.body);
+    if (cleaned !== (r.body ?? "")) {
+      await sql`UPDATE news_items SET body = ${cleaned} WHERE id = ${r.id}`;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('news_cleanup_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 레이저 솔더링 영상은 보안상의 이유로 동영상자료실에서 삭제한다.
