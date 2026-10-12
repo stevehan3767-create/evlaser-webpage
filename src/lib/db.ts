@@ -494,7 +494,93 @@ function createSchema(): Promise<void> {
     await ensureEventDatesPlus7();
     await ensurePartnerLogosImport();
     await ensureTechTaxonomyV1();
+    await ensureTechContentV2();
   })();
+}
+
+// 보정: ① 개념도 이미지 제거(작업 범위에서 제외) ② 설비 사양서를 관리자모드 표준
+// 형식(표준 사양서 항목)으로 재작성. 대표 설비사진은 관리자가 직접 업로드한다.
+const HT_EQUIP_V2: { key: string; desc: string; spec: string }[] = [
+  {
+    key: "htLineBeam",
+    desc: [
+      "레이저 라인빔 표면경화 시스템",
+      "",
+      "넓은 폭의 라인빔으로 금형 성형면·대면적 부품을 한 번에 균일하게 표면경화하는 시스템입니다.",
+      "",
+      "[주요 특징]",
+      "- 라인빔 방식으로 넓은 폭을 한 번에 균일 경화 → 높은 생산성",
+      "- 실시간 온도 피드백(폐루프) 제어로 재현성 높은 경화층 형성",
+      "- 비접촉·자기냉각 방식으로 변형 최소, 담금질 매체 불필요",
+      "- 다축 스테이지 연동으로 복잡 형상 대응",
+      "",
+      "※ 본 페이지의 사양은 참고용 예시 템플릿입니다. 실제 사양·설비 사진은 담당자 확인 후 등록됩니다.",
+    ].join("\n"),
+    spec: [
+      "레이저 종류(Laser type) | 고출력 다이오드 레이저 (Diode Laser)",
+      "출력(Laser power) | 1,000 ~ 6,000 W (사양 선택)",
+      "파장(Wavelength) | 900 ~ 1,080 nm",
+      "발진 모드(Oscillation mode) | 연속파(CW)",
+      "빔전송장치(Beam delivery) | 라인빔 광학계",
+      "최소 선폭·빔사이즈(Min. line width / Spot size) | 라인빔 폭 5 ~ 50 mm (가변)",
+      "경화 깊이(Hardening depth) | 0.1 ~ 1.5 mm",
+      "가공 재료(Processable materials) | 탄소강·합금강·금형강 등 철강계",
+      "제어 방식(Control system) | PLC / PC Control (실시간 온도 폐루프)",
+      "냉각 방식(Cooling) | 수냉식 (Water Cooling)",
+      "레이저안전(Laser Safety) | Class 1 Enclosure (국제표준 준수)",
+      "전원 사양(Power supply) | 3Φ 380V 50/60Hz (사양 선택)",
+    ].join("\n"),
+  },
+  {
+    key: "htRobotCell",
+    desc: [
+      "로봇 연동 레이저 표면경화 셀",
+      "",
+      "산업용 로봇에 레이저 헤드를 장착해 3차원 곡면·복잡 형상 부품의 부위 선택적 표면경화를 수행하는 셀형 시스템입니다.",
+      "",
+      "[주요 특징]",
+      "- 6축 산업용 로봇 연동으로 3D 곡면·난형상 부품의 국부 경화",
+      "- 부위 선택적 경화로 필요한 곳만 정밀 처리",
+      "- 비접촉·자기냉각으로 변형 최소",
+      "- 자동 로딩/언로딩 연계 및 MES 연동 가능",
+      "",
+      "※ 본 페이지의 사양은 참고용 예시 템플릿입니다. 실제 사양·설비 사진은 담당자 확인 후 등록됩니다.",
+    ].join("\n"),
+    spec: [
+      "레이저 종류(Laser type) | 고출력 다이오드 레이저 (Diode Laser)",
+      "출력(Laser power) | 1,000 ~ 4,000 W (사양 선택)",
+      "파장(Wavelength) | 900 ~ 1,080 nm",
+      "발진 모드(Oscillation mode) | 연속파(CW)",
+      "빔전송장치(Beam delivery) | 광섬유 + 로봇 장착 가공 헤드",
+      "가공 영역(Working area) | 6축 로봇 작업 반경 내 (부품 규격에 따름)",
+      "경화 깊이(Hardening depth) | 0.1 ~ 1.2 mm",
+      "가공 재료(Processable materials) | 탄소강·합금강·주철·금형강 등",
+      "제어 방식(Control system) | PLC / PC Control (실시간 온도 폐루프)",
+      "냉각 방식(Cooling) | 수냉식 (Water Cooling)",
+      "레이저안전(Laser Safety) | Class 1 Enclosure (국제표준 준수)",
+      "전원 사양(Power supply) | 3Φ 380V 50/60Hz (사양 선택)",
+    ].join("\n"),
+  },
+];
+
+async function ensureTechContentV2(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tech_content_v2'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+
+  // ① 개념도 이미지 제거 (작업 범위에서 제외)
+  await sql`UPDATE content_pages SET image_url = NULL, updated_at = ${now} WHERE group_key = 'tech' AND item_key = 'heatTreatment'`;
+
+  // ② 설비 사양서를 표준 형식(spec_table)으로, 설명에서 [사양] 표 제거
+  for (const e of HT_EQUIP_V2) {
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, updated_at)
+      VALUES ('lineup', ${e.key}, '', ${e.desc}, ${e.spec}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET description = EXCLUDED.description, spec_table = EXCLUDED.spec_table, updated_at = EXCLUDED.updated_at
+    `;
+  }
+
+  await sql`INSERT INTO settings (key, value) VALUES ('tech_content_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // ── 기술종류 간소화(A안) + 레이저 열처리 콘텐츠·설비 템플릿 등록 ──────────────
