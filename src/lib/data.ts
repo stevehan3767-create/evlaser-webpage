@@ -118,7 +118,7 @@ export const techItems: TechItem[] = [
   { icon: "heat", key: "heatTreatment" },
   { icon: "clad", key: "cladding" },
   { icon: "print3d", key: "print3d" },
-  { icon: "medical", key: "medical" },
+  // 의료기기(medical)는 산업분야(바이오·의료)와 중복이라 기술종류에서 제외.
   { icon: "safety", key: "safety" },
   { icon: "machine", key: "laserOscillator" },
   { icon: "precision", key: "beamDelivery" },
@@ -126,6 +126,22 @@ export const techItems: TechItem[] = [
   { icon: "case", key: "auxiliaryDevice" },
   { icon: "etc", key: "other" },
 ];
+
+// 기술종류 간소화(A안 시각적 그룹화): 가공 기술을 5개 대분류로 묶어 보여준다.
+// 데이터(키·설비 연결)는 그대로 두고 화면에서만 그룹 헤딩으로 표시한다.
+export const techCategoryGroups: { label: string; en: string; keys: string[] }[] = [
+  { label: "용접·접합", en: "Joining", keys: ["plasticWelding", "metalWelding", "glassWelding", "soldering"] },
+  { label: "절단·천공", en: "Cutting", keys: ["cutting", "drilling"] },
+  { label: "마킹·각인", en: "Marking", keys: ["marking", "etching"] },
+  { label: "표면처리", en: "Surface", keys: ["cleaning", "heatTreatment", "cladding"] },
+  { label: "정밀·미세가공", en: "Precision", keys: ["precisionMachining", "print3d"] },
+];
+// 가공 기술에 포함되는 소분류 키 전체(필터·목록에서 이 키들만 "기술종류"로 노출).
+export const techProcessKeys: string[] = techCategoryGroups.flatMap((g) => g.keys);
+// 레이저 구성요소(부품) — 가공 기술과 분리해 별도 섹션으로 노출.
+export const laserComponentKeys: string[] = ["laserOscillator", "beamDelivery", "measurementDevice", "auxiliaryDevice"];
+// 특정 대분류에 속하지 않는 기타 항목 키(참고용).
+export const techOtherKeys: string[] = ["safety", "other"];
 
 // Korean labels for techItems, used as the seed `name` for the DB-backed
 // content_items row on first load (see contentGroups.tech.itemSeeds below) —

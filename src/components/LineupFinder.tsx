@@ -20,6 +20,8 @@ export interface FacetGroup {
   group: string;
   label: string;
   tiles: FacetTile[];
+  // 지정되면 타일을 대분류(소제목)별로 묶어 표시한다(기술종류 그룹화용).
+  sections?: { heading: string; tiles: FacetTile[] }[];
 }
 
 // 설비 파인더 — 기본 화면은 결과(설비 카드)만 보여 단순하게 두고, 필터는
@@ -232,30 +234,45 @@ export default function LineupFinder({
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-1">
-              {facets.map((f) => (
-                <div key={f.group} className="py-3.5 border-b border-line last:border-b-0">
-                  <div className="text-[12px] font-bold text-ink-soft mb-2">{f.label}</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {f.tiles.map((t) => {
-                      const on = (selected[f.group] ?? []).includes(t.itemKey);
-                      return (
-                        <button
-                          key={t.itemKey}
-                          type="button"
-                          onClick={() => toggle(f.group, t.itemKey)}
-                          aria-pressed={on}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 border rounded-sm text-[12px] font-semibold whitespace-nowrap transition-colors ${
-                            on ? "bg-red text-white border-red" : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
-                          }`}
-                        >
-                          <Icon name={t.icon as IconName} className="w-3.5 h-3.5 flex-none" strokeWidth={1.6} />
-                          {t.name}
-                        </button>
-                      );
-                    })}
+              {facets.map((f) => {
+                const tile = (t: FacetTile) => {
+                  const on = (selected[f.group] ?? []).includes(t.itemKey);
+                  return (
+                    <button
+                      key={t.itemKey}
+                      type="button"
+                      onClick={() => toggle(f.group, t.itemKey)}
+                      aria-pressed={on}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 border rounded-sm text-[12px] font-semibold whitespace-nowrap transition-colors ${
+                        on ? "bg-red text-white border-red" : "border-line-strong text-ink-soft hover:border-blue hover:text-blue"
+                      }`}
+                    >
+                      <Icon name={t.icon as IconName} className="w-3.5 h-3.5 flex-none" strokeWidth={1.6} />
+                      {t.name}
+                    </button>
+                  );
+                };
+                return (
+                  <div key={f.group} className="py-3.5 border-b border-line last:border-b-0">
+                    <div className="text-[12px] font-bold text-ink-soft mb-2">{f.label}</div>
+                    {f.sections ? (
+                      <div className="flex flex-col gap-3">
+                        {f.sections.map((sec) => (
+                          <div key={sec.heading}>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="w-[6px] h-[6px] rounded-full bg-red flex-none" />
+                              <span className="text-[11.5px] font-bold text-ink">{sec.heading}</span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 pl-3">{sec.tiles.map(tile)}</div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">{f.tiles.map(tile)}</div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="flex gap-2 px-4 py-3 border-t border-line flex-none">

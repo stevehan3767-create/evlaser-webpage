@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
 import GroupItemGrid from "@/components/GroupItemGrid";
+import GroupedItemGrid from "@/components/GroupedItemGrid";
+import { techCategoryGroups, laserComponentKeys } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "기술·재료 소개 | EV Laser",
@@ -9,6 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default function ProductsGuidePage() {
+  const techSections = techCategoryGroups.map((g) => ({ heading: g.label, keys: g.keys }));
+
   return (
     <>
       <div className="mx-auto max-w-[1240px] px-7 pt-12">
@@ -23,23 +27,38 @@ export default function ProductsGuidePage() {
         </p>
       </div>
 
-      {/* 기술종류별 */}
+      {/* 기술종류별 — 5개 대분류로 그룹화 */}
       <section id="tech" className="pt-8 pb-14 sm:pb-18 border-b border-line">
         <div className="mx-auto max-w-[1240px] px-7">
-          <h2 className="mb-5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
+          <h2 className="mb-6 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
             기술종류별 <span className="text-[14px] text-ink-faint font-sans">(가공 기술로 보기)</span>
           </h2>
-          <GroupItemGrid group="tech" minColWidth="190px" iconColorClass="text-red" />
+          <GroupedItemGrid group="tech" sections={techSections} minColWidth="200px" iconColorClass="text-red" />
         </div>
       </section>
 
       {/* 재료별 */}
-      <section id="material" className="pt-10 pb-16 sm:pb-22 border-b border-line bg-surface-alt">
+      <section id="material" className="pt-10 pb-14 sm:pb-18 border-b border-line bg-surface-alt">
         <div className="mx-auto max-w-[1240px] px-7">
           <h2 className="mb-5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
             재료별 <span className="text-[14px] text-ink-faint font-sans">(가공 소재로 보기)</span>
           </h2>
           <GroupItemGrid group="material" minColWidth="150px" iconColorClass="text-blue" />
+        </div>
+      </section>
+
+      {/* 레이저 구성요소 — 가공 기술과 분리 */}
+      <section id="components" className="pt-10 pb-16 sm:pb-22 border-b border-line">
+        <div className="mx-auto max-w-[1240px] px-7">
+          <h2 className="mb-5 text-[20px] sm:text-[24px] font-[family-name:var(--font-display)] tracking-tight">
+            레이저 구성요소 <span className="text-[14px] text-ink-faint font-sans">(발진기·빔전송·측정·보조장치)</span>
+          </h2>
+          <GroupedItemGrid
+            group="tech"
+            sections={[{ heading: "구성요소", keys: laserComponentKeys }]}
+            minColWidth="200px"
+            iconColorClass="text-ink-soft"
+          />
         </div>
       </section>
     </>

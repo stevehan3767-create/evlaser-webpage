@@ -493,7 +493,144 @@ function createSchema(): Promise<void> {
     await ensureSafeTyposV3();
     await ensureEventDatesPlus7();
     await ensurePartnerLogosImport();
+    await ensureTechTaxonomyV1();
   })();
+}
+
+// ── 기술종류 간소화(A안) + 레이저 열처리 콘텐츠·설비 템플릿 등록 ──────────────
+// - 의료기기(medical) 기술 항목 제거(산업분야와 중복)
+// - 레이저 열처리 설명/개념도 보강
+// - 레이저 열처리 교집합에 설비 템플릿 2종 등록(사양서 포함, 추후 관리자 교정)
+const HEAT_TREATMENT_DESC = [
+  "레이저 열처리 (Laser Heat Treatment · 표면경화)",
+  "",
+  "쉽게 말해, 금속 표면만 레이저로 순간적으로 달궜다가 스스로 식히며 단단하게 만드는 기술입니다. 기름에 담그는 기존 열처리와 달리 필요한 부위만 비접촉으로 경화해 변형이 거의 없습니다.",
+  "",
+  "[한눈에 보는 원리]",
+  "- 급속 가열 : 라인빔이 표면을 오스테나이트화 온도(Ac₃ 이상)까지 수 밀리초 만에 가열(녹이지 않음)",
+  "- 자기냉각(Self-quenching) : 레이저가 지나가면 표면 열이 차가운 내부 금속으로 빠르게 빠져나가며 저절로 급랭",
+  "- 경화 : 급랭으로 '마르텐사이트' 조직이 형성되어 표면 경도·내마모성이 크게 향상(경화 깊이 0.1~1.5mm)",
+  "",
+  "[핵심 장점]",
+  "- 비접촉·국부 가열로 열영향부가 작고 변형이 적음",
+  "- 별도의 담금질(냉각매체)이 필요 없는 자기냉각 방식 → 공정 간단·친환경",
+  "- 라인빔 적용 시 넓은 면을 한 번에 균일 경화 → 생산성 향상",
+  "- 부위 선택적 경화·복잡 형상 대응, 자동화 및 정밀 제어 용이, 후가공 최소화",
+  "",
+  "[적용 분야]",
+  "- 자동차 : 캠샤프트·밸브시트·기어·샤프트 등 마찰·구동 부품",
+  "- 금형 : 프레스 금형 성형면, 에지·코너 등 마모 취약부 국부 경화로 수명 연장",
+  "- 기계·공구 : 가이드레일, 베어링 면, 절삭공구 날부",
+  "",
+  "[주요 공정 변수]",
+  "레이저 출력, 빔 크기·형상(라인빔 폭), 이송(주사) 속도, 표면 흡수율(흑화 처리), 트랙 중첩률, 실시간 온도 피드백",
+].join("\n");
+
+// 레이저 열처리 설비 템플릿 2종 (사양서 포함). 값은 참고용 예시이며 관리자가 교정한다.
+const HT_EQUIP: { key: string; name: string; desc: string }[] = [
+  {
+    key: "htLineBeam",
+    name: "레이저 라인빔 표면경화 시스템",
+    desc: [
+      "레이저 라인빔 표면경화 시스템",
+      "",
+      "넓은 폭의 라인빔으로 금형 성형면·대면적 부품을 한 번에 균일하게 표면경화하는 시스템입니다.",
+      "",
+      "[주요 특징]",
+      "- 라인빔 방식으로 넓은 폭을 한 번에 균일 경화 → 높은 생산성",
+      "- 실시간 온도 피드백(폐루프) 제어로 재현성 높은 경화층 형성",
+      "- 비접촉·자기냉각 방식으로 변형 최소, 담금질 매체 불필요",
+      "- 다축 스테이지 연동으로 복잡 형상 대응",
+      "",
+      "[사양 (Data Sheet)]",
+      "| 항목 | 내용 |",
+      "|---|---|",
+      "| Laser Type | 고출력 다이오드 레이저 (Diode Laser) |",
+      "| Laser Power | 1,000 ~ 6,000 W (사양 선택) |",
+      "| Beam Type | 라인빔 / 가변 스폿 |",
+      "| Hardening Width | 라인빔 폭 가변 (예: 5 ~ 50 mm) |",
+      "| Hardening Depth | 0.1 ~ 1.5 mm |",
+      "| Temperature Control | 실시간 온도 피드백 (Closed-loop) |",
+      "| Motion | 다축 스테이지 |",
+      "| Cooling Type | 수냉식 (Water Cooling) |",
+      "| System Control | PLC / PC Control |",
+      "| Laser Safety | Class 1 Enclosure (국제표준 준수) |",
+      "",
+      "※ 본 사양은 참고용 예시 템플릿입니다. 실제 사양은 담당자에게 문의해 주세요.",
+    ].join("\n"),
+  },
+  {
+    key: "htRobotCell",
+    name: "로봇 연동 레이저 표면경화 셀",
+    desc: [
+      "로봇 연동 레이저 표면경화 셀",
+      "",
+      "산업용 로봇에 레이저 헤드를 장착해 3차원 곡면·복잡 형상 부품의 부위 선택적 표면경화를 수행하는 셀형 시스템입니다.",
+      "",
+      "[주요 특징]",
+      "- 6축 로봇 연동으로 3D 곡면·난형상 부품의 국부 경화",
+      "- 부위 선택적 경화로 필요한 곳만 정밀 처리",
+      "- 비접촉·자기냉각으로 변형 최소",
+      "- 자동 로딩/언로딩 연계 및 MES 연동 가능",
+      "",
+      "[사양 (Data Sheet)]",
+      "| 항목 | 내용 |",
+      "|---|---|",
+      "| Laser Type | 고출력 다이오드 레이저 (Diode Laser) |",
+      "| Laser Power | 1,000 ~ 4,000 W (사양 선택) |",
+      "| Motion | 6축 산업용 로봇 |",
+      "| Beam Type | 가변 스폿 / 라인빔 |",
+      "| Hardening Depth | 0.1 ~ 1.2 mm |",
+      "| Temperature Control | 실시간 온도 피드백 (Closed-loop) |",
+      "| Cooling Type | 수냉식 (Water Cooling) |",
+      "| System Control | PLC / PC Control |",
+      "| Laser Safety | Class 1 Enclosure (국제표준 준수) |",
+      "",
+      "※ 본 사양은 참고용 예시 템플릿입니다. 실제 사양은 담당자에게 문의해 주세요.",
+    ].join("\n"),
+  },
+];
+
+async function ensureTechTaxonomyV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tech_taxonomy_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+
+  // 1) 의료기기(medical) 기술 항목 제거(항목·페이지·연결)
+  await sql`DELETE FROM content_item_links WHERE (from_group='tech' AND from_key='medical') OR (to_group='tech' AND to_key='medical')`;
+  await sql`DELETE FROM content_pages WHERE group_key='tech' AND item_key='medical'`;
+  await sql`DELETE FROM content_items WHERE group_key='tech' AND item_key='medical'`;
+
+  // 2) 레이저 열처리 설명/개념도 보강
+  await sql`
+    INSERT INTO content_pages (group_key, item_key, title, description, image_url, updated_at)
+    VALUES ('tech','heatTreatment','레이저 열처리 (Laser Heat Treatment · 표면경화)', ${HEAT_TREATMENT_DESC}, '/images/tech/laser-heat-treatment.webp', ${now})
+    ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
+  `;
+
+  // 3) 레이저 열처리 교집합 설비 템플릿 2종 등록 + 매핑
+  const matKeys = ["metalSteel", "copperAluminum"];
+  const indKeys = ["automotive", "machinery", "steel", "precisionMachining"];
+  let order = 90;
+  for (const e of HT_EQUIP) {
+    await sql`
+      INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at)
+      VALUES (${newId()}, 'lineup', ${e.key}, ${e.name}, 'heat', ${order}, ${now})
+      ON CONFLICT (group_key, item_key) DO NOTHING
+    `;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, updated_at)
+      VALUES ('lineup', ${e.key}, ${e.name}, ${e.desc}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, updated_at = EXCLUDED.updated_at
+    `;
+    const links: [string, string][] = [["tech", "heatTreatment"], ...matKeys.map((m): [string, string] => ["material", m]), ...indKeys.map((i): [string, string] => ["industry", i])];
+    for (const [toGroup, toKey] of links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${e.key}, ${toGroup}, ${toKey}) ON CONFLICT DO NOTHING`;
+    }
+    order++;
+  }
+
+  await sql`INSERT INTO settings (key, value) VALUES ('tech_taxonomy_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // YTN <최강기업> 출연(2025.05.12)을 언론·방송(press)에 한 번만 등록한다.

@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { contentGroups, resolveLineupDisplay } from "@/lib/data";
+import { contentGroups, resolveLineupDisplay, techCategoryGroups, techProcessKeys } from "@/lib/data";
 import { contentItemRepo, contentPageRepo, contentLinkRepo, seedContentItemsIfEmpty } from "@/lib/repo";
 import LineupFinder, { type FinderCard, type FacetGroup } from "./LineupFinder";
 
@@ -68,11 +68,17 @@ export default async function ProductLineup() {
   // 값이 하나도 등록되지 않은 축은 필터에 표시하지 않는다.
   const facets: FacetGroup[] = facetData
     .filter((fd) => fd.items.length > 0)
-    .map((fd) => ({
-      group: fd.group,
-      label: fd.label,
-      tiles: fd.items.map((it) => ({ itemKey: it.itemKey, name: it.name, icon: it.icon })),
-    }));
+    .map((fd) => {
+      const allTiles = fd.items.map((it) => ({ itemKey: it.itemKey, name: it.name, icon: it.icon }));
+      if (fd.group !== "tech") return { group: fd.group, label: fd.label, tiles: allTiles };
+      // 기술종류: 가공 기술 소분류만 노출하고 5개 대분류로 묶는다(구성요소·안전·의료 제외).
+      const byKey = new Map(allTiles.map((t) => [t.itemKey, t]));
+      const sections = techCategoryGroups
+        .map((g) => ({ heading: g.label, tiles: g.keys.map((k) => byKey.get(k)).filter((t): t is (typeof allTiles)[number] => !!t) }))
+        .filter((s) => s.tiles.length > 0);
+      const tiles = allTiles.filter((t) => techProcessKeys.includes(t.itemKey));
+      return { group: "tech", label: fd.label, tiles, sections };
+    });
 
   return (
     <section id="lineup" className="pt-6 pb-16 sm:pb-22 border-b border-line">
