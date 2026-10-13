@@ -348,6 +348,7 @@ export const companyMegaGroups: { titleKey: string; items: { labelKey: string; h
 export const productsNav: NavItem[] = [
   { key: "lineup", href: "/products/lineup" },
   { key: "guide", href: "/products/guide" },
+  { key: "safety", href: "/products/safety" },
 ];
 
 export const resourcesNav: NavItem[] = [
@@ -653,6 +654,20 @@ export interface ContentGroupMeta {
   labelKo: string;
 }
 
+// 레이저 안전 제품군(별도 카테고리). laservision과의 협력 기반 제품 라인업을 참고해 구성.
+export const safetyItems: { icon: IconName; key: string }[] = [
+  { icon: "safety", key: "safetyEyewear" },
+  { icon: "glass", key: "safetyWindow" },
+  { icon: "shield", key: "safetyBarrier" },
+  { icon: "alert", key: "safetySign" },
+];
+export const safetyLabelsKo: Record<string, string> = {
+  safetyEyewear: "레이저 안전 보안경",
+  safetyWindow: "레이저 안전 윈도우",
+  safetyBarrier: "레이저 안전 차폐(커튼·배리어)",
+  safetySign: "레이저 안전 표지",
+};
+
 // Registry shared by the generic /products/[group]/[key] detail route and the
 // generic /admin/content-pages CRUD screen. Every group follows the same
 // article shape: title + long-form description + application-case cards
@@ -681,6 +696,12 @@ export const contentGroups: Record<string, ContentGroupMeta> = {
     seeds: [],
     backHref: "/products/guide#material",
     labelKo: "재료별",
+  },
+  safety: {
+    itemSeeds: safetyItems.map((i) => ({ key: i.key, name: safetyLabelsKo[i.key], icon: i.icon })),
+    seeds: [],
+    backHref: "/products/safety",
+    labelKo: "레이저 안전",
   },
 };
 

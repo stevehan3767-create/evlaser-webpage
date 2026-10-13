@@ -7,6 +7,7 @@ import type { IconName } from "@/lib/data";
 const CARDS: { icon: IconName; title: string; desc: string; href: string }[] = [
   { icon: "machine", title: "설비 찾기", desc: "기술·재료·산업 조건으로 원하는 설비를 바로 찾기", href: "/products/lineup?finder=open" },
   { icon: "weld", title: "기술·재료 소개", desc: "용접·절단·마킹 등 가공 기술과 적용 재료 살펴보기", href: "/products/guide" },
+  { icon: "safety", title: "레이저 안전", desc: "보안경·윈도우·차폐·표지 등 레이저 안전 제품", href: "/products/safety" },
 ];
 
 export default function CategoryShortcuts() {

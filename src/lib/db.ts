@@ -500,7 +500,111 @@ function createSchema(): Promise<void> {
     await ensureTechContentV4();
     await ensureRemoveTestLineupV1();
     await ensureMaterialContentV1();
+    await ensureSafetyCategoryV1();
   })();
+}
+
+// 레이저 안전 카테고리(별도): laservision 협력 기반 제품군 설명 + 표준 사양서 + 대표이미지.
+const SAFETY_CONTENT: Record<string, { title: string; img: string; desc: string; spec: string }> = {
+  safetyEyewear: {
+    title: "레이저 안전 보안경 (Laser Safety Eyewear)", img: "safety-eyewear",
+    desc: [
+      "사용하는 레이저의 파장·출력에 맞춰 눈을 보호하는 레이저 안전 보안경입니다. 글라스·폴리카보네이트·박막 필터로 특정 파장을 차단하면서도 작업에 필요한 가시광은 확보합니다.",
+      "", "[특징]",
+      "- 레이저 파장별 맞춤 선택(UV ~ Far-IR)",
+      "- 글라스/고글/페이스실드/헬멧 등 다양한 형태",
+      "- 국제 표준(EN 207/208, ANSI Z136) 준수",
+      "", "[적용] 레이저 가공·연구·의료 등 레이저를 다루는 모든 작업 환경",
+    ].join("\n"),
+    spec: [
+      "제품 유형(Type) | 글라스 / 고글 / 페이스실드 / 헬멧",
+      "적용 표준(Standards) | EN 207 · EN 208 · ANSI Z136",
+      "보호 파장(Protected wavelength) | UV ~ Far-IR (레이저별 선택)",
+      "광학 밀도(Optical Density, OD) | 파장별 L-rating(LB) 표기",
+      "가시광 투과율(VLT) | 제품별 상이",
+      "필터 소재(Filter) | 글라스 / 폴리카보네이트 / 박막",
+      "인증(Certification) | CE 등",
+    ].join("\n"),
+  },
+  safetyWindow: {
+    title: "레이저 안전 윈도우 (Viewing Window)", img: "safety-window",
+    desc: [
+      "레이저 가공 공간을 안전하게 들여다볼 수 있는 레이저 차단 관찰창입니다. 특정 파장을 차단해 외부 작업자·관찰자를 보호하면서 내부 공정을 확인할 수 있습니다.",
+      "", "[특징]",
+      "- 레이저 파장별 차단, 공정 관찰 가능",
+      "- 장비 커버·격실·인클로저에 적용",
+      "- 맞춤 크기 제작",
+      "", "[적용] 레이저 장비 커버·격실, 클린룸·연구실 관찰창",
+    ].join("\n"),
+    spec: [
+      "적용 표준(Standards) | EN 207",
+      "보호 파장(Protected wavelength) | 레이저별 선택",
+      "광학 밀도(Optical Density, OD) | 파장별 표기",
+      "가시광 투과율(VLT) | 제품별 상이",
+      "크기(Size) | 맞춤 제작",
+      "프레임(Frame) | 알루미늄 등",
+    ].join("\n"),
+  },
+  safetyBarrier: {
+    title: "레이저 안전 차폐 — 커튼·배리어·인클로저", img: "safety-barrier",
+    desc: [
+      "레이저 작업 구역을 물리적으로 구획해 산란·반사 레이저로부터 주변을 보호하는 차폐 솔루션입니다. 커튼·배리어·인클로저 형태로 작업 환경에 맞게 구성합니다.",
+      "", "[특징]",
+      "- 난연 특수소재로 레이저 차폐",
+      "- 커튼/이동식 배리어/고정 인클로저 구성",
+      "- 작업 공간에 맞춘 맞춤 제작",
+      "", "[적용] 레이저 작업셀 구획, 생산라인·연구실 안전 구역",
+    ].join("\n"),
+    spec: [
+      "제품 유형(Type) | 커튼 / 배리어 / 인클로저",
+      "적용 표준(Standards) | EN 12254",
+      "보호 파장(Protected wavelength) | 레이저별 선택",
+      "내조사 정격(Rating) | 조사 시간·파워 정격",
+      "소재(Material) | 난연 특수소재",
+      "크기(Size) | 맞춤 제작",
+    ].join("\n"),
+  },
+  safetySign: {
+    title: "레이저 안전 표지 (Signs & Labels)", img: "safety-sign",
+    desc: [
+      "레이저 등급과 위험을 알리는 경고 표지·라벨입니다. 국제 표준에 따라 레이저 구역·장비에 부착해 작업자 안전과 규정 준수를 돕습니다.",
+      "", "[특징]",
+      "- 레이저 등급(Class)·위험 표시",
+      "- 국제 표준(ANSI Z136, IEC 60825) 준수",
+      "- 표준/맞춤 규격, 국·영문 제작",
+      "", "[적용] 레이저 장비·출입문·작업구역 표시",
+    ].join("\n"),
+    spec: [
+      "적용 표준(Standards) | ANSI Z136 · IEC 60825",
+      "표시 등급(Laser Class) | Class 1 ~ 4",
+      "소재(Material) | PVC / 알루미늄 등",
+      "규격(Size) | 표준 / 맞춤",
+      "언어(Language) | 국문 / 영문 등",
+    ].join("\n"),
+  },
+};
+async function ensureSafetyCategoryV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'safety_category_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  const base = "/images/safety/";
+  let order = 0;
+  for (const [key, c] of Object.entries(SAFETY_CONTENT)) {
+    // 항목(content_items)도 선등록 — 목록/상세에서 바로 표시되도록.
+    const icon = key === "safetyEyewear" ? "safety" : key === "safetyWindow" ? "glass" : key === "safetyBarrier" ? "shield" : "alert";
+    const name = { safetyEyewear: "레이저 안전 보안경", safetyWindow: "레이저 안전 윈도우", safetyBarrier: "레이저 안전 차폐(커튼·배리어)", safetySign: "레이저 안전 표지" }[key] ?? key;
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'safety', ${key}, ${name}, ${icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, updated_at)
+      VALUES ('safety', ${key}, ${c.title}, ${c.desc}, ${c.spec}, ${base + c.img + ".webp"}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET
+        description = CASE WHEN content_pages.description IS NULL OR content_pages.description = '' THEN EXCLUDED.description ELSE content_pages.description END,
+        spec_table = CASE WHEN content_pages.spec_table IS NULL OR content_pages.spec_table = '' THEN EXCLUDED.spec_table ELSE content_pages.spec_table END,
+        image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
+    `;
+    order++;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('safety_category_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 재료별 콘텐츠: 각 재료의 레이저 가공 설명 + 대표이미지(자작·라이선스 자유) 등록.
