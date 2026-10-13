@@ -497,7 +497,183 @@ function createSchema(): Promise<void> {
     await ensureTechContentV2();
     await ensureTechSceneImagesV1();
     await ensureTemplateCaseImagesV1();
+    await ensureTechContentV4();
   })();
+}
+
+// ── 콘텐츠 마무리: ① 설명 미비 기술 보강 ② 설비 2개 미만 기술에 설비 템플릿 top-up ──
+// 설비 템플릿은 표준 사양서(spec_table) + 대분류 가공장면 이미지 + 적용사례1·2·3(로고
+// placeholder) + 기술/재료/산업 매핑을 포함한다. 값은 참고용 템플릿이며 관리자가 교정한다.
+const TECH_SCENE: Record<string, string> = {
+  plasticWelding: "welding", metalWelding: "welding", glassWelding: "welding", soldering: "welding",
+  cutting: "cutting", drilling: "cutting", marking: "marking", etching: "marking",
+  cleaning: "surface", heatTreatment: "surface", cladding: "surface",
+  precisionMachining: "precision", print3d: "precision",
+};
+// 설명이 비어 있는 기술 보강(관리자가 작성한 내용은 보존 — 빈 경우만 채움)
+const TECH_DESC_FILL: Record<string, string> = {
+  metalWelding: [
+    "레이저 금속·알루미늄·동 용접 (Metal Welding)",
+    "",
+    "고출력 레이저 빔으로 금속·알루미늄·동 모재를 국부적으로 녹여 접합하는 정밀 용접 기술입니다. 열영향부가 작아 변형이 적고, 깊고 좁은 용입을 얻을 수 있어 정밀 부품과 이종금속 접합에 적합합니다.",
+    "",
+    "[기술 특징]",
+    "- 비접촉·고속·저변형, 깊은 용입과 좁은 비드",
+    "- 동·알루미늄 등 이종·고반사 금속 접합 대응(빔 워블링 등)",
+    "- 자동화·실시간 품질 모니터링 용이",
+    "",
+    "[적용 분야]",
+    "- 자동차·배터리: 셀/팩 탭·버스바 접합",
+    "- 전장·전자 부품, 정밀 금속 부품",
+    "",
+    "[주요 공정 변수]",
+    "레이저 출력, 용접 속도, 초점 위치, 보호가스, 빔 스캐닝(워블링)",
+  ].join("\n"),
+  glassWelding: [
+    "레이저 유리 용접 (Glass Welding)",
+    "",
+    "초단펄스(피코·펨토초) 레이저로 유리와 유리(또는 유리-금속)를 접착제 없이 직접 접합하는 기술입니다. 접합부가 투명하고 기밀성이 우수합니다.",
+    "",
+    "[기술 특징]",
+    "- 무접착·고기밀 접합, 투명한 접합부",
+    "- 국부 가열로 균열·열변형 최소",
+    "- 미세·정밀 접합 대응",
+    "",
+    "[적용 분야]",
+    "- 디스플레이·광학부품, 센서 패키징",
+    "- 의료·바이오 디바이스",
+    "",
+    "[주요 공정 변수]",
+    "펄스 에너지·반복률, 초점 심도, 접촉 정밀도, 스캔 속도",
+  ].join("\n"),
+  drilling: [
+    "레이저 드릴링 (Laser Drilling)",
+    "",
+    "레이저로 미세한 구멍을 비접촉·고속으로 가공하는 기술입니다. 공구 마모가 없고, 미세하고 종횡비가 높은 홀을 정밀하게 가공할 수 있습니다.",
+    "",
+    "[기술 특징]",
+    "- 비접촉·무공구마모, 미세·고정밀 홀",
+    "- 고속 가공, 다양한 재료 대응",
+    "- 타격(Percussion)·트레판(Trepanning) 등 방식 선택",
+    "",
+    "[적용 분야]",
+    "- PCB 비아홀, 반도체",
+    "- 연료분사 노즐, 필터·메시, 미세 유로",
+    "",
+    "[주요 공정 변수]",
+    "펄스 에너지, 반복률, 초점 위치, 가공 방식, 어시스트 가스",
+  ].join("\n"),
+  precisionMachining: [
+    "레이저 정밀·미세가공 (Precision / Micro Machining)",
+    "",
+    "초단펄스 레이저로 열영향을 최소화하며 미세 패턴·형상을 정밀하게 가공하는 기술입니다. 재료 손상 없이 마이크로·나노 수준의 가공이 가능합니다.",
+    "",
+    "[기술 특징]",
+    "- 저열영향(냉간가공)으로 버·열손상 최소",
+    "- 마이크로·나노 수준의 정밀도",
+    "- 금속·세라믹·유리 등 다양한 소재",
+    "",
+    "[적용 분야]",
+    "- 반도체·디스플레이 공정",
+    "- 의료기기, 정밀 전자부품",
+    "",
+    "[주요 공정 변수]",
+    "펄스폭(ps/fs), 펄스 에너지, 스캔 속도, 초점 제어, 반복률",
+  ].join("\n"),
+  print3d: [
+    "레이저 3D 프린팅·적층제조 (Additive Manufacturing)",
+    "",
+    "레이저로 금속 분말을 선택적으로 용융·적층하여 3차원 부품을 제조하는 적층제조(AM) 기술입니다. 절삭 없이 복잡 형상과 경량 구조를 제작합니다.",
+    "",
+    "[기술 특징]",
+    "- 복잡 형상·경량화(내부 냉각수로 등) 구현",
+    "- 소량·맞춤형 생산에 유리",
+    "- 재료 활용 효율이 높음",
+    "",
+    "[적용 분야]",
+    "- 항공우주, 의료(임플란트)",
+    "- 금형(냉각수로), 고성능 기계부품",
+    "",
+    "[주요 공정 변수]",
+    "레이저 출력, 적층 두께, 스캔 전략, 분말 특성, 예열 온도",
+  ].join("\n"),
+};
+// 설비 템플릿 구성(기술별). names: 설비명 후보, mats/inds: 매핑 키, matText: 사양 표기,
+// laser/power/wave/beam/cool: 사양 값, extra: 기술별 추가 사양 행.
+type TplCfg = { names: string[]; intro: string; feats: string[]; mats: string[]; matText: string; inds: string[]; laser: string; power: string; wave: string; beam: string; cool: string; extra: [string, string][] };
+const TECH_TPL: Record<string, TplCfg> = {
+  metalWelding: { names: ["금속 레이저 용접 시스템", "로봇 연동 금속 용접 셀"], intro: "고출력 레이저로 금속·알루미늄·동 모재를 정밀 접합하는 용접 설비입니다.", feats: ["비접촉·고속·저변형 용접", "빔 워블링으로 이종·고반사 금속 대응", "실시간 용접 품질 모니터링"], mats: ["metalSteel", "copperAluminum"], matText: "금속·철강, 동·알루미늄", inds: ["automotive", "battery", "electronics3c", "machinery"], laser: "파이버 레이저 (Fiber)", power: "500 ~ 6,000 W (사양 선택)", wave: "약 1,064 nm", beam: "스캐너 / 가공 헤드(워블링)", cool: "수냉식 (Water Cooling)", extra: [["보호가스(Shielding gas)", "Ar / N₂ (옵션)"]] },
+  glassWelding: { names: ["유리 레이저 접합 시스템", "초단펄스 유리 용접 시스템"], intro: "초단펄스 레이저로 유리-유리/유리-금속을 접착제 없이 직접 접합하는 설비입니다.", feats: ["무접착·고기밀 접합", "투명 접합부·저열변형", "미세 정밀 접합"], mats: ["glass", "metalSteel"], matText: "유리, 금속(이종 접합)", inds: ["electronics3c", "display", "bioHealth"], laser: "초단펄스 레이저 (ps/fs)", power: "사양 선택", wave: "약 1,030 / 515 nm", beam: "집광 광학계 / 스캐너", cool: "수냉식 (Water Cooling)", extra: [["펄스폭(Pulse width)", "피코초/펨토초"]] },
+  soldering: { names: ["레이저 솔더링 시스템", "인라인 레이저 솔더링 시스템"], intro: "레이저 국부 가열로 전자부품·기판을 비접촉 납땜하는 설비입니다.", feats: ["비접촉·국부 가열(인접부 열영향 최소)", "실시간 온도 피드백", "미세피치·열민감 부품 대응"], mats: ["pcb", "metalSteel"], matText: "PCB, 금속 리드", inds: ["electronics3c", "automotive", "semiconductor"], laser: "다이오드 / 파이버 레이저", power: "사양 선택", wave: "약 915 ~ 1,080 nm", beam: "집광 광학계(온도센서 연동)", cool: "공냉 / 수냉", extra: [["온도 제어(Temp. control)", "실시간 폐루프"]] },
+  cutting: { names: ["레이저 정밀 절단 시스템", "고속 레이저 커팅 시스템"], intro: "레이저 빔으로 금속·비금속을 정밀·고속으로 절단하는 설비입니다.", feats: ["비접촉·고속 절단, 좁은 절단폭", "복잡 형상·정밀 가공", "다양한 재료 대응"], mats: ["metalSteel", "copperAluminum", "plastic"], matText: "금속·철강, 동·알루미늄, 플라스틱", inds: ["automotive", "electronics3c", "display"], laser: "파이버 / CO₂ 레이저", power: "사양 선택", wave: "약 1,064 / 10,600 nm", beam: "커팅 헤드 / 갈바노 스캐너", cool: "수냉식 (Water Cooling)", extra: [["어시스트 가스(Assist gas)", "O₂ / N₂ / Air (옵션)"]] },
+  drilling: { names: ["레이저 미세 드릴링 시스템", "고속 레이저 천공 시스템"], intro: "레이저로 미세·고종횡비 홀을 비접촉·고속으로 가공하는 설비입니다.", feats: ["비접촉·무공구마모", "미세·고정밀 홀", "타격/트레판 방식 선택"], mats: ["metalSteel", "ceramic", "pcb"], matText: "금속, 세라믹, PCB", inds: ["semiconductor", "electronics3c", "automotive"], laser: "펄스 파이버 / UV 레이저", power: "사양 선택", wave: "약 1,064 / 355 nm", beam: "갈바노 스캐너 / 집광 광학계", cool: "수냉식 (Water Cooling)", extra: [["가공 방식(Method)", "Percussion / Trepanning"]] },
+  marking: { names: ["파이버 레이저 마킹 시스템", "3D 레이저 마킹 시스템"], intro: "레이저로 로고·일련번호·바코드 등을 반영구적으로 각인하는 설비입니다.", feats: ["고정밀·반영구 마킹", "잉크·소모품 불필요(친환경)", "금속·플라스틱 등 다양한 소재"], mats: ["metalSteel", "plastic", "preciousMetal"], matText: "금속, 플라스틱, 귀금속", inds: ["automotive", "electronics3c", "bioHealth"], laser: "파이버 / UV / CO₂ 레이저", power: "사양 선택", wave: "약 1,064 / 355 / 10,600 nm", beam: "갈바노 스캐너 (2D/3D)", cool: "공냉식 (Air Cooling)", extra: [["마킹 영역(Field)", "110×110 ~ 300×300 mm (옵션)"]] },
+  etching: { names: ["레이저 에칭(어블레이션) 시스템", "정밀 레이저 에칭 시스템"], intro: "레이저로 표면층을 제거해 미세 패턴·질감을 형성하는 에칭(어블레이션) 설비입니다.", feats: ["정밀 패턴·표면 가공", "비접촉·비마모", "금속·유리·세라믹 등 대응"], mats: ["metalSteel", "glass", "ceramic"], matText: "금속, 유리, 세라믹", inds: ["semiconductor", "electronics3c", "display"], laser: "파이버 / UV 레이저", power: "사양 선택", wave: "약 1,064 / 355 nm", beam: "갈바노 스캐너", cool: "공냉 / 수냉", extra: [["해상도(Resolution)", "고해상 패턴 대응"]] },
+  cleaning: { names: ["레이저 클리닝 시스템", "휴대형 레이저 세정 시스템"], intro: "레이저로 녹·산화물·도막·오염물을 비접촉·친환경적으로 제거하는 세정 설비입니다.", feats: ["비접촉·비마모, 기판 손상 최소", "약품·폐기물 없는 친환경 공정", "선택적 오염물 제거"], mats: ["metalSteel", "copperAluminum"], matText: "금속·철강, 동·알루미늄", inds: ["automotive", "aerospace", "machinery"], laser: "펄스 파이버 레이저", power: "100 ~ 2,000 W (사양 선택)", wave: "약 1,064 nm", beam: "갈바노 스캐너 / 핸드헬드", cool: "공냉 / 수냉", extra: [["세정 방식(Type)", "고정형 / 휴대형"]] },
+  cladding: { names: ["레이저 클래딩(코팅) 시스템", "로봇 연동 레이저 클래딩 셀"], intro: "레이저로 금속 분말·와이어를 모재 표면에 용융·적층해 코팅하는 설비입니다.", feats: ["내마모·내식·내열 코팅", "낮은 희석율·높은 접착력", "부품 보수·수명 연장"], mats: ["metalSteel"], matText: "금속·철강(분말/와이어)", inds: ["automotive", "machinery", "aerospace", "steel"], laser: "고출력 다이오드 / 파이버 레이저", power: "1,000 ~ 6,000 W (사양 선택)", wave: "약 900 ~ 1,080 nm", beam: "클래딩 헤드(분말 공급)", cool: "수냉식 (Water Cooling)", extra: [["분말 공급(Powder feed)", "동축 노즐"]] },
+  precisionMachining: { names: ["초단펄스 정밀가공 시스템", "레이저 미세가공 시스템"], intro: "초단펄스 레이저로 열영향을 최소화하며 미세 패턴·형상을 정밀 가공하는 설비입니다.", feats: ["저열영향(냉간가공)", "마이크로·나노 정밀", "다양한 소재 대응"], mats: ["metalSteel", "ceramic", "glass"], matText: "금속, 세라믹, 유리", inds: ["semiconductor", "electronics3c", "bioHealth"], laser: "초단펄스 레이저 (ps/fs)", power: "사양 선택", wave: "약 1,030 / 515 / 343 nm", beam: "고정밀 갈바노 스캐너", cool: "수냉식 (Water Cooling)", extra: [["펄스폭(Pulse width)", "피코초/펨토초"]] },
+  print3d: { names: ["금속 3D 프린팅 시스템(LPBF)", "레이저 적층제조 시스템"], intro: "레이저로 금속 분말을 선택적으로 용융·적층해 3차원 부품을 제조하는 적층제조 설비입니다.", feats: ["복잡 형상·경량화 구현", "소량·맞춤 생산", "항공·의료용 고부가 부품"], mats: ["metalSteel", "copperAluminum"], matText: "금속 분말(철강·Ti·Al 등)", inds: ["aerospace", "machinery", "bioHealth"], laser: "파이버 레이저 (단일/다중)", power: "200 ~ 1,000 W (사양 선택)", wave: "약 1,064 nm", beam: "갈바노 스캐너", cool: "수냉식 (Water Cooling)", extra: [["적층 두께(Layer)", "20 ~ 100 ㎛"]] },
+};
+function buildTplSpec(c: TplCfg): string {
+  const rows: [string, string][] = [
+    ["레이저 종류(Laser type)", c.laser],
+    ["출력(Laser power)", c.power],
+    ["파장(Wavelength)", c.wave],
+    ["빔전송장치(Beam delivery)", c.beam],
+    ["가공 재료(Processable materials)", c.matText],
+    ...c.extra,
+    ["제어 방식(Control system)", "PLC / PC Control"],
+    ["냉각 방식(Cooling)", c.cool],
+    ["레이저안전(Laser Safety)", "Class 1 Enclosure (국제표준 준수)"],
+    ["전원 사양(Power supply)", "3Φ 380V 50/60Hz (사양 선택)"],
+  ];
+  return rows.map(([k, v]) => `${k} | ${v}`).join("\n");
+}
+async function ensureTechContentV4(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tech_content_v4'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  const sceneBase = "/images/tech/scenes/scene-";
+  const placeholder = "/images/news/logo-thumb.webp";
+
+  // ① 설명 미비 기술 보강(빈 경우만)
+  for (const [key, desc] of Object.entries(TECH_DESC_FILL)) {
+    await sql`UPDATE content_pages SET description = ${desc}, updated_at = ${now} WHERE group_key = 'tech' AND item_key = ${key} AND (description IS NULL OR description = '')`;
+  }
+
+  // ② 설비 2개 미만 기술에 설비 템플릿 top-up
+  const procKeys = Object.keys(TECH_SCENE);
+  for (const tech of procKeys) {
+    const cfg = TECH_TPL[tech];
+    if (!cfg) continue;
+    const cntRows = (await sql`SELECT COUNT(*)::int AS c FROM content_item_links WHERE to_group='tech' AND to_key=${tech} AND from_group='lineup'`) as { c: number }[];
+    const have = cntRows[0]?.c ?? 0;
+    const need = Math.max(0, 2 - have);
+    const img = `${sceneBase}${TECH_SCENE[tech]}.webp`;
+    let order = 120;
+    for (let n = 0; n < need; n++) {
+      const key = `tpl_${tech}_${n + 1}`;
+      const name = cfg.names[n] ?? cfg.names[0];
+      const exists = (await sql`SELECT 1 FROM content_items WHERE group_key='lineup' AND item_key=${key}`) as unknown[];
+      if (exists.length > 0) continue;
+      const desc = [name, "", cfg.intro, "", "[주요 특징]", ...cfg.feats.map((f) => `- ${f}`), "", "※ 본 페이지의 사양은 참고용 예시 템플릿입니다. 실제 사양·설비 사진은 담당자 확인 후 등록됩니다."].join("\n");
+      const spec = buildTplSpec(cfg);
+      await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${key}, ${name}, 'machine', ${order + n}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+      await sql`
+        INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, updated_at)
+        VALUES ('lineup', ${key}, ${name}, ${desc}, ${spec}, ${img}, ${now})
+        ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, updated_at=EXCLUDED.updated_at
+      `;
+      const links: [string, string][] = [["tech", tech], ...cfg.mats.map((m): [string, string] => ["material", m]), ...cfg.inds.map((i): [string, string] => ["industry", i])];
+      for (const [tg, tk] of links) {
+        await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+      }
+      for (let i = 1; i <= 3; i++) {
+        await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${key}, ${placeholder}, ${`적용사례${i}`}, ${i - 1}, ${now})`;
+      }
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('tech_content_v4', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 새로 만든 설비 템플릿(적용사례 이미지가 없던 것)에만 EV Laser 로고를 적용사례
