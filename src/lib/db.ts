@@ -499,7 +499,116 @@ function createSchema(): Promise<void> {
     await ensureTemplateCaseImagesV1();
     await ensureTechContentV4();
     await ensureRemoveTestLineupV1();
+    await ensureMaterialContentV1();
   })();
+}
+
+// 재료별 콘텐츠: 각 재료의 레이저 가공 설명 + 대표이미지(자작·라이선스 자유) 등록.
+// 설명은 비어 있을 때만 채우고(관리자 작성 보존), 이미지는 항상 지정한다.
+const MATERIAL_CONTENT: Record<string, { title: string; img: string; desc: string }> = {
+  metalSteel: { title: "금속·철강", img: "mat-metal", desc: [
+    "철강·스테인리스 등 금속은 레이저 가공의 대표 소재입니다. 레이저로 절단·용접·마킹·표면경화·클리닝·클래딩 등 거의 모든 가공이 가능합니다.",
+    "", "[레이저 가공 특징]",
+    "- 비접촉·저변형으로 정밀 가공, 자동화 용이",
+    "- 고출력/적정 파장으로 고반사·고열전도 금속도 안정적으로 가공",
+    "", "[주요 적용 기술] 절단 · 용접 · 마킹 · 열처리(표면경화) · 클리닝 · 클래딩",
+    "[적용 분야] 자동차 · 기계 · 조선 · 철강 · 금형",
+  ].join("\n") },
+  copperAluminum: { title: "동·알루미늄", img: "mat-nonferrous", desc: [
+    "동·알루미늄은 전기·열전도가 우수하지만 빛 반사가 높아 가공이 까다로운 소재입니다. 적정 파장(그린·블루)과 빔 제어(워블링)로 안정적인 용접·절단이 가능합니다.",
+    "", "[레이저 가공 특징]",
+    "- 고반사 금속 대응(그린·블루 레이저, 빔 워블링)",
+    "- 배터리·전장의 핵심 소재, 이종금속 접합 대응",
+    "", "[주요 적용 기술] 용접(탭·버스바) · 절단 · 마킹 · 클리닝",
+    "[적용 분야] 배터리(2차전지) · 전기·전자 · 자동차 전장",
+  ].join("\n") },
+  plastic: { title: "플라스틱", img: "mat-plastic", desc: [
+    "플라스틱은 레이저 용접·절단·마킹에 널리 쓰이는 소재입니다. 투과/흡수 특성을 이용한 레이저 플라스틱 용접은 ㈜이브이레이저의 핵심 기술입니다.",
+    "", "[레이저 가공 특징]",
+    "- 비접촉·무버(Burr)·고기밀 용접",
+    "- 깨끗한 절단면과 내구성 높은 마킹",
+    "", "[주요 적용 기술] 플라스틱 용접 · 절단 · 마킹",
+    "[적용 분야] 자동차 부품(센서·램프·전장) · 의료기기 · 전자",
+  ].join("\n") },
+  glass: { title: "유리", img: "mat-glass", desc: [
+    "유리는 초단펄스 레이저로 절단·용접·마킹·에칭이 가능한 소재입니다. 미세 균열 없이 정밀하게 가공할 수 있습니다.",
+    "", "[레이저 가공 특징]",
+    "- 초단펄스로 저손상·저균열 정밀 가공",
+    "- 접착제 없는 투명 접합(유리 용접)",
+    "", "[주요 적용 기술] 유리 용접 · 절단 · 마킹 · 에칭",
+    "[적용 분야] 디스플레이 · 광학 · 의료·바이오",
+  ].join("\n") },
+  ceramic: { title: "세라믹", img: "mat-ceramic", desc: [
+    "세라믹은 경도가 높아 기계가공이 어렵지만, 레이저로 절단·드릴링·마킹·미세가공이 가능합니다.",
+    "", "[레이저 가공 특징]",
+    "- 비접촉으로 취성(깨지기 쉬운) 재료 손상 최소",
+    "- 미세·고정밀 가공",
+    "", "[주요 적용 기술] 절단 · 드릴링 · 마킹 · 정밀가공",
+    "[적용 분야] 반도체 · 전자부품 · 의료",
+  ].join("\n") },
+  pcb: { title: "PCB", img: "mat-pcb", desc: [
+    "PCB(인쇄회로기판)는 레이저 드릴링(비아홀)·마킹·절단·솔더링에 쓰입니다.",
+    "", "[레이저 가공 특징]",
+    "- 미세 비아홀·고밀도 가공",
+    "- 비접촉 정밀 가공으로 열영향 최소",
+    "", "[주요 적용 기술] 드릴링 · 마킹 · 절단 · 솔더링",
+    "[적용 분야] 전자·반도체 · 자동차 전장",
+  ].join("\n") },
+  preciousMetal: { title: "귀금속", img: "mat-precious", desc: [
+    "금·은 등 귀금속은 레이저로 정밀 마킹·에칭·미세가공·용접이 가능합니다.",
+    "", "[레이저 가공 특징]",
+    "- 미세·고정밀 가공, 소재 손실 최소",
+    "- 반영구적인 마킹·각인",
+    "", "[주요 적용 기술] 마킹 · 에칭 · 정밀가공 · 용접",
+    "[적용 분야] 주얼리 · 전자 · 의료",
+  ].join("\n") },
+  wood: { title: "나무(목재)", img: "mat-generic", desc: [
+    "목재는 CO₂ 레이저로 절단·조각·마킹이 가능합니다.",
+    "", "[주요 적용 기술] 절단 · 마킹(조각)",
+    "[적용 분야] 공예 · 인테리어 · 간판",
+  ].join("\n") },
+  paper: { title: "종이", img: "mat-generic", desc: [
+    "종이·필름은 CO₂ 레이저로 정밀 절단·마킹이 가능합니다.",
+    "", "[주요 적용 기술] 절단 · 마킹",
+    "[적용 분야] 포장 · 라벨 · 인쇄",
+  ].join("\n") },
+  fabric: { title: "천(옷감)", img: "mat-generic", desc: [
+    "직물·섬유는 레이저로 깨끗한 절단과 가장자리 융착이 가능합니다.",
+    "", "[주요 적용 기술] 절단 · 마킹",
+    "[적용 분야] 의류 · 산업용 섬유",
+  ].join("\n") },
+  leather: { title: "가죽", img: "mat-generic", desc: [
+    "가죽은 레이저로 정밀 절단·조각·마킹이 가능합니다.",
+    "", "[주요 적용 기술] 절단 · 마킹(조각)",
+    "[적용 분야] 패션 · 자동차 내장",
+  ].join("\n") },
+  rubber: { title: "고무", img: "mat-generic", desc: [
+    "고무는 레이저로 절단·마킹·스탬프(인장) 제작이 가능합니다.",
+    "", "[주요 적용 기술] 절단 · 마킹",
+    "[적용 분야] 산업용 부품 · 인장(스탬프)",
+  ].join("\n") },
+  other: { title: "기타", img: "mat-generic", desc: [
+    "그 외 다양한 소재도 레이저 가공이 가능합니다. 소재 특성과 요구사항에 맞춰 최적의 레이저 공법을 제안해 드립니다.",
+    "", "자세한 사항은 문의해 주세요.",
+  ].join("\n") },
+};
+async function ensureMaterialContentV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'material_content_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  const base = "/images/materials/";
+  for (const [key, c] of Object.entries(MATERIAL_CONTENT)) {
+    const img = `${base}${c.img}.webp`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, image_url, updated_at)
+      VALUES ('material', ${key}, ${c.title}, ${c.desc}, ${img}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET
+        description = CASE WHEN content_pages.description IS NULL OR content_pages.description = '' THEN EXCLUDED.description ELSE content_pages.description END,
+        image_url = EXCLUDED.image_url,
+        updated_at = EXCLUDED.updated_at
+    `;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('material_content_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 테스트로 등록된 설비 항목(Djdjd, New 등) 제거 — 항목·페이지·연결·적용사례 이미지 정리.
