@@ -498,7 +498,24 @@ function createSchema(): Promise<void> {
     await ensureTechSceneImagesV1();
     await ensureTemplateCaseImagesV1();
     await ensureTechContentV4();
+    await ensureRemoveTestLineupV1();
   })();
+}
+
+// 테스트로 등록된 설비 항목(Djdjd, New 등) 제거 — 항목·페이지·연결·적용사례 이미지 정리.
+async function ensureRemoveTestLineupV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'remove_test_lineup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const rows = (await sql`SELECT item_key FROM content_items WHERE group_key='lineup' AND name IN ('Djdjd','New','new','djdjd')`) as { item_key: string }[];
+  for (const r of rows) {
+    const k = r.item_key;
+    await sql`DELETE FROM content_item_links WHERE (from_group='lineup' AND from_key=${k}) OR (to_group='lineup' AND to_key=${k})`;
+    await sql`DELETE FROM content_images WHERE group_key='lineup' AND item_key=${k}`;
+    await sql`DELETE FROM content_videos WHERE group_key='lineup' AND item_key=${k}`;
+    await sql`DELETE FROM content_pages WHERE group_key='lineup' AND item_key=${k}`;
+    await sql`DELETE FROM content_items WHERE group_key='lineup' AND item_key=${k}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('remove_test_lineup_v1', ${new Date().toISOString()}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // ── 콘텐츠 마무리: ① 설명 미비 기술 보강 ② 설비 2개 미만 기술에 설비 템플릿 top-up ──
