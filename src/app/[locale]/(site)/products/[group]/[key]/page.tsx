@@ -5,9 +5,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Icon from "@/components/Icon";
 import RichDescription from "@/components/RichDescription";
 import LinkPreviewButton from "@/components/LinkPreviewButton";
-import ItemCardsGrid from "@/components/ItemCardsGrid";
 import ImageGallery from "@/components/ImageGallery";
-import { contentGroups, categoryNameEn, resolveLineupDisplay, type IconName } from "@/lib/data";
+import { contentGroups, categoryNameEn, type IconName } from "@/lib/data";
 import { resolveSpecRowsWithOptions } from "@/lib/spec";
 import {
   contentPageRepo,
@@ -69,26 +68,12 @@ export default async function ContentDetailPage({
   const item = items.find((i) => i.itemKey === key);
   if (!item) notFound();
 
-  // 같은 그룹 카드 그리드에 연결 정보 개수를 표시(설비 라인업 그룹은 제외).
-  const siblingCounts = group === "lineup" ? {} : await contentLinkRepo.countsForGroup(group).catch(() => ({} as Record<string, number>));
-
-  const [page, images, videos, tp, allPages] = await Promise.all([
+  const [page, images, videos, tp] = await Promise.all([
     contentPageRepo.get(group, key),
     contentImageRepo.listByKey(group, key),
     contentVideoRepo.listByKey(group, key),
     getTranslations("contentPage"),
-    // 설비 라인업 그룹은 형제 카드도 "설비명"으로 표시하기 위해 전체 페이지를 가져온다.
-    group === "lineup" ? contentPageRepo.listAll().catch(() => []) : Promise.resolve([]),
   ]);
-  // 설비 라인업 형제 카드용: itemKey → {설비명, 모델코드 보조라벨}
-  const lineupDisplayByKey = new Map<string, { name: string; subLabel?: string }>();
-  if (group === "lineup") {
-    const pageByKey = new Map(allPages.filter((p) => p.groupKey === "lineup").map((p) => [p.itemKey, p]));
-    for (const it of items) {
-      const p = pageByKey.get(it.itemKey);
-      lineupDisplayByKey.set(it.itemKey, resolveLineupDisplay({ itemKey: it.itemKey, itemName: it.name, model: p?.model, description: p?.description }));
-    }
-  }
 
   const title = page?.title || item.name;
   // 헤더(브레드크럼 현재 항목)에는 "한글(영문)"으로 표기. 카드/박스는 그대로 한글만.
@@ -143,24 +128,12 @@ export default async function ContentDetailPage({
         />
       </div>
 
-      {/* 같은 그룹의 다른 항목으로 바로 이동 — 현재 항목은 빨간 활성 카드로 강조 */}
-      <div className="mx-auto max-w-[1240px] px-7 mt-5">
-        <ItemCardsGrid
-          items={items.map((it) => {
-            const d = lineupDisplayByKey.get(it.itemKey);
-            return {
-              itemKey: it.itemKey,
-              name: d?.name ?? it.name,
-              subLabel: d?.subLabel,
-              icon: it.icon,
-              count: group === "lineup" ? undefined : ((siblingCounts as Record<string, number>)[it.itemKey] ?? 0),
-            };
-          })}
-          hrefFor={(k) => `/products/${group}/${k}`}
-          activeKey={key}
-          minColWidth="220px"
-          iconColorClass="text-red"
-        />
+      {/* 카드 그리드 없이 바로 제목 + 본문 (목록으로는 브레드크럼으로 이동) */}
+      <div className="mx-auto max-w-[1240px] px-7 mt-4">
+        <span className="eyebrow">PRODUCTS & TECHNOLOGY</span>
+        <h1 className="mt-2 text-[24px] sm:text-[32px] font-[family-name:var(--font-display)] tracking-tight text-balance">
+          {title}
+        </h1>
       </div>
 
       {/* 본문 — 좌측 기준선은 위(제목·카드)와 동일(1240 컨테이너)하게 두고, 읽기 좋은 폭(900)으로 왼쪽 정렬 */}
