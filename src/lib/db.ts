@@ -496,7 +496,30 @@ function createSchema(): Promise<void> {
     await ensureTechTaxonomyV1();
     await ensureTechContentV2();
     await ensureTechSceneImagesV1();
+    await ensureTemplateCaseImagesV1();
   })();
+}
+
+// 새로 만든 설비 템플릿(적용사례 이미지가 없던 것)에만 EV Laser 로고를 적용사례
+// 1·2·3 placeholder로 넣는다. 기존에 이미지가 등록된 설비는 건드리지 않는다.
+// (관리자가 추후 실제 적용사례 사진으로 교체)
+const TEMPLATE_EQUIP_KEYS = ["htLineBeam", "htRobotCell"];
+async function ensureTemplateCaseImagesV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'template_case_images_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  const placeholder = "/images/news/logo-thumb.webp";
+  for (const key of TEMPLATE_EQUIP_KEYS) {
+    const cnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${key}`) as { c: number }[];
+    if ((cnt[0]?.c ?? 0) > 0) continue; // 이미지가 이미 있으면 건너뜀
+    for (let i = 1; i <= 3; i++) {
+      await sql`
+        INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at)
+        VALUES (${newId()}, 'lineup', ${key}, ${placeholder}, ${`적용사례${i}`}, ${i - 1}, ${now})
+      `;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('template_case_images_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술 카테고리별 "가공 장면" 대표이미지(자작·라이선스 자유) 적용. 특정 설비가
