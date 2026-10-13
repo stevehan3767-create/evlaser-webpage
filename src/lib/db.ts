@@ -495,7 +495,37 @@ function createSchema(): Promise<void> {
     await ensurePartnerLogosImport();
     await ensureTechTaxonomyV1();
     await ensureTechContentV2();
+    await ensureTechSceneImagesV1();
   })();
+}
+
+// 기술 카테고리별 "가공 장면" 대표이미지(자작·라이선스 자유) 적용. 특정 설비가
+// 아닌 일반 장면이며, 실제 설비사진은 관리자가 설비별로 업로드해 대체한다.
+async function ensureTechSceneImagesV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'tech_scene_images_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  const base = "/images/tech/scenes/";
+  const sceneByKey: Record<string, string> = {
+    plasticWelding: "welding", metalWelding: "welding", glassWelding: "welding", soldering: "welding",
+    cutting: "cutting", drilling: "cutting",
+    marking: "marking", etching: "marking",
+    cleaning: "surface", heatTreatment: "surface", cladding: "surface",
+    precisionMachining: "precision", print3d: "precision",
+  };
+  for (const [key, scene] of Object.entries(sceneByKey)) {
+    const img = `${base}scene-${scene}.webp`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, image_url, updated_at)
+      VALUES ('tech', ${key}, ${img}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET image_url = EXCLUDED.image_url, updated_at = EXCLUDED.updated_at
+    `;
+  }
+  // 레이저 열처리 설비 템플릿 2종에도 표면처리 장면을 기본 이미지로(관리자 실사진 업로드 전까지).
+  for (const k of ["htLineBeam", "htRobotCell"]) {
+    await sql`UPDATE content_pages SET image_url = ${base + "scene-surface.webp"}, updated_at = ${now} WHERE group_key = 'lineup' AND item_key = ${k} AND (image_url IS NULL OR image_url = '')`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('tech_scene_images_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 보정: ① 개념도 이미지 제거(작업 범위에서 제외) ② 설비 사양서를 관리자모드 표준
