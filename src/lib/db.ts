@@ -503,6 +503,7 @@ function createSchema(): Promise<void> {
     await ensureSafetyCategoryV1();
     await ensureTechDescRichV1();
     await ensureMaterialDescRichV1();
+    await ensureCkdLineupV1();
   })();
 }
 
@@ -713,6 +714,145 @@ async function ensureMaterialDescRichV1(): Promise<void> {
     `;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('material_desc_rich_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 해외 공급·협업사(중국 CKD, 심천창과달) 제품을 설비(lineup)에 자동 등록하는 파일럿.
+// 카탈로그의 제품명·사진·특징을 기존 설비와 동일한 형식으로 등록하고, 기술종류(절단·
+// 드릴링)·재료·산업에 연결한다. 사양 수치는 카탈로그가 이미지 기반이라 공란으로 두고
+// (사양서 템플릿), 관리자가 카탈로그를 보고 직접 보정·공개한다.
+interface CkdProduct {
+  key: string;
+  itemName: string; // content_items.name (모델/시리즈 — 카드 보조 라벨)
+  title: string;
+  nameEn: string;
+  model: string;
+  icon: string;
+  description: string;
+  specTable: string;
+  imageUrl: string;
+  links: [string, string][]; // [toGroup, toKey]
+  cases: { url: string; caption: string }[]; // 적용사례 이미지
+}
+const CKD_OEM_SOURCE = "http://www.ckdseiki.com";
+const CKD_PRODUCTS: CkdProduct[] = [
+  {
+    key: "ckdGlassCutDrill",
+    itemName: "CKD Glass Series",
+    title: "유리 레이저 절단·드릴링 시스템",
+    nameEn: "Glass Laser Cutting & Drilling Machine",
+    model: "CKD Glass Series",
+    icon: "cut",
+    description: [
+      "유리 레이저 절단·드릴링 시스템",
+      "초단펄스(피코초·펨토초) 레이저로 유리·강화유리·OLED 패널 등 취성 소재를 미세 균열 없이 절단·드릴링하는 시스템입니다. 중국 CKD(심천창과달)의 유리 레이저 가공 전용 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 비접촉·저손상 가공으로 칩핑(chipping)·미세 균열을 최소화하고 꺾임 강도 유지",
+      "- 직선·곡선·이형(異形) 절단과 홀(hole) 가공을 한 장비에서 구현",
+      "- 비전 정렬(CCD)로 마크·패턴 기준 고정밀 위치 보정",
+      "- 듀얼 테이블 구조로 상·하차와 가공을 병행해 생산성 향상",
+      "- 자체 개발 제어 소프트웨어로 레시피 전환 용이",
+      "",
+      "[적용 분야]",
+      "스마트폰·태블릿 커버글라스, 디스플레이 패널, 반도체·전자부품용 유리",
+      "",
+      "[가공 소재]",
+      "유리, 강화유리, 사파이어, OLED, 세라믹 등 취성 소재",
+      "",
+      "※ 중국 CKD와의 공급·협업 제품입니다. 모델별 상세 사양(출력·가공 두께·속도·정밀도 등)은 카탈로그 기준이며, 담당자 확인 후 사양서에 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "레이저 종류 (Laser type) | ",
+      "가공 소재 (Material) | 유리·강화유리·사파이어·OLED·세라믹",
+      "가공 두께 (Thickness) | 최대 약 19 mm (1-pass, 모델별 상이)",
+      "가공 정밀도 (Accuracy) | ",
+      "최소 절단폭/홀경 (Min. kerf / hole) | ",
+      "작업 영역 (Working area) | ",
+      "반복 정밀도 (Repeatability) | ",
+      "비전 정렬 (Vision alignment) | CCD",
+      "전원 (Power supply) | ",
+      "설비 치수 (Dimensions) | ",
+    ].join("\n"),
+    imageUrl: "/images/lineup/ckd/ckd-glass-cutdrill.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["material", "glass"],
+      ["industry", "display"],
+      ["industry", "electronics3c"],
+      ["industry", "semiconductor"],
+    ],
+    cases: [{ url: "/images/lineup/ckd/ckd-glass-lineup.webp", caption: "CKD 유리 레이저 절단·드릴링 설비 라인업" }],
+  },
+  {
+    key: "ckdCeramicCutDrill",
+    itemName: "CKD Ceramic Series",
+    title: "세라믹·취성재료 레이저 절단·드릴링 시스템",
+    nameEn: "Ceramic Laser Cutting & Drilling Machine",
+    model: "CKD Ceramic Series",
+    icon: "cut",
+    description: [
+      "세라믹·취성재료 레이저 절단·드릴링 시스템",
+      "세라믹(알루미나·질화알루미늄 등)·사파이어 등 고경도 취성 소재를 레이저로 절단·드릴링하는 시스템입니다. 중국 CKD의 세라믹 레이저 가공 전용 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 초경도 세라믹을 비접촉으로 가공해 공구 마모·파손 없이 미세 형상 구현",
+      "- 초단펄스 레이저로 열영향부(HAZ)를 최소화하고 크랙·치핑 억제",
+      "- 미세 홀·슬롯·이형 절단 등 고정밀 패턴 가공",
+      "- 비전 정렬 및 자동화 라인 연동 가능",
+      "",
+      "[적용 분야]",
+      "반도체·전자부품용 세라믹 기판, LED, 전력반도체, 정밀부품",
+      "",
+      "[가공 소재]",
+      "알루미나(Al₂O₃)·질화알루미늄(AlN) 등 세라믹, 사파이어, 취성 소재",
+      "",
+      "※ 중국 CKD와의 공급·협업 제품입니다. 모델별 상세 사양은 카탈로그 기준이며, 담당자 확인 후 사양서에 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "레이저 종류 (Laser type) | ",
+      "가공 소재 (Material) | 세라믹(알루미나·AlN)·사파이어·취성 소재",
+      "가공 두께 (Thickness) | ",
+      "가공 정밀도 (Accuracy) | ",
+      "최소 절단폭/홀경 (Min. kerf / hole) | ",
+      "작업 영역 (Working area) | ",
+      "반복 정밀도 (Repeatability) | ",
+      "비전 정렬 (Vision alignment) | CCD",
+      "전원 (Power supply) | ",
+      "설비 치수 (Dimensions) | ",
+    ].join("\n"),
+    imageUrl: "/images/lineup/ckd/ckd-ceramic-cutdrill.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["material", "ceramic"],
+      ["industry", "semiconductor"],
+      ["industry", "electronics3c"],
+    ],
+    cases: [],
+  },
+];
+async function ensureCkdLineupV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ckd_lineup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  let order = 300;
+  for (const p of CKD_PRODUCTS) {
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.itemName}, ${p.icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, model, name_en, is_oem, oem_source, updated_at)
+      VALUES ('lineup', ${p.key}, ${p.title}, ${p.description}, ${p.specTable}, ${p.imageUrl}, ${p.model}, ${p.nameEn}, true, ${CKD_OEM_SOURCE}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, model=EXCLUDED.model, name_en=EXCLUDED.name_en, is_oem=EXCLUDED.is_oem, oem_source=EXCLUDED.oem_source, updated_at=EXCLUDED.updated_at
+    `;
+    for (const [tg, tk] of p.links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+    }
+    for (let i = 0; i < p.cases.length; i++) {
+      await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.cases[i].url}, ${p.cases[i].caption}, ${i}, ${now})`;
+    }
+    order += 1;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
