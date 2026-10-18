@@ -109,6 +109,7 @@ export const techItems: TechItem[] = [
   { icon: "weld", key: "metalWelding" },
   { icon: "weld", key: "glassWelding" },
   { icon: "cut", key: "cutting" },
+  { icon: "cut", key: "tubeCutting" },
   { icon: "mark", key: "marking" },
   { icon: "weld", key: "soldering" },
   { icon: "mark", key: "etching" },
@@ -131,7 +132,7 @@ export const techItems: TechItem[] = [
 // 데이터(키·설비 연결)는 그대로 두고 화면에서만 그룹 헤딩으로 표시한다.
 export const techCategoryGroups: { label: string; en: string; keys: string[] }[] = [
   { label: "용접·접합", en: "Joining", keys: ["plasticWelding", "metalWelding", "glassWelding", "soldering"] },
-  { label: "절단·천공", en: "Cutting", keys: ["cutting", "drilling"] },
+  { label: "절단·천공", en: "Cutting", keys: ["cutting", "drilling", "tubeCutting"] },
   { label: "마킹·각인", en: "Marking", keys: ["marking", "etching"] },
   { label: "표면처리", en: "Surface", keys: ["cleaning", "heatTreatment", "cladding"] },
   { label: "정밀·미세가공", en: "Precision", keys: ["precisionMachining", "print3d"] },
@@ -152,6 +153,7 @@ export const techLabelsKo: Record<string, string> = {
   metalWelding: "금속·알루미늄·동 용접",
   glassWelding: "유리 용접",
   cutting: "레이저 절단",
+  tubeCutting: "튜브·관재 레이저 절단",
   marking: "레이저마킹(인쇄·조각)",
   etching: "레이저에칭(어블레이션)",
   cleaning: "레이저 클리닝(세정)",
@@ -178,6 +180,7 @@ export const categoryNameEn: Record<string, Record<string, string>> = {
     metalWelding: "Metal Welding",
     glassWelding: "Glass Welding",
     cutting: "Laser Cutting",
+    tubeCutting: "Tube Laser Cutting",
     marking: "Laser Marking",
     etching: "Laser Etching",
     cleaning: "Laser Cleaning",
