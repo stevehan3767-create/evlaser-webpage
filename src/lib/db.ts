@@ -504,6 +504,7 @@ function createSchema(): Promise<void> {
     await ensureTechDescRichV1();
     await ensureMaterialDescRichV1();
     await ensureCkdLineupV1();
+    await ensureChanxanLineupV1();
   })();
 }
 
@@ -1089,6 +1090,318 @@ async function ensureCkdLineupV1(): Promise<void> {
     order += 1;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v3', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 해외 공급·협업사(중국 CHANXAN 创轩激光, 쑤저우) 정밀 레이저 절단·미세가공·마킹
+// 제품을 설비(lineup)에 등록. 카탈로그에서 실제 사진·실사양을 반영(기존 설비와 동일 형식).
+const CHANXAN_OEM_SOURCE = "https://www.chanxan.com";
+const CHANXAN_PRODUCTS: CkdProduct[] = [
+  {
+    key: "chanxanCw650r",
+    itemName: "CW-650R",
+    title: "CW-650R 레이저 절단기",
+    nameEn: "Laser Cutting Machine",
+    model: "CW-650R",
+    icon: "cut",
+    description: [
+      "CW-650R 레이저 절단기",
+      "휴대폰용 필름 등 박막 소재를 비접촉으로 고정밀 절단하는 레이저 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 비접촉 가공으로 버(burr) 없이 매끄럽고, 변형·표면 손상이 없음",
+      "- 듀얼 드라이브 갠트리 + 고강성 모션 제어, 수입 레이저·광학계로 정밀 위치결정",
+      "- 미세홀 진원도 우수, 직각 과소/과열 없음, R각·복잡 곡선·미세 패턴 왜곡 없음",
+      "- 레이어드 커팅 지원 소프트웨어, 대/중/소 배치 생산·신제품 검증에 적합",
+      "- CCD 자동 보정으로 절단 정밀도 향상, 24시간 연속 운전, 자동 상·하차 옵션",
+      "",
+      "[적용 분야]",
+      "휴대폰 박막, 통신·소비자 전자, gdf필름·전자종이·편광필름·터치스크린 PET·OCA·플렉시블 OLED 등 고정밀 필름 절단",
+      "",
+      "[가공 소재]",
+      "각종 필름·PET·OCA·플렉시블 OLED 등",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CW-650R",
+      "레이저 출력 (Laser power) | 30~150 W",
+      "가공 영역 (Working area) | 600 × 500 mm",
+      "위치결정 정밀도 (Positioning) | ±0.01 mm",
+      "최대 이송 속도 (Max. moving speed) | 1,000 mm/s",
+      "냉각 방식 (Cooling) | 수냉/공냉 (Water/air)",
+      "전원 (Supply voltage) | AC 220V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-cw650r.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["material", "plastic"],
+      ["material", "glass"],
+      ["industry", "electronics3c"],
+      ["industry", "display"],
+    ],
+    cases: [],
+  },
+  {
+    key: "chanxanPicoMicro",
+    itemName: "CX-2060PZ/PLT",
+    title: "더블스테이션 피코초 레이저 미세가공 설비",
+    nameEn: "Double-station Roll-to-sheet Picosecond Laser Micromachining Equipment",
+    model: "CX-2060PZ/PLT",
+    icon: "precision",
+    description: [
+      "더블스테이션 롤투시트 피코초 레이저 미세가공 설비",
+      "커버필름 등 롤 소재를 피코초 레이저로 고속·고정밀 미세가공하는 더블스테이션(2헤드) 자동화 설비입니다. 중국 CHANXAN(创轩激光)의 FPC 전용 미세가공 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 2헤드 동시 가공으로 롤 소재(커버필름) 가공 효율 2배",
+      "- 자동 피딩·자동 절단·자동 수거의 완전 자동화",
+      "- 절단 가장자리 매끄럽고 탄화(carbonization) 거의 없음",
+      "- 독자 설계 분광 시스템으로 동일 출력 대비 속도·품질 최적화",
+      "- 네트워크 기능으로 생산 진척·가동 상태 원격 모니터링",
+      "",
+      "[적용 분야]",
+      "FPC 커버필름 롤투시트·롤투롤, FPC 외형, FPC 부자재 가공",
+      "",
+      "[가공 소재]",
+      "FPC 커버필름·PET 등 롤 소재",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CX-2060PZ/PLT",
+      "레이저 출력 (Laser power) | 나노초/피코초 선택 (Nanosecond/picosecond selectable)",
+      "가공 영역 (Working area) | 270 × 610 mm",
+      "위치결정 정밀도 (Positioning) | ±5 µm",
+      "절단 속도 (Cutting speed) | ≤ 3,000 mm/s",
+      "외형 치수 (Overall dimension) | 2,200 × 1,500 × 1,750 mm",
+      "전원 (Supply voltage) | AC 380V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-pico-micro.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "precisionMachining"],
+      ["material", "plastic"],
+      ["material", "pcb"],
+      ["industry", "electronics3c"],
+    ],
+    cases: [],
+  },
+  {
+    key: "chanxanHighprec",
+    itemName: "CW-6060J",
+    title: "고정밀 레이저 절단기",
+    nameEn: "High Precision Laser Cutting Machine",
+    model: "CW-6060J",
+    icon: "cut",
+    description: [
+      "고정밀 레이저 절단기",
+      "수입 QCW 준연속(fiber) 레이저와 대리석·열처리 강재 구조로 고정밀·장기 안정성을 구현한 레이저 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 수입 QCW 준연속 파이버 레이저, 전광 변환 효율 높고 운영비 낮음",
+      "- 고정밀 대리석 + 열처리 강재 구조로 장기 안정성 확보",
+      "- 빔 품질 우수, 무정비 수명 최대 10만 시간",
+      "- 리니어 모터 + 대리석 정반으로 고속·고정밀 운전",
+      "- CCD 비전 다중 위치결정 지원",
+      "",
+      "[적용 분야]",
+      "LED 세라믹 기판 드릴링·절단, 자동차·LED 세라믹 회로기판 스크라이빙, 휴대폰 백플레이트·3C 전자, 시계 기어·안경테 정밀 외형 절단, 이어폰 스피커 드릴링",
+      "",
+      "[가공 소재]",
+      "세라믹, 금속, 전자부품 등",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CW-6060J",
+      "가공 영역 (Working area) | 600 × 500 mm",
+      "위치결정 정밀도 (Positioning) | ±3 µm",
+      "레이저 출력 (Laser power) | 100 / 150 / 1,000 W",
+      "절단 폭 (Cutting slit width) | 0.05 ~ 0.12 mm",
+      "외형 치수 (Overall dimension) | 1,400 × 1,600 × 1,800 mm",
+      "전원 (Supply voltage) | AC 380V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-highprec.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["material", "ceramic"],
+      ["material", "metalSteel"],
+      ["industry", "electronics3c"],
+      ["industry", "automotive"],
+      ["industry", "semiconductor"],
+    ],
+    cases: [],
+  },
+  {
+    key: "chanxanFemtoUv",
+    itemName: "CW-6050FZ/PZ/Z",
+    title: "펨토·피코·나노·UV 레이저 절단기",
+    nameEn: "Femtosecond/Picosecond/Nanosecond/UV Laser Cutting Machine",
+    model: "CW-6050FZ/PZ/Z",
+    icon: "cut",
+    description: [
+      "펨토·피코·나노·UV 레이저 절단기",
+      "초단펄스 UV 피코초 레이저로 열영향부(HAZ)를 최소화한 '냉가공'을 구현하는 정밀 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 초단펄스 UV 레이저로 고효율·저열영향 '냉가공' 구현",
+      "- 대리석 정반 X/Y축 리니어 모터 구동으로 고속·안정성 확보",
+      "- 고화소 CCD 자동 정렬로 정밀 절단·정합",
+      "- 대형 텔레센트릭 필드렌즈로 대면적 무이음(single) 가공, 최대 단일 200×200mm",
+      "- 고정밀 갈바노미터로 반복 정밀도 1µm",
+      "",
+      "[적용 분야]",
+      "휴대폰·통신·소비자 전자·반도체·연구·바이오의료. 플렉시블 OLED, LCP, PI필름, FPC, 나노골드, 편광필름, FPC 커버필름 등 비금속 복합소재의 정밀 절단·드릴링·에칭",
+      "",
+      "[가공 소재]",
+      "PI필름·FPC·LCP·플렉시블 OLED·편광필름·나노골드 등 비금속 복합소재",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CW-6050FZ/PZ/Z",
+      "레이저 출력 (Laser power) | 10 / 30 / 35 W",
+      "가공 영역 (Working area) | 500×500 / 600×900 mm (듀얼 테이블 맞춤)",
+      "위치결정 정밀도 (Positioning) | ±1 µm",
+      "반복 정밀도 (Repeatability) | ±1 µm",
+      "외형 치수 (Overall dimension) | 1,700 × 1,600 × 2,200 mm",
+      "전원 (Supply voltage) | AC 380V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-femto-uv.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["tech", "etching"],
+      ["material", "plastic"],
+      ["material", "pcb"],
+      ["material", "glass"],
+      ["industry", "electronics3c"],
+      ["industry", "display"],
+      ["industry", "semiconductor"],
+      ["industry", "bioHealth"],
+    ],
+    cases: [],
+  },
+  {
+    key: "chanxanGlass",
+    itemName: "CW-6050IPL",
+    title: "유리 레이저 절단기",
+    nameEn: "Glass Laser Cutting Machine",
+    model: "CW-6050IPL",
+    icon: "cut",
+    description: [
+      "유리 레이저 절단기",
+      "피코초 레이저로 유리를 치핑(가장자리 깨짐) 없이 고강도로 가공하는 전용 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 피코초 레이저로 절단 치핑 작고 절단 후 강도 높으며 열영향부 작음",
+      "- 수입 렌즈 광학계로 고품질 빔 전송",
+      "- 대리석 정반으로 평면도·내진성 우수, 장기 가공 안정성 확보",
+      "- 수입 고속 갈바노미터로 가공 정밀도·장기 안정성 우수",
+      "",
+      "[적용 분야]",
+      "유리 가공: 계기판·디스플레이 패널·사파이어·시계·내마모 스크린·전자부품·반도체 산업",
+      "",
+      "[가공 소재]",
+      "유리, 사파이어 등 취성 소재",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CW-6050IPL",
+      "가공 영역 (Working area) | 500 × 500 mm",
+      "위치결정 정밀도 (Positioning) | ±3 µm",
+      "가공 치핑 (Processing chipping) | ≤ 20 µm",
+      "이송 속도 (Moving speed) | 1,000 mm/s",
+      "최소 홀 직경 (Min. hole diameter) | 0.2 ~ 1.5 mm",
+      "외형 치수 (Overall dimension) | 1,800 × 1,600 × 2,200 mm",
+      "전원 (Supply voltage) | AC 380V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-glass.webp",
+    links: [
+      ["tech", "cutting"],
+      ["tech", "drilling"],
+      ["material", "glass"],
+      ["industry", "display"],
+      ["industry", "electronics3c"],
+      ["industry", "semiconductor"],
+    ],
+    cases: [],
+  },
+  {
+    key: "chanxanCxhv",
+    itemName: "CX-HV",
+    title: "CX-HV 비전 이동 레이저 마킹기",
+    nameEn: "Visual Mutual Shift Marking Machine",
+    model: "CX-HV",
+    icon: "mark",
+    description: [
+      "CX-HV 비전 이동 레이저 마킹기",
+      "비전 시스템과 정밀 이동축으로 수작업 개입을 최소화한 고자동화 레이저 마킹기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 이동 마킹으로 수작업 셋업 개입 최소화, 자동화 수준 향상",
+      "- 고화소 비전 보조, 반복 위치결정 정밀도 ±0.01mm, 인식 속도 0.01s",
+      "- 고정밀 서보 볼스크류 구동, 정밀 콜리메이터 검증으로 ±0.05mm 이내 안정",
+      "- 전체 밀폐형 프레임으로 유럽 안전표준 충족",
+      "- 비전 시스템이 파이버·UV·CO2·그린 등 모든 마킹 광원과 호환",
+      "",
+      "[적용 분야]",
+      "고급 칩 마킹, 정밀 전자부품 스마트 식별 마킹, 자동차 버튼·비정형 정밀부품 마킹",
+      "",
+      "[가공 소재]",
+      "금속·플라스틱·유리 등 (광원별 상이)",
+      "",
+      "※ 중국 CHANXAN과의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | CX-HV",
+      "레이저 출력 (Laser power) | 선택형 (Optional)",
+      "가공 영역 (Working area) | 맞춤 제작 (Customizable)",
+      "마킹 선속도 (Marking speed) | ≤ 8,000 mm/s",
+      "반복 정밀도 (Repeatability) | ±0.002 mm",
+      "소비 전력 (Whole power) | 1,200 W",
+      "전원 (Supply voltage) | AC 220V ±10% 50Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/chanxan/chanxan-cxhv.webp",
+    links: [
+      ["tech", "marking"],
+      ["material", "metalSteel"],
+      ["material", "plastic"],
+      ["material", "glass"],
+      ["industry", "electronics3c"],
+      ["industry", "automotive"],
+      ["industry", "semiconductor"],
+    ],
+    cases: [],
+  },
+];
+async function ensureChanxanLineupV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_lineup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  let order = 320;
+  for (const p of CHANXAN_PRODUCTS) {
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.itemName}, ${p.icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, model, name_en, is_oem, oem_source, updated_at)
+      VALUES ('lineup', ${p.key}, ${p.title}, ${p.description}, ${p.specTable}, ${p.imageUrl}, ${p.model}, ${p.nameEn}, true, ${CHANXAN_OEM_SOURCE}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, model=EXCLUDED.model, name_en=EXCLUDED.name_en, is_oem=EXCLUDED.is_oem, oem_source=EXCLUDED.oem_source, updated_at=EXCLUDED.updated_at
+    `;
+    for (const [tg, tk] of p.links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+    }
+    const imgCnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${p.key}`) as { c: number }[];
+    if ((imgCnt[0]?.c ?? 0) === 0) {
+      for (let i = 0; i < p.cases.length; i++) {
+        await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.cases[i].url}, ${p.cases[i].caption}, ${i}, ${now})`;
+      }
+    }
+    order += 1;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
