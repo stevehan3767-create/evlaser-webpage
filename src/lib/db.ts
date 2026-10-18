@@ -762,7 +762,8 @@ const CKD_PRODUCTS: CkdProduct[] = [
       "※ 중국 CKD와의 공급·협업 제품입니다. 모델별 상세 사양(출력·가공 두께·속도·정밀도 등)은 카탈로그 기준이며, 담당자 확인 후 사양서에 반영됩니다.",
     ].join("\n"),
     specTable: [
-      "레이저 종류 (Laser type) | ",
+      "가공 방식 (Process) | 레이저 절단·드릴링 (비접촉)",
+      "레이저 종류 (Laser type) | 모델별 상이 (UV·그린·피코초 등)",
       "가공 소재 (Material) | 유리·강화유리·사파이어·OLED·세라믹",
       "가공 두께 (Thickness) | 최대 약 19 mm (1-pass, 모델별 상이)",
       "가공 정밀도 (Accuracy) | ",
@@ -770,6 +771,7 @@ const CKD_PRODUCTS: CkdProduct[] = [
       "작업 영역 (Working area) | ",
       "반복 정밀도 (Repeatability) | ",
       "비전 정렬 (Vision alignment) | CCD",
+      "제어 소프트웨어 (Control S/W) | 자체 개발 (CKD)",
       "전원 (Power supply) | ",
       "설비 치수 (Dimensions) | ",
     ].join("\n"),
@@ -810,7 +812,8 @@ const CKD_PRODUCTS: CkdProduct[] = [
       "※ 중국 CKD와의 공급·협업 제품입니다. 모델별 상세 사양은 카탈로그 기준이며, 담당자 확인 후 사양서에 반영됩니다.",
     ].join("\n"),
     specTable: [
-      "레이저 종류 (Laser type) | ",
+      "가공 방식 (Process) | 레이저 절단·드릴링 (비접촉)",
+      "레이저 종류 (Laser type) | 모델별 상이 (초단펄스 등)",
       "가공 소재 (Material) | 세라믹(알루미나·AlN)·사파이어·취성 소재",
       "가공 두께 (Thickness) | ",
       "가공 정밀도 (Accuracy) | ",
@@ -818,6 +821,7 @@ const CKD_PRODUCTS: CkdProduct[] = [
       "작업 영역 (Working area) | ",
       "반복 정밀도 (Repeatability) | ",
       "비전 정렬 (Vision alignment) | CCD",
+      "제어 소프트웨어 (Control S/W) | 자체 개발 (CKD)",
       "전원 (Power supply) | ",
       "설비 치수 (Dimensions) | ",
     ].join("\n"),
@@ -833,7 +837,9 @@ const CKD_PRODUCTS: CkdProduct[] = [
   },
 ];
 async function ensureCkdLineupV1(): Promise<void> {
-  const flag = (await sql`SELECT value FROM settings WHERE key = 'ckd_lineup_v1'`) as { value: string }[];
+  // v2: 사양표(spec_table) 보강 반영. content_pages는 upsert로 갱신하고,
+  // content_items/links는 중복 방지, 적용사례 이미지는 기존이 없을 때만 추가한다.
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ckd_lineup_v2'`) as { value: string }[];
   if (flag.length > 0) return;
   const now = new Date().toISOString();
   let order = 300;
@@ -847,12 +853,15 @@ async function ensureCkdLineupV1(): Promise<void> {
     for (const [tg, tk] of p.links) {
       await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
     }
-    for (let i = 0; i < p.cases.length; i++) {
-      await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.cases[i].url}, ${p.cases[i].caption}, ${i}, ${now})`;
+    const imgCnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${p.key}`) as { c: number }[];
+    if ((imgCnt[0]?.c ?? 0) === 0) {
+      for (let i = 0; i < p.cases.length; i++) {
+        await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.cases[i].url}, ${p.cases[i].caption}, ${i}, ${now})`;
+      }
     }
     order += 1;
   }
-  await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+  await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
