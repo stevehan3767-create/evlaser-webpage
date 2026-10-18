@@ -727,11 +727,11 @@ export const newsRepo = {
     `;
     return id;
   },
-  async update(id: string, input: { tag: string; title: string; date: string; body?: string; author?: string | null; views?: number | null; postNo?: string | null }): Promise<void> {
+  async update(id: string, input: { tag: string; title: string; date: string; body?: string; published?: boolean; author?: string | null; views?: number | null; postNo?: string | null }): Promise<void> {
     await ensureSchema();
     await sql`
       UPDATE news_items SET tag = ${input.tag}, title = ${input.title}, date = ${input.date}, body = ${input.body ?? ""},
-        author = ${input.author ?? null}, views = ${input.views ?? null}, post_no = ${input.postNo ?? null}
+        published = ${input.published ?? true}, author = ${input.author ?? null}, views = ${input.views ?? null}, post_no = ${input.postNo ?? null}
       WHERE id = ${id}
     `;
   },
