@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { contentGroups, iconNames, standardSpecTable, specOptionDefaults } from "@/lib/data";
+import { contentGroups, iconNames, standardSpecTable, specOptionDefaults, techCategoryGroups, laserComponentKeys } from "@/lib/data";
 import {
   contentPageRepo,
   contentImageRepo,
@@ -33,7 +33,16 @@ import type { IconName } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-const GROUP_ORDER = ["lineup", "tech", "industry", "material"];
+// 공개 홈페이지 IA 순서대로: 설비 찾기 → 기술종류별 → 재료별 → 레이저 안전 → 산업분야별(필터).
+const GROUP_ORDER = ["lineup", "tech", "material", "safety", "industry"];
+// 각 그룹이 공개 페이지에서 어디에 노출되는지 관리자에게 알려주는 보조 설명.
+const GROUP_HINTS: Record<string, string> = {
+  lineup: "홈페이지 '설비 찾기'에 노출되는 설비 라인업입니다. (기술·재료·산업 조건으로 검색)",
+  tech: "홈페이지 '기술·재료 소개'의 기술종류 섹션입니다. 아래 대분류(용접·절단·마킹·표면처리·정밀가공)별로 묶여 표시됩니다.",
+  material: "홈페이지 '기술·재료 소개'의 재료 섹션입니다.",
+  safety: "홈페이지 '레이저 안전' 카테고리의 제품입니다. (laservision 협력)",
+  industry: "독립 메뉴는 없어졌고, '설비 찾기'의 산업분야 필터와 설비 상세의 산업 태그로만 사용됩니다.",
+};
 // 어떤 그룹의 항목 편집 화면에 어떤 상대 그룹 다중선택 체크박스를 보여줄지 —
 // 설비 라인업 → 기술/산업/재료, 재료 → 기술.
 // src/app/admin/(protected)/content-pages/actions.ts의 LINK_TARGET_GROUPS와 짝을 이룬다.
@@ -145,8 +154,13 @@ export default async function AdminContentPagesPage({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {items.map((t, i) => (
+      {GROUP_HINTS[group] && (
+        <p className="mb-4 text-[12px] text-ink-soft leading-relaxed bg-surface-alt border border-line rounded-sm px-3.5 py-2.5">
+          {GROUP_HINTS[group]}
+        </p>
+      )}
+      {(() => {
+        const chip = (t: (typeof items)[number], num?: number) => (
           <span key={t.id} className="inline-flex items-stretch">
             <Link
               href={`/admin/content-pages?group=${group}&key=${t.itemKey}`}
@@ -155,7 +169,7 @@ export default async function AdminContentPagesPage({
               }`}
             >
               <Icon name={t.icon as IconName} className="w-3.5 h-3.5 flex-none" strokeWidth={1.6} />
-              {String(i + 1).padStart(2, "0")}. {t.name}
+              {num != null && `${String(num).padStart(2, "0")}. `}{t.name}
             </Link>
             <form action={deleteContentItem}>
               <input type="hidden" name="id" value={t.id} />
@@ -172,8 +186,42 @@ export default async function AdminContentPagesPage({
               </ConfirmSubmitButton>
             </form>
           </span>
-        ))}
-      </div>
+        );
+
+        // 기술종류별: 공개 '기술·재료 소개'와 동일하게 5대분류 + 레이저 구성요소로 묶어 표시.
+        if (group === "tech") {
+          const byKey = new Map(items.map((t) => [t.itemKey, t]));
+          const used = new Set<string>();
+          const sections = [
+            ...techCategoryGroups.map((g) => ({ heading: g.label, keys: g.keys })),
+            { heading: "레이저 구성요소", keys: laserComponentKeys },
+          ];
+          const leftovers = () => items.filter((t) => !used.has(t.itemKey));
+          return (
+            <div className="mb-3 grid gap-2.5">
+              {sections.map((sec) => {
+                const secItems = sec.keys.map((k) => byKey.get(k)).filter((t): t is (typeof items)[number] => !!t);
+                secItems.forEach((t) => used.add(t.itemKey));
+                if (secItems.length === 0) return null;
+                return (
+                  <div key={sec.heading}>
+                    <p className="text-[11px] font-bold text-ink-faint mb-1.5">{sec.heading}</p>
+                    <div className="flex flex-wrap gap-1.5">{secItems.map((t) => chip(t))}</div>
+                  </div>
+                );
+              })}
+              {leftovers().length > 0 && (
+                <div>
+                  <p className="text-[11px] font-bold text-ink-faint mb-1.5">기타 (미분류)</p>
+                  <div className="flex flex-wrap gap-1.5">{leftovers().map((t) => chip(t))}</div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return <div className="flex flex-wrap gap-1.5 mb-3">{items.map((t, i) => chip(t, i + 1))}</div>;
+      })()}
 
       <details className="mb-8 pb-8 border-b border-line">
         <summary className="cursor-pointer text-[12.5px] font-bold text-blue select-none">+ 새 항목 추가</summary>
@@ -218,6 +266,13 @@ export default async function AdminContentPagesPage({
         {autoSorted && (
           <p className="mt-2.5 text-[11.5px] text-ink-faint">
             이 그룹은 이름순(가나다·ABC)으로 <b>자동 정렬</b>됩니다. 추가한 항목은 이름 순서에 맞춰 자동으로 배치됩니다.
+          </p>
+        )}
+        {group === "tech" && (
+          <p className="mt-2.5 text-[11.5px] text-red leading-relaxed">
+            ※ 기술종류는 공개 페이지에서 <b>대분류(용접·절단·마킹·표면처리·정밀가공 / 레이저 구성요소)별로 묶여</b> 표시됩니다.
+            여기서 새로 추가한 항목은 아직 어느 대분류에도 속하지 않아 <b>&quot;기타(미분류)&quot;</b>에만 보이고 공개 페이지에는 노출되지 않습니다.
+            새 기술 대분류 배치가 필요하면 담당 개발자에게 요청하세요. (기존 항목의 이름·내용·사양 수정은 자유롭게 가능합니다.)
           </p>
         )}
       </details>
