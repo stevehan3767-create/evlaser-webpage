@@ -755,7 +755,7 @@ const CKD_PRODUCTS: CkdProduct[] = [
       "",
       "[주요 특징]",
       "- 비접촉·저손상 가공으로 칩핑(chipping)·미세 균열을 최소화하고 꺾임 강도 유지",
-      "- 직선·곡선·이형(異形) 절단과 홀(hole) 가공을 한 장비에서 구현",
+      "- 직선·곡선·이형 절단과 홀(hole) 가공을 한 장비에서 구현",
       "- 비전 정렬(CCD)로 마크·패턴 기준 고정밀 위치 보정",
       "- 듀얼 테이블 구조로 상·하차와 가공을 병행해 생산성 향상",
       "- 자체 개발 제어 소프트웨어로 레시피 전환 용이",
@@ -1073,7 +1073,7 @@ async function ensureCkdLineupV1(): Promise<void> {
   // v3: CKD 전 제품(절단·드릴링·마킹·3D조각·자동화라인) 확장. content_pages는
   // upsert로 갱신하고, content_items/links는 중복 방지, 적용사례 이미지는 기존이
   // 없을 때만 추가한다(관리자가 올린 사진 보존).
-  const flag = (await sql`SELECT value FROM settings WHERE key = 'ckd_lineup_v3'`) as { value: string }[];
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'ckd_lineup_v4'`) as { value: string }[];
   if (flag.length > 0) return;
   const now = new Date().toISOString();
   let order = 300;
@@ -1095,10 +1095,10 @@ async function ensureCkdLineupV1(): Promise<void> {
     }
     order += 1;
   }
-  await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v3', ${now}) ON CONFLICT (key) DO NOTHING`;
+  await sql`INSERT INTO settings (key, value) VALUES ('ckd_lineup_v4', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
-// 해외 공급·협업사(중국 CHANXAN 创轩激光, 쑤저우) 정밀 레이저 절단·미세가공·마킹
+// 해외 공급·협업사(중국 CHANXAN, 쑤저우) 정밀 레이저 절단·미세가공·마킹
 // 제품을 설비(lineup)에 등록. 카탈로그에서 실제 사진·실사양을 반영(기존 설비와 동일 형식).
 const CHANXAN_OEM_SOURCE = "https://www.chanxan.com";
 const CHANXAN_PRODUCTS: CkdProduct[] = [
@@ -1111,7 +1111,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "cut",
     description: [
       "CW-650R 레이저 절단기",
-      "휴대폰용 필름 등 박막 소재를 비접촉으로 고정밀 절단하는 레이저 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "휴대폰용 필름 등 박막 소재를 비접촉으로 고정밀 절단하는 레이저 절단기입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 비접촉 가공으로 버(burr) 없이 매끄럽고, 변형·표면 손상이 없음",
@@ -1157,7 +1157,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "precision",
     description: [
       "더블스테이션 롤투시트 피코초 레이저 미세가공 설비",
-      "커버필름 등 롤 소재를 피코초 레이저로 고속·고정밀 미세가공하는 더블스테이션(2헤드) 자동화 설비입니다. 중국 CHANXAN(创轩激光)의 FPC 전용 미세가공 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "커버필름 등 롤 소재를 피코초 레이저로 고속·고정밀 미세가공하는 더블스테이션(2헤드) 자동화 설비입니다. 중국 CHANXAN의 FPC 전용 미세가공 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 2헤드 동시 가공으로 롤 소재(커버필름) 가공 효율 2배",
@@ -1202,7 +1202,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "cut",
     description: [
       "고정밀 레이저 절단기",
-      "수입 QCW 준연속(fiber) 레이저와 대리석·열처리 강재 구조로 고정밀·장기 안정성을 구현한 레이저 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "수입 QCW 준연속(fiber) 레이저와 대리석·열처리 강재 구조로 고정밀·장기 안정성을 구현한 레이저 절단기입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 수입 QCW 준연속 파이버 레이저, 전광 변환 효율 높고 운영비 낮음",
@@ -1249,7 +1249,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "cut",
     description: [
       "펨토·피코·나노·UV 레이저 절단기",
-      "초단펄스 UV 피코초 레이저로 열영향부(HAZ)를 최소화한 '냉가공'을 구현하는 정밀 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "초단펄스 UV 피코초 레이저로 열영향부(HAZ)를 최소화한 '냉가공'을 구현하는 정밀 절단기입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 초단펄스 UV 레이저로 고효율·저열영향 '냉가공' 구현",
@@ -1299,7 +1299,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "cut",
     description: [
       "유리 레이저 절단기",
-      "피코초 레이저로 유리를 치핑(가장자리 깨짐) 없이 고강도로 가공하는 전용 절단기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "피코초 레이저로 유리를 치핑(가장자리 깨짐) 없이 고강도로 가공하는 전용 절단기입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 피코초 레이저로 절단 치핑 작고 절단 후 강도 높으며 열영향부 작음",
@@ -1345,7 +1345,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
     icon: "mark",
     description: [
       "CX-HV 비전 이동 레이저 마킹기",
-      "비전 시스템과 정밀 이동축으로 수작업 개입을 최소화한 고자동화 레이저 마킹기입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "비전 시스템과 정밀 이동축으로 수작업 개입을 최소화한 고자동화 레이저 마킹기입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 이동 마킹으로 수작업 셋업 개입 최소화, 자동화 수준 향상",
@@ -1385,7 +1385,7 @@ const CHANXAN_PRODUCTS: CkdProduct[] = [
   },
 ];
 async function ensureChanxanLineupV1(): Promise<void> {
-  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_lineup_v1'`) as { value: string }[];
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_lineup_v2'`) as { value: string }[];
   if (flag.length > 0) return;
   const now = new Date().toISOString();
   let order = 320;
@@ -1407,7 +1407,7 @@ async function ensureChanxanLineupV1(): Promise<void> {
     }
     order += 1;
   }
-  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_lineup_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 의료·바이오 확장: ① 신규 기술 '튜브·관재 레이저 절단'(tubeCutting) 추가,
@@ -1445,7 +1445,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "cut",
     description: [
       "정밀 박벽 튜브 레이저 절단기",
-      "니티놀·스테인리스 등 박벽 금속 튜브를 파이버 레이저로 정밀 절단·천공하는 의료기기 전용 설비입니다. 스텐트·주사침 등 미세 관재 가공에 사용됩니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "니티놀·스테인리스 등 박벽 금속 튜브를 파이버 레이저로 정밀 절단·천공하는 의료기기 전용 설비입니다. 스텐트·주사침 등 미세 관재 가공에 사용됩니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 부품 단위부터 시스템 단위까지 유연한 맞춤 설계",
@@ -1489,7 +1489,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "cut",
     description: [
       "심장 판막(생체막) 레이저 절단기",
-      "돼지·소 심막 등 의료용 생체 박막을 CO₂ 레이저로 고정밀 절단·개구하는 설비입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "돼지·소 심막 등 의료용 생체 박막을 CO₂ 레이저로 고정밀 절단·개구하는 설비입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 소형 설계로 생산 공간 절약·비용 절감",
@@ -1532,7 +1532,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "mark",
     description: [
       "의료용 CCD 비전 레이저 마킹기",
-      "고화소 CCD 비전으로 자동 인식·정렬·검사하며 의료기기에 로고·문자·2D코드를 마킹하는 설비입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "고화소 CCD 비전으로 자동 인식·정렬·검사하며 의료기기에 로고·문자·2D코드를 마킹하는 설비입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 소재에 맞춰 UV·그린·파이버·CO₂ 광원 선택",
@@ -1570,13 +1570,13 @@ const CHANXAN_MED: CkdProduct[] = [
   {
     key: "chanxanMedTubeMark",
     itemName: "세관 회전 마킹기",
-    title: "세관(細管) 회전 레이저 마킹기",
+    title: "세관 회전 레이저 마킹기",
     nameEn: "Rotary Laser Marking Machine for Thin Round Tubes",
     model: "SG Series",
     icon: "mark",
     description: [
-      "세관(細管) 회전 레이저 마킹기",
-      "가는 원형관(튜브)을 회전시키며 표면에 미세 패턴·눈금을 마킹하는 의료기기 전용 설비입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "세관 회전 레이저 마킹기",
+      "가는 원형관(튜브)을 회전시키며 표면에 미세 패턴·눈금을 마킹하는 의료기기 전용 설비입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 가공 중 정밀 비전 위치결정 시스템",
@@ -1618,7 +1618,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "mark",
     description: [
       "의료 카테터 레이저 마킹기",
-      "UV 레이저로 의료용 플라스틱·고무 카테터 표면에 문자·눈금(스케일)을 저열영향으로 마킹하는 설비입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "UV 레이저로 의료용 플라스틱·고무 카테터 표면에 문자·눈금(스케일)을 저열영향으로 마킹하는 설비입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 빔 품질 우수·초점 스폿 작아 열영향 작고 탄화 없음",
@@ -1660,7 +1660,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "cut",
     description: [
       "의료 카테터 레이저 드릴링기",
-      "CO₂ 레이저로 의료용 플라스틱 원형관(카테터) 표면을 천공·마킹하는 설비입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "CO₂ 레이저로 의료용 플라스틱 원형관(카테터) 표면을 천공·마킹하는 설비입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 수입/고품질 국산 CO₂ RF 레이저, 빔 품질·광전 변환 효율 우수",
@@ -1697,13 +1697,13 @@ const CHANXAN_MED: CkdProduct[] = [
   {
     key: "chanxanMedMicroFast",
     itemName: "CS-0605-V-A",
-    title: "미(微)정밀 초고속 레이저 가공 시스템",
+    title: "미정밀 초고속 레이저 가공 시스템",
     nameEn: "Micro-precision Ultra-fast Laser Processing System",
     model: "CS-0605-V-A",
     icon: "precision",
     description: [
-      "미(微)정밀 초고속 레이저 가공 시스템",
-      "초단펄스(피코초) 레이저로 생체재료·박막을 열영향 없이 '냉가공'하는 미정밀 가공 시스템입니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "미정밀 초고속 레이저 가공 시스템",
+      "초단펄스(피코초) 레이저로 생체재료·박막을 열영향 없이 '냉가공'하는 미정밀 가공 시스템입니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 초단펄스 레이저로 고효율·저열영향 '냉가공' 구현",
@@ -1750,7 +1750,7 @@ const CHANXAN_MED: CkdProduct[] = [
     icon: "cut",
     description: [
       "고정밀 금속 레이저 절단기",
-      "고출력 파이버 레이저로 금속 박판·미세 금속을 고정밀 스크라이빙·절단·천공하는 설비입니다. 니티놀·귀금속·스틸 니들 등 의료·정밀 부품에 적합합니다. 중국 CHANXAN(创轩激光)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "고출력 파이버 레이저로 금속 박판·미세 금속을 고정밀 스크라이빙·절단·천공하는 설비입니다. 니티놀·귀금속·스틸 니들 등 의료·정밀 부품에 적합합니다. 중국 CHANXAN의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
       "",
       "[주요 특징]",
       "- 국제 일류급 레이저로 빔 품질·절단 품질 우수, 최소 선폭 50µm(소재별)",
@@ -1789,7 +1789,7 @@ const CHANXAN_MED: CkdProduct[] = [
   },
 ];
 async function ensureChanxanMedicalV1(): Promise<void> {
-  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_medical_v1'`) as { value: string }[];
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_medical_v2'`) as { value: string }[];
   if (flag.length > 0) return;
   const now = new Date().toISOString();
   // ① 신규 기술종류 'tubeCutting'(튜브·관재 레이저 절단) 추가
@@ -1813,7 +1813,7 @@ async function ensureChanxanMedicalV1(): Promise<void> {
     }
     order += 1;
   }
-  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_medical_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_medical_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // CHANXAN 산업·의료 설비에 카탈로그의 '가공 샘플(Sample show)' 이미지를 적용사례로 추가.
