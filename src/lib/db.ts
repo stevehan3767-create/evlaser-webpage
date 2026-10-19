@@ -506,6 +506,7 @@ function createSchema(): Promise<void> {
     await ensureCkdLineupV1();
     await ensureChanxanLineupV1();
     await ensureChanxanMedicalV1();
+    await ensureChanxanCasesV1();
   })();
 }
 
@@ -1809,6 +1810,36 @@ async function ensureChanxanMedicalV1(): Promise<void> {
     order += 1;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('chanxan_medical_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// CHANXAN 산업·의료 설비에 카탈로그의 '가공 샘플(Sample show)' 이미지를 적용사례로 추가.
+// 제품에 등록된 사진이 없을 때만 넣어 관리자 업로드분과 중복을 피한다.
+const CHANXAN_CASE_IMAGES: { key: string; file: string }[] = [
+  { key: "chanxanCw650r", file: "chanxan-cw650r-samples.webp" },
+  { key: "chanxanPicoMicro", file: "chanxan-pico-micro-samples.webp" },
+  { key: "chanxanHighprec", file: "chanxan-highprec-samples.webp" },
+  { key: "chanxanFemtoUv", file: "chanxan-femto-uv-samples.webp" },
+  { key: "chanxanGlass", file: "chanxan-glass-samples.webp" },
+  { key: "chanxanCxhv", file: "chanxan-cxhv-samples.webp" },
+  { key: "chanxanMedCcdMark", file: "chanxan-med-ccdmark-samples.webp" },
+  { key: "chanxanMedTubeMark", file: "chanxan-med-tubemark-samples.webp" },
+  { key: "chanxanMedTubeCut", file: "chanxan-med-tubecut-samples.webp" },
+  { key: "chanxanMedHeartValve", file: "chanxan-med-heartvalve-samples.webp" },
+  { key: "chanxanMedMicroFast", file: "chanxan-med-microfast-samples.webp" },
+  { key: "chanxanMedMetal", file: "chanxan-med-metal-samples.webp" },
+  { key: "chanxanMedCathMark", file: "chanxan-med-cathmark-samples.webp" },
+  { key: "chanxanMedCathDrill", file: "chanxan-med-cathdrill-samples.webp" },
+];
+async function ensureChanxanCasesV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'chanxan_cases_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  for (const { key, file } of CHANXAN_CASE_IMAGES) {
+    const cnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${key}`) as { c: number }[];
+    if ((cnt[0]?.c ?? 0) > 0) continue;
+    await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${key}, ${`/images/lineup/chanxan/cases/${file}`}, ${"가공 샘플 (Processing samples)"}, 0, ${now})`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('chanxan_cases_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
