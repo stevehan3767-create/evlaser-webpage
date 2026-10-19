@@ -508,6 +508,7 @@ function createSchema(): Promise<void> {
     await ensureChanxanMedicalV1();
     await ensureChanxanCasesV1();
     await ensureHuiruiLineupV1();
+    await ensureHuiruiCatalogueV1();
   })();
 }
 
@@ -2011,6 +2012,294 @@ async function ensureHuiruiLineupV1(): Promise<void> {
     order += 1;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('huirui_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// Huirui 종합 카탈로그 기준 핵심 장비 시리즈 추가(레이저 증재제조·熔覆·3D프린팅·용접).
+const HUIRUI_CATALOG: CkdProduct[] = [
+  {
+    key: "huiruiIlam", itemName: "iLAM 시리즈", title: "iLAM® 레이저 로봇 지능 증재제조 시스템",
+    nameEn: "Laser Robot Intelligent Additive Manufacturing System", model: "iLAM® Series", icon: "print3d",
+    description: [
+      "iLAM® 레이저 로봇 지능 증재제조 시스템",
+      "다자유도 로봇에 레이저 熔覆(클래딩)와 금속 3D프린팅을 융합한 지능 증재제조 시스템입니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 구성(3종)]",
+      "- 환경박스식 8축 연동 지능 증재제조 시스템: 저수분·저산소 환경에서 고부가 부품 정밀 성형·재제조",
+      "- 워크스테이션식 지능 증재제조 시스템: 고유연 로봇 기반, 복잡 곡면 近净 성형·터빈엔진 등 정밀 보수",
+      "- 슬라이드식 표면강화·재제조 시스템: 6축 로봇+슬라이드레일 초고속 熔覆, 대형 부품 수복·표면강화",
+      "",
+      "[적용 소재] 니켈 초합금·티타늄·알루미늄·코발트합금·고강도강",
+      "[적용 분야] 항공·에너지·기계·금속 부품 증재제조·정밀 보수·3D프린팅",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 레이저 금속 적층(LMD)·熔覆·금속 3D프린팅",
+      "구성 (Configuration) | 환경박스 8축 / 워크스테이션 / 슬라이드식",
+      "적용 소재 (Material) | 니켈 초합금·티타늄·알루미늄·코발트합금·고강도강",
+      "제어·SW (Control) | 다축 연동, 경로계획·熔池 모니터링 소프트웨어",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-ilam.webp",
+    links: [["tech", "cladding"], ["tech", "print3d"], ["material", "metalSteel"], ["industry", "aerospace"], ["industry", "machinery"], ["industry", "steel"]],
+    cases: [],
+  },
+  {
+    key: "huiruiMetalPlus", itemName: "Metal+ 시리즈", title: "Metal+® 고처리량 금속 3D프린팅(DED) 시스템",
+    nameEn: "High-throughput Metal DED 3D Printing System", model: "Metal+® Series", icon: "print3d",
+    description: [
+      "Metal+® 고처리량 금속 3D프린팅(DED) 시스템",
+      "직접에너지적층(DED) 방식으로 금속 분말·와이어를 적층해 무금형 쾌속 제조·증재 수복하는 3D프린팅 시스템입니다. 소형·중형·대형 환경박스로 제공됩니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 구성(3종)]",
+      "- 소형 환경박스 DED: 레이저 송사(wire) 3D, 폐루프 제어, 위치결정 0.02mm, 진공 보호 분위기",
+      "- 중형 환경박스 DED: 다성분 연속변화 합금 제조·성형, 배치 가공(3D프린팅·증재수복·熔覆강화·재료연구)",
+      "- 대형 환경박스 DED: 레이저 동축 송분, 무금형 층적층, 대형 복잡 구조·정밀 수복",
+      "",
+      "[적용 분야] 금속 부품 3D프린팅·증재 수복·표면강화·재료 연구",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 직접에너지적층(DED, 송사/송분)",
+      "구성 (Configuration) | 소형 · 중형 · 대형 환경박스",
+      "위치결정 정밀도 (Positioning) | 0.02 mm",
+      "분위기 (Atmosphere) | 진공/불활성 보호 (저수분·저산소)",
+      "적용 (Application) | 3D프린팅·증재수복·熔覆강화·재료연구",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-metalplus.webp",
+    links: [["tech", "print3d"], ["tech", "cladding"], ["material", "metalSteel"], ["industry", "aerospace"], ["industry", "machinery"]],
+    cases: [],
+  },
+  {
+    key: "huiruiMetalOne", itemName: "Metal+One-400Er4", title: "Metal+One® 금속 직접에너지적층(DED) 3D프린팅 시스템",
+    nameEn: "Metal Direct Energy Deposition 3D Printing System", model: "Metal+One®-400Er4", icon: "print3d",
+    description: [
+      "Metal+One® 금속 직접에너지적층(DED) 3D프린팅 시스템",
+      "다채널 송분기로 여러 분말을 실시간 혼합해 성분비를 정밀 제어하는 연구·개발용 DED 3D프린팅 시스템입니다. 소재 성분 선별·물성 연구·경사기능재료(FGM) 연구에 적합합니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 다채널 송분기 실시간 혼분, 성분비 정밀 제어",
+      "- 고처리량 실험 소프트웨어로 성분별 배치 프린팅",
+      "- 철강·알루미늄·티타늄·니켈 초합금·고엔트로피 합금·세라믹 분말 대응",
+      "",
+      "[적용 분야] 과학연구·분말 제조사의 소재 연구·FGM 개발",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | Metal+One®-400Er4",
+      "레이저 (Laser) | 광섬유/반도체 레이저",
+      "레이저 출력 (Laser power) | 1 ~ 6 kW (전체 <10kW)",
+      "위치결정 정밀도 (Positioning) | ±0.02 mm",
+      "운동 행정 (Travel) | 400 × 400 × 400 mm",
+      "송분기 (Powder feeder) | 1 ~ 4 통 (선택)",
+      "熔覆 노즐 (Nozzle) | 동축 3점식 / 환형",
+      "수분·산소 (Water/Oxygen) | < 50 ppm",
+      "광스폿 (Spot) | 0.4 ~ 5 mm",
+      "전체 크기 (Dimension) | 1.6 × 1.6 × 2.2 m",
+      "소프트웨어 (Software) | 경로계획·熔池 모니터링·동축 비전",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-metalone.webp",
+    links: [["tech", "print3d"], ["tech", "cladding"], ["material", "metalSteel"], ["industry", "aerospace"], ["industry", "machinery"], ["industry", "steel"]],
+    cases: [],
+  },
+  {
+    key: "huiruiMobilam", itemName: "MobiLAM 시리즈", title: "MobiLAM® 이동식 레이저 熔覆 증재 수복 시스템",
+    nameEn: "Mobile Laser Cladding Additive Repair System", model: "MobiLAM® Series", icon: "machine",
+    description: [
+      "MobiLAM® 이동식 레이저 熔覆 증재 수복 시스템",
+      "레이저 熔覆에 필요한 각 부분을 전용 운반차에 모듈 집약한 현장 레이저 재제조 워크스테이션입니다. 현장에 신속 투입·조립해 대형 부품을 수복합니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 전용 운반차 탑재, 현장 신속 조립·분해로 인건비·운반비 절감",
+      "- 로봇 승강 플랫폼·현수암 기구로 대형 부품 현장 수복",
+      "- 작업 환경(공조·조명)·전역 모니터링 장치 구비",
+      "- 자적응 수형(隨形) 熔覆: 스캔 측정 → 교시점 생성 → 로봇 경로 생성 → 熔覆 실행 자동화",
+      "",
+      "[적용 분야] 대형 동력장비 핵심 부품 현장 수복·재제조(기계·에너지·조선·철강)",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 이동식 레이저 熔覆·증재 수복 (비접촉)",
+      "구성 (Configuration) | 전용 운반차 + 로봇 + 현장 작업 모듈",
+      "핵심 기술 (Key tech) | 자적응 수형 熔覆(스캔→교시→경로생성→실행)",
+      "특징 (Features) | 신속 조립·분해, 대형 부품 현장 긴급 수복",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-mobilam.webp",
+    links: [["tech", "cladding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "shipbuilding"], ["industry", "steel"], ["industry", "aerospace"]],
+    cases: [],
+  },
+  {
+    key: "huiruiPortilam", itemName: "PortiLAM 시리즈", title: "PortiLAM® 휴대식 레이저 지능 증감재 수복 시스템",
+    nameEn: "Portable Laser Intelligent Additive-Subtractive Repair System", model: "PortiLAM® Series", icon: "machine",
+    description: [
+      "PortiLAM® 휴대식 레이저 지능 증감재 수복 시스템",
+      "협동로봇 기반의 휴대형 증감재(熔覆+연마) 수복 시스템으로, 고부가 부품의 현장 수복에 특화된 제품입니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 비전 자적응 熔覆 + 다양한 교시(추랍·비전·3D스캔), 측정 정밀도 0.1mm",
+      "- 모듈형 휴대 구조로 현장별 분해·조립",
+      "- 역제어(力控) 연마로 熔覆 후 연마까지 수행",
+      "- 자흡(磁吸, magnetic) 구조로 협소·복잡 공간 고정·熔覆",
+      "",
+      "[적용 분야] 고부가 핵심 부품의 현장 증감재 수복·재제조",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 휴대식 증감재 수복 (熔覆 + 연마)",
+      "로봇 (Robot) | 협동로봇(Cobot)",
+      "교시 (Teaching) | 추랍 / 비전 / 3D 스캔",
+      "측정 정밀도 (Accuracy) | 0.1 mm",
+      "구조 (Structure) | 모듈형 휴대 · 자흡(magnetic) 고정",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-portilam.webp",
+    links: [["tech", "cladding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "aerospace"], ["industry", "steel"]],
+    cases: [],
+  },
+  {
+    key: "huiruiUhs", itemName: "UHS-iCoating-C1025A", title: "UHS-iCoating® 초고속 레이저 熔覆 복합가공 시스템",
+    nameEn: "Ultra-High-Speed Laser Cladding Composite Machining System", model: "UHS-iCoating®-C1025A", icon: "clad",
+    description: [
+      "UHS-iCoating® 초고속 레이저 熔覆 복합가공 증재 시스템",
+      "선삭(車削)과 초고속 레이저 熔覆를 결합한 복합가공 설비로, 한 번의 척 장착으로 증재·감재 복합 가공을 완성합니다. 안정적인 코팅층 양산 공정을 구현합니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 선삭 + 초고속 熔覆 복합 가공으로 한 번에 완성, 가공 효율 높음",
+      "- 안정적 코팅 공정으로 코팅층 양산성 확보",
+      "- 전(全)방호 버전(C1025A)과 컴팩트 버전(iCoating-S) 제공",
+      "",
+      "[적용 분야] 슬라이딩 베어링 등 내마모·내식 코팅 양산, 축류 부품 熔覆",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | UHS-iCoating®-C1025A",
+      "레이저 출력 (Laser power) | 10 kW (전체 <45kW)",
+      "레이저 (Laser) | 광섬유/반도체 레이저",
+      "제어 (Control) | CNC",
+      "위치결정 정밀도 (Positioning) | ±0.05 mm",
+      "성형 치수 (Forming size) | ≤ 500 × 400 × 300 mm",
+      "회전테이블 부하 (Table load) | 3,000 kg (맞춤)",
+      "노즐 (Nozzle) | 환형 / 선형 동축 노즐",
+      "광스폿 (Spot) | 0.4 ~ 6 mm",
+      "공작물 유효 길이/직경 (Workpiece) | 1,500 mm / Φ600 mm (맞춤)",
+      "송분기 (Powder feeder) | 1 ~ 4 통 (선택)",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-uhscoating.webp",
+    links: [["tech", "cladding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "automotive"], ["industry", "steel"], ["industry", "aerospace"]],
+    cases: [],
+  },
+  {
+    key: "huiruiBore", itemName: "내경 熔覆 시스템", title: "내경(보어) 레이저 熔覆 증재 수복 시스템",
+    nameEn: "Internal-Bore Laser Cladding Additive Repair System", model: "내경 熔覆 Series", icon: "clad",
+    description: [
+      "내경(보어) 레이저 熔覆 증재 수복 시스템",
+      "실린더 라이너·유압 실린더 등 내경(안지름) 면에 레이저 熔覆로 내마모·내식 코팅층을 형성·수복하는 전용 설비입니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 열입력 작고 열영향부 작아 모재 조직 영향 최소",
+      "- 熔覆 표면 평탄, 기계 가공량 적음",
+      "- 낮은 熔覆 깊이·낮은 희석율(<1%)로 방식(防蝕) 효과 우수",
+      "- 다양한 소재 熔覆 대응, 높은 집적도·정밀도·적응성",
+      "",
+      "[적용 분야] 실린더 라이너 熔覆 수복, 고압펌프·유압 실린더 내벽 강화",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "레이저 (Laser) | 광섬유/반도체 레이저",
+      "레이저 출력 (Laser power) | 6 kW",
+      "척 직경 (Chuck diameter) | 500 mm",
+      "최대 회전 직경 (Max. turning dia.) | 600 mm",
+      "주축 회전 (Spindle) | 1 ~ 50 rpm",
+      "모재 희석율 (Dilution) | < 1%",
+      "운동 기구 (Motion) | 3 + 1 축",
+      "반복 위치결정 정밀도 (Repeatability) | 0.02 mm",
+      "가공 길이 / 공작물 최대 길이 | 2 m+ / 2 m",
+      "최대 적재 (Max. load) | 3 t",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-bore.webp",
+    links: [["tech", "cladding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "steel"], ["industry", "automotive"]],
+    cases: [],
+  },
+  {
+    key: "huiruiCustomClad", itemName: "자동화 熔覆 전용", title: "자동화 레이저 熔覆 전용 시스템 (장봉·정밀)",
+    nameEn: "Automated Laser Cladding Dedicated System", model: "定制化 Series", icon: "clad",
+    description: [
+      "자동화 레이저 熔覆 전용 시스템 (장봉·정밀)",
+      "대상 부품에 맞춰 맞춤 설계하는 자동화 배치 레이저 熔覆 전용 시스템입니다. 장봉(long-rod)형과 정밀 소형형을 제공합니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 구성(2종)]",
+      "- 장봉 자동화 熔覆 전용 시스템: 석유 드릴로드 등 복잡 봉류 부품의 고효율 수복·표면강화 (고정밀 3축 운동 + 고주파 유도가열 + 지능 제어)",
+      "- 정밀 소형 자동화 熔覆 전용 시스템: 유리금형 펀치·커팅티·드릴조인트·밸브 밀봉면 등 소형 부품, 다각도·다위치 고정밀 가공",
+      "",
+      "[적용 분야] 드릴로드·유리금형·커팅티·밸브시트 등 부품 熔覆 수복·표면강화",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 자동화 배치 레이저 熔覆",
+      "구성 (Configuration) | 장봉형 / 정밀 소형형 (맞춤 설계)",
+      "특징 (Features) | 고정밀·고효율·고적응, 다각도·다위치 가공",
+      "적용 (Application) | 드릴로드·유리금형·커팅티·밸브시트 등",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-custom.webp",
+    links: [["tech", "cladding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "steel"]],
+    cases: [],
+  },
+  {
+    key: "huiruiHybridWeld", itemName: "레이저-아크 복합 용접", title: "레이저-아크 복합 용접 시스템",
+    nameEn: "Laser-Arc Hybrid Welding System", model: "激光+MIG Hybrid", icon: "weld",
+    description: [
+      "레이저-아크 복합 용접 시스템",
+      "레이저와 직류 MIG를 결합한 차세대 복합 용접 기술로, 단일 용접의 한계를 극복하고 가공 양품률을 크게 높이는 자동화 용접 솔루션입니다. 중국 Huirui(南京辉锐光电)의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 레이저+직류 MIG 복합으로 에너지 이용률·용접 속도 향상",
+      "- 전통 전호(電弧) 용접 대비 熔深 크고 용접 품질 우수",
+      "- 레이저가 아크 안정성을 높여 용접 간극 적응성·효율 향상",
+      "- 용접 심(seam) 추적 시스템으로 품질 확보·비용 절감",
+      "",
+      "[적용 분야] 후판·구조물 고품질 자동 용접(기계·자동차·조선·철강)",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "용접 방식 (Welding) | 레이저 + 직류 MIG 복합",
+      "레이저 (Laser) | 20 kW (光纤芯径 200µm)",
+      "레이저 출력 (Laser power) | 5 kW",
+      "광학 준직/집속 (Collimation/Focus) | 100 / 200 mm",
+      "용접 전원 (Power source) | CMT 용접기",
+      "운동 기구 (Robot) | KUKA kr210",
+      "용접 전류/전압 (Current/Voltage) | 144 A / 16.7 V",
+      "용접 속도 (Speed) | 10 mm/s",
+      "熔深 / 熔宽 (Penetration/Width) | 9 mm / 6.7 mm",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-hybridweld.webp",
+    links: [["tech", "metalWelding"], ["material", "metalSteel"], ["industry", "machinery"], ["industry", "automotive"], ["industry", "shipbuilding"], ["industry", "steel"]],
+    cases: [],
+  },
+];
+async function ensureHuiruiCatalogueV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'huirui_catalogue_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  let order = 380;
+  for (const p of HUIRUI_CATALOG) {
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.itemName}, ${p.icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, model, name_en, is_oem, oem_source, updated_at)
+      VALUES ('lineup', ${p.key}, ${p.title}, ${p.description}, ${p.specTable}, ${p.imageUrl}, ${p.model}, ${p.nameEn}, true, ${HUIRUI_OEM_SOURCE}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, model=EXCLUDED.model, name_en=EXCLUDED.name_en, is_oem=EXCLUDED.is_oem, oem_source=EXCLUDED.oem_source, updated_at=EXCLUDED.updated_at
+    `;
+    for (const [tg, tk] of p.links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+    }
+    order += 1;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('huirui_catalogue_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
