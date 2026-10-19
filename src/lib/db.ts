@@ -509,6 +509,8 @@ function createSchema(): Promise<void> {
     await ensureChanxanCasesV1();
     await ensureHuiruiLineupV1();
     await ensureHuiruiCatalogueV1();
+    await ensureHuiruiCasesV1();
+    await ensureHuiruiSpecFilesV1();
   })();
 }
 
@@ -2300,6 +2302,56 @@ async function ensureHuiruiCatalogueV1(): Promise<void> {
     order += 1;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('huirui_catalogue_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// Huirui 카탈로그 9종에 적용사례(샘플) 이미지 추가.
+const HUIRUI_CASE_IMAGES: { key: string; file: string }[] = [
+  { key: "huiruiIlam", file: "huirui-ilam-samples.webp" },
+  { key: "huiruiMetalPlus", file: "huirui-ded-samples.webp" },
+  { key: "huiruiMetalOne", file: "huirui-ded-samples.webp" },
+  { key: "huiruiMobilam", file: "huirui-mobilam-samples.webp" },
+  { key: "huiruiPortilam", file: "huirui-portilam-samples.webp" },
+  { key: "huiruiUhs", file: "huirui-uhscoating-samples.webp" },
+  { key: "huiruiBore", file: "huirui-bore-samples.webp" },
+  { key: "huiruiCustomClad", file: "huirui-custom-samples.webp" },
+  { key: "huiruiHybridWeld", file: "huirui-hybridweld-samples.webp" },
+];
+async function ensureHuiruiCasesV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'huirui_cases_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  for (const { key, file } of HUIRUI_CASE_IMAGES) {
+    const cnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${key}`) as { c: number }[];
+    if ((cnt[0]?.c ?? 0) > 0) continue;
+    await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${key}, ${`/images/lineup/huirui/cases/${file}`}, ${"적용사례 (Application cases)"}, 0, ${now})`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('huirui_cases_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// Huirui 설비 12종에 '사양서 파일(PDF) 다운로드'(spec_file_url) 연결 →
+// 상세페이지에 ①사양서 보기·다운로드(자동 생성) + ②사양서 파일 다운로드(정적 PDF) 2종 모두 제공.
+const HUIRUI_SPEC_FILES: { key: string; name: string }[] = [
+  { key: "huiruiBrakeDisc", name: "Huirui_브레이크디스크클래딩_사양서.pdf" },
+  { key: "huiruiBrakeLine", name: "Huirui_브레이크디스크양산라인_사양서.pdf" },
+  { key: "huiruiRepair", name: "Huirui_클래딩보수표면강화_사양서.pdf" },
+  { key: "huiruiIlam", name: "Huirui_iLAM_증재제조_사양서.pdf" },
+  { key: "huiruiMetalPlus", name: "Huirui_MetalPlus_DED3D프린팅_사양서.pdf" },
+  { key: "huiruiMetalOne", name: "Huirui_MetalOne_DED3D프린팅_사양서.pdf" },
+  { key: "huiruiMobilam", name: "Huirui_MobiLAM_이동식수복_사양서.pdf" },
+  { key: "huiruiPortilam", name: "Huirui_PortiLAM_휴대식수복_사양서.pdf" },
+  { key: "huiruiUhs", name: "Huirui_UHS-iCoating_초고속熔覆_사양서.pdf" },
+  { key: "huiruiBore", name: "Huirui_내경熔覆_사양서.pdf" },
+  { key: "huiruiCustomClad", name: "Huirui_자동화熔覆전용_사양서.pdf" },
+  { key: "huiruiHybridWeld", name: "Huirui_레이저아크복합용접_사양서.pdf" },
+];
+async function ensureHuiruiSpecFilesV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'huirui_spec_files_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  for (const { key, name } of HUIRUI_SPEC_FILES) {
+    await sql`UPDATE content_pages SET spec_file_url = ${`/docs/huirui/${key}.pdf`}, spec_file_name = ${name}, updated_at = ${now} WHERE group_key='lineup' AND item_key=${key}`;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('huirui_spec_files_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
