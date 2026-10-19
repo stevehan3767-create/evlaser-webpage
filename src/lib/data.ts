@@ -37,6 +37,7 @@ export const industries: Industry[] = [
   { icon: "display", key: "display" },
   { icon: "defense", key: "defense" },
   { icon: "precision", key: "precisionMachining" },
+  { icon: "gem", key: "jewelry" },
   { icon: "etc", key: "other" },
 ];
 
@@ -57,6 +58,7 @@ export const industryLabelsKo: Record<string, string> = {
   display: "디스플레이",
   defense: "방위산업",
   precisionMachining: "정밀가공",
+  jewelry: "귀금속·쥬얼리",
   other: "기타",
 };
 
@@ -227,6 +229,7 @@ export const categoryNameEn: Record<string, Record<string, string>> = {
     display: "Display",
     defense: "Defense",
     precisionMachining: "Precision Machining",
+    jewelry: "Jewelry",
     other: "Others",
   },
 };

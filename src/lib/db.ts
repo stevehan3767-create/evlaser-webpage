@@ -511,6 +511,7 @@ function createSchema(): Promise<void> {
     await ensureHuiruiCatalogueV1();
     await ensureHuiruiCasesV1();
     await ensureHuiruiSpecFilesV1();
+    await ensureMavenLineupV1();
   })();
 }
 
@@ -2352,6 +2353,569 @@ async function ensureHuiruiSpecFilesV1(): Promise<void> {
     await sql`UPDATE content_pages SET spec_file_url = ${`/docs/huirui/${key}.pdf`}, spec_file_name = ${name}, updated_at = ${now} WHERE group_key='lineup' AND item_key=${key}`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('huirui_spec_files_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// MAVEN LASER (중국 Maven Laser Automation Co., Ltd. / 선전) — 해외 OEM 협업 설비.
+// 주얼리(귀금속) 레이저 가공 + 산업용 로봇 레이저 용접·절단·클래딩·세정 설비를
+// 카탈로그(Maven01/02) 기준으로 기술종류·재료·산업분야별로 분류해 등록한다.
+// 중국어 자료는 모두 한국어/영어로 변환해 수록한다.
+// ───────────────────────────────────────────────────────────────────────────
+const MAVEN_OEM_SOURCE = "http://www.mavenlaser.com";
+const MAVEN_OEM_NOTE =
+  "※ 중국 Maven Laser Automation과의 공급·협업(해외 OEM) 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.";
+// 신규 산업분야 "귀금속·쥬얼리"(industry/jewelry) 상세 페이지 콘텐츠.
+const MAVEN_JEWELRY_INDUSTRY = {
+  title: "귀금속·쥬얼리 (Precious Metal · Jewelry)",
+  description: [
+    "귀금속·쥬얼리 (Precious Metal · Jewelry)",
+    "금·은·백금 등 귀금속은 반사율이 높고 열전도가 커 전통 공법으로는 미세·정밀 가공이 어렵지만, 레이저는 비접촉·저열영향으로 주얼리 제작 전 공정에 적용됩니다. ㈜이브이레이저는 주얼리 전용 레이저 용접·절단·마킹·자동 조립 설비를 공급합니다.",
+    "",
+    "[주요 레이저 가공]",
+    "- 용접: 반지·팔찌 사이징, 체인·잠금쇠 접합, 난집(스톤 세팅)·안경테·보철(치과) 용접",
+    "- 절단: 금·은·동판 고반사 소재의 정밀 절단(네임·펜던트), 소재 손실 최소화",
+    "- 마킹·각인: 순도각인·로고·일련번호 등 반영구 마킹",
+    "- 자동화: 랍스터/피쉬락 잠금쇠 자동 성형·용접·조립, 체인 자동 결합",
+    "",
+    "[레이저의 장점]",
+    "- 미세·고정밀 국부 가공으로 인접부 변형·변색 최소화",
+    "- 소재(귀금속) 회수·재활용으로 손실 절감",
+    "- 비접촉·반영구 품질, 자동화로 생산성 향상",
+    "",
+    "[적용 소재] 금(9K~24K)·은·백금·티타늄·동·니켈 등",
+    "[대표 설비] 금·은 파이버 절단기, YAG/QCW 주얼리 용접기, 밀폐형 마킹·절단기, 체인 용접기, 잠금쇠 자동 조립 설비",
+  ].join("\n"),
+};
+const MAVEN_PRODUCTS: CkdProduct[] = [
+  // ── 산업용(로봇/자동화) ──────────────────────────────────────────────
+  {
+    key: "mavenRobotWeld",
+    itemName: "MLA-W-AU001",
+    title: "6축 로봇 파이버 레이저 용접 시스템",
+    nameEn: "6-Axis Robot Fiber Laser Welding System",
+    model: "MLA-W-AU001",
+    icon: "weld",
+    description: [
+      "6축 로봇 파이버 레이저 용접 시스템",
+      "6축 산업용 로봇에 고출력 파이버 레이저 용접 헤드를 결합해 3차원 복잡 형상을 자동 용접하는 시스템입니다. 중국 Maven Laser Automation의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 고정식·요동(스윙) 용접 헤드 선택, 안정적 고품질·고효율 용접",
+      "- 연속 와이어 송급(단선/복선)·회전 송급 지원으로 두꺼운 판재 대응",
+      "- 로봇 10축(확장축 포함) 연동, 회전 테이블·가이드 레일 구성 가능",
+      "- FANUC·YASKAWA·국산 등 다양한 로봇 브랜드 지원",
+      "- 간편한 운영 소프트웨어로 짧은 교육 후 바로 사용 가능",
+      "",
+      "[적용 분야]",
+      "자동차·중장비·신에너지·3C 전자 등 금속 부품의 3D 자동 용접",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "레이저 출력 (Laser power) | 1,000 ~ 6,000 W",
+      "파장 (Wavelength) | 1070 ± 10 nm",
+      "출력 조절 (Power adjustment) | 10 ~ 100%",
+      "가공 모드 (Work mode) | CW / Pulse",
+      "용접 속도 (Speed) | 0 ~ 120 mm/s",
+      "용접 두께 (Weld thickness) | 0.5 ~ 8 mm",
+      "용접 갭 (Welding gap) | < 0.5 mm",
+      "광섬유 길이 (Fiber length) | 10 m",
+      "로봇 축 (Robot axis) | 6축 + 확장축 최대 10축",
+      "반복 위치정밀도 (Positioning) | 0.08 mm",
+      "로봇 암 길이 (Arm) | 1.5 / 1.6 / 1.85 m",
+      "가반하중 (Payload) | 10 / 15 / 25 kg",
+      "입력 전원 (Input power) | AC 220V / 380V",
+      "지원 로봇 (Robot brand) | FANUC · YASKAWA · 국산",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-robot-weld.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "metalSteel"],
+      ["material", "copperAluminum"],
+      ["industry", "automotive"],
+      ["industry", "machinery"],
+      ["industry", "shipbuilding"],
+    ],
+    cases: [],
+  },
+  {
+    key: "mavenCobotWeld",
+    itemName: "MLA-W-AU003",
+    title: "협동로봇(코봇) 레이저 용접 시스템",
+    nameEn: "Cobot Laser Welding Process System",
+    model: "MLA-W-AU003",
+    icon: "weld",
+    description: [
+      "협동로봇(코봇) 레이저 용접 시스템",
+      "출고 전 조립을 완료한 \"Ready to Weld\" 일체형 협동로봇(코봇) 레이저 용접 시스템입니다. 중국 Maven Laser Automation의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 콤팩트 일체형 구조, 설치 후 즉시 사용 가능",
+      "- 각 축 토크 센서 내장으로 정밀한 티칭·변위 제어",
+      "- 직관적 조작으로 작업 효율 향상, 터치스크린 매크로 명령 지원",
+      "- 다품종 소량·셀 생산에 적합한 유연 용접",
+      "",
+      "[적용 분야]",
+      "금속 부품 소·중량 용접, 다품종 셀 생산 라인",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "레이저 출력 (Laser power) | 1,500 / 3,000 / 6,000 W",
+      "파장 (Wavelength) | 1070 ± 10 nm",
+      "출력 조절 (Power adjustment) | 10 ~ 100%",
+      "가공 모드 (Work mode) | CW / Pulse",
+      "용접 두께 (Weld thickness) | 0.5 ~ 5 mm",
+      "용접 갭 (Welding gap) | < 0.5 mm",
+      "광섬유 길이 (Fiber length) | 10 m",
+      "구성 (Configuration) | 코봇 + 레이저 + 제어 일체형(Ready to Weld)",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-cobot-weld.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "metalSteel"],
+      ["industry", "machinery"],
+      ["industry", "automotive"],
+      ["industry", "electronics3c"],
+    ],
+    cases: [],
+  },
+  {
+    key: "mavenRobotCut",
+    itemName: "MLA-W-AU006",
+    title: "로봇 파이버 레이저 절단 시스템",
+    nameEn: "Robot Fiber Laser Cutting Process System",
+    model: "MLA-W-AU006",
+    icon: "cut",
+    description: [
+      "로봇 파이버 레이저 절단 시스템",
+      "6축 로봇에 자동 초점 절단 헤드를 결합해 3차원 판금·구조물을 고속 절단하는 시스템입니다. 중국 Maven Laser Automation의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 포털(겐트리)형 로봇으로 작업 범위가 넓어 대형 판금 상·하차 용이",
+      "- 서보 절단 헤드: 경량 설계·이중 미러 보호로 유지비 절감",
+      "- 완전 밀폐 보호(안전 인터록·차광)로 안전성 확보",
+      "- 지능형 터미널·공정 데이터베이스 내장, 원격 진단 지원",
+      "- 충돌 리셋(핵심부품 보호), 멀티유닛 그룹 라인 확장 지원",
+      "",
+      "[적용 분야]",
+      "자동차·기계·판금 부품의 3D 레이저 절단, 중량 양산",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "레이저 출력 (Laser power) | 1,000 ~ 12,000 W",
+      "파장 (Wavelength) | 1070 ± 10 nm",
+      "출력 조절 (Power adjustment) | 10 ~ 100%",
+      "가공 모드 (Work mode) | 연속(Continuous)",
+      "가공 두께 (Thickness) | 0.5 ~ 8 mm",
+      "절단 정밀도 (Cutting accuracy) | ± 0.05 mm",
+      "광섬유 길이 (Fiber length) | 10 m",
+      "로봇 축 (Robot axis) | 6축 + 확장 4축(옵션)",
+      "절단 헤드 (Cutting head) | Ospri / Raytools 자동 초점",
+      "높이 추종 (Height follow) | 지원",
+      "인증 (Certificate) | CE",
+      "입력 전원 (Input power) | AC 220V 50-60Hz",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-robot-cut.webp",
+    links: [
+      ["tech", "cutting"],
+      ["material", "metalSteel"],
+      ["industry", "machinery"],
+      ["industry", "automotive"],
+      ["industry", "steel"],
+    ],
+    cases: [],
+  },
+  {
+    key: "mavenCladding",
+    itemName: "MLA-W-A10",
+    title: "로봇 레이저 클래딩 시스템",
+    nameEn: "Laser Cladding Process System",
+    model: "MLA-W-A10",
+    icon: "clad",
+    description: [
+      "로봇 레이저 클래딩 시스템",
+      "레이저로 금속 분말을 모재 표면에 용융·적층해 내마모·내식·내산화 코팅층을 형성하는 클래딩(클래딩) 시스템입니다. 중국 Maven Laser Automation의 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 클래딩층과 모재 표면이 견고한 야금 결합 계면 형성",
+      "- 레이저 에너지가 집중되어 입열이 적어 모재 변형 최소화",
+      "- 내마모·내식·내산화성 향상으로 부품 수명 연장",
+      "- 재활용·재제조로 설비 수명 연장 및 사용 비용 절감",
+      "",
+      "[분말 공급 노즐(선택)]",
+      "측축(side-shaft) 분말 공급 노즐 · 링(ring)형 고속 용착 노즐 등 (소재: 동)",
+      "",
+      "[적용 분야]",
+      "금형·기계 부품 보수, 축·롤·밸브 등 표면강화·재제조",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 레이저 클래딩(분말 용착)",
+      "결합 (Bonding) | 모재와 야금 결합(무균열)",
+      "노즐 (Nozzle) | 측축 / 링형 고속 노즐 (동)",
+      "분체 입도 (Powder size) | 50 ~ 200 µm",
+      "냉각수 유량 (Cooling water) | ≥ 2 L/min",
+      "효과 (Effect) | 내마모·내식·내산화 코팅, 수명 연장",
+      "적용 (Application) | 금형·축·롤·밸브 표면강화·보수",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-cladding.webp",
+    links: [
+      ["tech", "cladding"],
+      ["material", "metalSteel"],
+      ["industry", "machinery"],
+      ["industry", "automotive"],
+      ["industry", "aerospace"],
+      ["industry", "steel"],
+    ],
+    cases: [],
+  },
+  {
+    key: "mavenCleaning",
+    itemName: "MLA-CL 시리즈",
+    title: "펄스 레이저 클리닝(세정) 시스템",
+    nameEn: "Pulse Laser Cleaning System",
+    model: "MLA-CL-C1000 / C1500 / C2000 / C3000",
+    icon: "clean",
+    description: [
+      "펄스 레이저 클리닝(세정) 시스템",
+      "고에너지 펄스 레이저로 표면의 녹·산화물·오염·코팅을 비접촉으로 제거하는 친환경 세정 시스템입니다. 휴대형·로봇 연동형으로 구성되며, 중국 Maven Laser Automation의 설비로 ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 무소모품·무화학·저소음·에너지 절약(소모품/약품 불필요)",
+      "- 비접촉·무연마·무응력으로 모재 손상 최소화",
+      "- 나노 단위 오염 입자까지 제거, 높은 청정도",
+      "- 광섬유 전송·이동식 조작으로 작업이 어려운 부위도 세정",
+      "- 중오염 고속 제거와 경오염 초고속 제거 모두 대응",
+      "",
+      "[적용 분야]",
+      "금형 세정, 금속 녹·산화물·유분 제거, 용접·코팅 전 표면 전처리, 자동차·항공 부품 유지보수",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | MLA-CL-C1000 / C1500 / C2000 / C3000",
+      "레이저 출력 (Laser power) | 1,000 / 1,500 / 2,000 / 3,000 W (모델별)",
+      "가공 모드 (Work mode) | 펄스(Pulse)",
+      "방식 (Type) | 휴대형 / 로봇 연동형",
+      "제거 대상 (Removal) | 녹·산화물·유분·도막·오염층",
+      "특징 (Feature) | 무소모품·무화학·비접촉 친환경 세정",
+      "적용 (Application) | 금형·금속 표면 세정, 용접·코팅 전처리",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-cleaning.webp",
+    links: [
+      ["tech", "cleaning"],
+      ["material", "metalSteel"],
+      ["industry", "machinery"],
+      ["industry", "automotive"],
+      ["industry", "homeAppliance"],
+    ],
+    cases: [{ url: "/images/lineup/maven/cases/clean-gear.webp", caption: "기어 녹 제거 전·후 (Before/After)" }],
+  },
+  // ── 주얼리(귀금속) ──────────────────────────────────────────────────
+  {
+    key: "mavenGoldCut",
+    itemName: "MLA-3030",
+    title: "금·은 파이버 레이저 절단기",
+    nameEn: "Gold & Silver Fiber Laser Cutting Machine",
+    model: "MLA-3030",
+    icon: "cut",
+    description: [
+      "금·은 파이버 레이저 절단기",
+      "고반사 귀금속(금·은·동) 전용으로 설계된 파이버 레이저 절단기입니다. 네임·펜던트 등 정밀 형상을 버 없이 절단합니다. 중국 Maven Laser Automation의 주얼리 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 고반사 금·은·동 소재 절단에 특화",
+      "- 9K~24K 금, 각종 등급의 은·동 대응",
+      "- 절단면이 깨끗하고 버(burr) 없이 광택 유지",
+      "- 분말·스크랩 회수 시스템(회수율 1.0~4.0 g/kg)으로 귀금속 손실 최소화",
+      "- 절단 정밀도 ±0.1 mm의 고정밀 가공",
+      "",
+      "[적용 소재]",
+      "금·은·동 등 귀금속, 스테인리스·알루미늄",
+      "",
+      "[적용 분야]",
+      "네임·이니셜·펜던트·장식 부품 등 주얼리 정밀 절단",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "가공 소재 (Material) | 금(9K~24K)·은·동, 스테인리스·알루미늄",
+      "절단 두께 (Thickness) | 금/은/동 1 ~ 3 mm",
+      "절단 정밀도 (Accuracy) | ± 0.1 mm",
+      "귀금속 회수 (Recycling) | 1.0 ~ 4.0 g/kg",
+      "절단면 (Edge) | 버(burr) 없음·광택 유지",
+      "적용 (Application) | 네임·펜던트 등 주얼리 정밀 절단",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-gold-cut.webp",
+    links: [
+      ["tech", "cutting"],
+      ["material", "preciousMetal"],
+      ["material", "metalSteel"],
+      ["material", "copperAluminum"],
+      ["industry", "jewelry"],
+    ],
+    cases: [{ url: "/images/lineup/maven/cases/gold-samples.webp", caption: "금·은 절단 적용 사례 (Cutting samples)" }],
+  },
+  {
+    key: "mavenYagWeld",
+    itemName: "MLA-W-A01 / A03",
+    title: "스탠드형 YAG 주얼리 레이저 용접기",
+    nameEn: "Stand-Alone YAG Jewelry Laser Welding Machine",
+    model: "MLA-W-A01 / MLA-W-A03",
+    icon: "weld",
+    description: [
+      "스탠드형 YAG 주얼리 레이저 용접기",
+      "고에너지 YAG 레이저로 귀금속을 변색(흑화) 없이 정밀 용접하는 스탠드형 주얼리 용접기입니다. 중국 Maven Laser Automation의 주얼리 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 250W·300W 고출력, 펄스 에너지 최대 180 J",
+      "- 금·은 고출력 용접 시에도 흑화(변색) 없음",
+      "- 공랭 + 수냉 순환의 지능형 온도 제어로 장시간 연속 가동",
+      "- 콤팩트 설계(약 85 kg), 강·연(soft) 모드 선택으로 금·은 용접 최적화",
+      "",
+      "[적용 소재]",
+      "금·백금·티타늄·은·동·니켈·알루미늄·마그네슘·스테인리스 등",
+      "",
+      "[적용 분야]",
+      "반지·팔찌 사이징, 난집(스톤 세팅), 안경테·보철(치과)·소형 부품 용접 등 미세 타깃 정밀 용접",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | MLA-W-A01 / MLA-W-A03",
+      "레이저 출력 (Laser power) | 250 W & 300 W",
+      "펄스 에너지 (Energy) | 최대 180 J",
+      "냉각 (Cooling) | 공랭 + 수냉 순환(지능형 온도제어)",
+      "중량 (Weight) | 약 85 kg",
+      "모드 (Mode) | 강(strong) / 연(soft) 선택",
+      "가공 소재 (Material) | 금·백금·티타늄·은·동·니켈·알루미늄·마그네슘·스테인리스",
+      "적용 (Application) | 주얼리 제작·수리, 사이징, 스톤 세팅, 보철",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-yag-weld.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "preciousMetal"],
+      ["industry", "jewelry"],
+      ["industry", "bioHealth"],
+    ],
+    cases: [{ url: "/images/lineup/maven/cases/yag-samples.webp", caption: "주얼리 용접 적용 사례 (Welding samples)" }],
+  },
+  {
+    key: "mavenQcwWeld",
+    itemName: "MLA-W-A05",
+    title: "QCW 데스크탑 주얼리 레이저 용접기",
+    nameEn: "QCW Desktop Jewelry Laser Welding Machine",
+    model: "MLA-W-A05",
+    icon: "weld",
+    description: [
+      "QCW 데스크탑 주얼리 레이저 용접기",
+      "QCW(준연속) 파이버 레이저 기반의 공랭식 데스크탑 주얼리 용접기로, 스폿·심 용접과 롱펄스 드릴링에 적합합니다. 중국 Maven Laser Automation의 주얼리 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 공랭식·콤팩트 설계로 설치·운용 간편",
+      "- 수명 약 10,000시간, 소모품(램프·로드) 불필요",
+      "- 기존 YAG 대비 소비 전력 약 40% 절감, 높은 가성비",
+      "- 레이저 스폿 안정성 우수, CCD + 현미경으로 정밀 위치 확인",
+      "",
+      "[적용 분야]",
+      "주얼리 제작·수리, 사이징, 스톤 세팅, 안경테·보철 용접 등 미세 타깃 정밀 용접",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | MLA-W-A05",
+      "레이저 (Laser) | QCW 파이버, 공랭식",
+      "수명 (Lifetime) | 약 10,000 시간",
+      "소비 전력 (Power saving) | YAG 대비 약 40% 절감",
+      "관측 (Observation) | CCD + 현미경",
+      "소모품 (Consumables) | 램프·로드 불필요",
+      "적용 (Application) | 주얼리 스폿·심 용접, 롱펄스 드릴링",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-qcw-weld.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "preciousMetal"],
+      ["industry", "jewelry"],
+    ],
+    cases: [{ url: "/images/lineup/maven/cases/qcw-samples.webp", caption: "주얼리 용접 적용 사례 (Welding samples)" }],
+  },
+  {
+    key: "mavenMarkCut",
+    itemName: "MLA-M-004",
+    title: "밀폐형 포터블 파이버 레이저 마킹·절단기",
+    nameEn: "Enclosed Portable Fiber Laser Marking & Cutting Machine",
+    model: "MLA-M-004",
+    icon: "mark",
+    description: [
+      "밀폐형 포터블 파이버 레이저 마킹·절단기",
+      "미국·유럽 안전 기준에 맞춘 밀폐형(도어) 캐비닛 구조의 파이버 레이저 마킹·절단기입니다. 중국 Maven Laser Automation의 주얼리 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 밀폐형 안전 캐비닛(고안전 설계), 작업 중 레이저 차광",
+      "- 자동 초점 Z축으로 깊은 절단·각인(최대 2 mm)",
+      "- 금·은 박판 절단용 자동 피더(auto feeder) 지원",
+      "- 진공 방식 귀금속(금) 회수로 손실 최소화",
+      "- 4-LED 조명으로 손쉬운 조작",
+      "",
+      "[적용 분야]",
+      "주얼리 마킹·각인(순도·로고·일련번호), 금·은 박판 절단, 3D 각인, 금형·부품 마킹",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "모델 (Model) | MLA-M-004",
+      "구조 (Structure) | 밀폐형 안전 캐비닛(US/EU 안전기준)",
+      "초점 (Focus) | 자동 초점 Z축",
+      "각인·절단 깊이 (Depth) | 최대 2 mm",
+      "박판 절단 (Sheet cutting) | 금·은 박판 + 자동 피더",
+      "귀금속 회수 (Recovery) | 진공식 금 회수",
+      "조명 (Lighting) | 4-LED",
+      "적용 (Application) | 주얼리 마킹·각인·박판 절단",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-mark-cut.webp",
+    links: [
+      ["tech", "marking"],
+      ["tech", "cutting"],
+      ["material", "preciousMetal"],
+      ["material", "metalSteel"],
+      ["industry", "jewelry"],
+    ],
+    cases: [],
+  },
+  {
+    key: "mavenChainWeld",
+    itemName: "체인 용접기",
+    title: "공랭식 QCW 레이저 체인 용접기",
+    nameEn: "Air-cooled QCW Laser Chain Welding Machine",
+    model: "QCW 60 / 100 / 150 / 300 W",
+    icon: "weld",
+    description: [
+      "공랭식 QCW 레이저 체인 용접기",
+      "QCW(준연속) 공랭식 레이저로 귀금속 체인의 연결 고리를 고속으로 용접하는 주얼리 체인 전용 용접기입니다. 중국 Maven Laser Automation의 주얼리 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- QCW 60/100/150/300 W, 변환 효율 약 30%",
+      "- 공랭식·콤팩트 설계, 수명 약 10,000시간",
+      "- 소모품(램프·로드) 불필요, 유지비 절감",
+      "- 기존 YAG 대비 소비 전력 약 60% 절감",
+      "- 레이저 스폿 안정성 우수",
+      "",
+      "[적용 소재]",
+      "금·은·동·스테인리스",
+      "",
+      "[대응 체인]",
+      "볼·박스·커브·피가로·플랫케이블·로프·스네이크 체인 등",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "레이저 (Laser) | QCW 60 / 100 / 150 / 300 W",
+      "변환 효율 (Efficiency) | 약 30%",
+      "냉각 (Cooling) | 공랭식(Air cooled)",
+      "수명 (Lifetime) | 약 10,000 시간",
+      "소비 전력 (Power saving) | YAG 대비 약 60% 절감",
+      "가공 소재 (Material) | 금·은·동·스테인리스",
+      "적용 (Application) | 주얼리 체인 고리 용접",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-chain-weld.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "preciousMetal"],
+      ["industry", "jewelry"],
+    ],
+    cases: [
+      { url: "/images/lineup/maven/cases/chain-gold.webp", caption: "금 체인 적용 사례 (Gold chains)" },
+      { url: "/images/lineup/maven/cases/chain-silver.webp", caption: "은 체인 적용 사례 (Silver chains)" },
+    ],
+  },
+  {
+    key: "mavenLobsterLock",
+    itemName: "잠금쇠 자동 조립 설비",
+    title: "주얼리 랍스터/피쉬락 자동 조립 설비",
+    nameEn: "Jewelry Lobster/Fish Lock Automatic Assembly Equipment",
+    model: "Auto Assembly Line",
+    icon: "machine",
+    description: [
+      "주얼리 랍스터/피쉬락 자동 조립 설비",
+      "주얼리 잠금쇠(랍스터/피쉬락)를 성형·용접·스프링 삽입·조립까지 자동화한 생산 설비입니다. 중국 Maven Laser Automation의 주얼리 자동화 설비로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[공정 구성]",
+      "1. 성형·펀칭(금형 2종): 금형·프레스로 박판 성형",
+      "2. 벤딩·레이저 용접(20~30 pcs/min): 성형 시트를 구부려 레이저 용접(고리 성형)",
+      "3. 스프링 자동 삽입(30~40 pcs/min): 칩 + 스프링 자동 조립",
+      "4. 자동 조립: 용접품 + 스프링 조립품을 자동 결합 → 완성 잠금쇠",
+      "",
+      "[주요 특징]",
+      "- 성형→용접→스프링 삽입→조립 전 공정 자동화",
+      "- 레이저 용접으로 균일·고강도 접합",
+      "- 분당 20~40개 고속 생산",
+      "",
+      "[적용 분야]",
+      "금·은 체인용 랍스터/피쉬락 잠금쇠 대량 생산",
+      "",
+      MAVEN_OEM_NOTE,
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | 성형·펀칭 → 벤딩·레이저 용접 → 스프링 삽입 → 자동 조립",
+      "용접 (Welding) | 레이저 용접, 20 ~ 30 pcs/min",
+      "스프링 조립 (Spring install) | 30 ~ 40 pcs/min",
+      "자동화 (Automation) | 전 공정 자동 (금형 2종)",
+      "가공 소재 (Material) | 금·은 등 귀금속",
+      "적용 (Application) | 랍스터/피쉬락 잠금쇠 대량 생산",
+    ].join("\n"),
+    imageUrl: "/images/lineup/maven/maven-lobster-lock.webp",
+    links: [
+      ["tech", "metalWelding"],
+      ["material", "preciousMetal"],
+      ["industry", "jewelry"],
+    ],
+    cases: [{ url: "/images/lineup/maven/cases/lobster-samples.webp", caption: "랍스터/피쉬락 잠금쇠 (Lobster/Fish lock)" }],
+  },
+];
+async function ensureMavenLineupV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'maven_lineup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  // 1) 신규 산업분야 "귀금속·쥬얼리"(industry/jewelry) 항목·상세 등록 — 설비 찾기 필터와
+  //    산업 상세 페이지가 바로 동작하도록 content_items + content_pages 선등록.
+  await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'industry', 'jewelry', '귀금속·쥬얼리', 'gem', 50, ${now}) ON CONFLICT (group_key, item_key) DO UPDATE SET name=EXCLUDED.name, icon=EXCLUDED.icon`;
+  // 기존 '기타'를 맨 뒤로 보내 '귀금속·쥬얼리'가 그 앞에 오도록 정렬 보정.
+  await sql`UPDATE content_items SET sort_order = 60 WHERE group_key='industry' AND item_key='other'`;
+  await sql`
+    INSERT INTO content_pages (group_key, item_key, title, description, updated_at)
+    VALUES ('industry', 'jewelry', ${MAVEN_JEWELRY_INDUSTRY.title}, ${MAVEN_JEWELRY_INDUSTRY.description}, ${now})
+    ON CONFLICT (group_key, item_key) DO UPDATE SET
+      title = CASE WHEN content_pages.title IS NULL OR content_pages.title = '' THEN EXCLUDED.title ELSE content_pages.title END,
+      description = CASE WHEN content_pages.description IS NULL OR content_pages.description = '' THEN EXCLUDED.description ELSE content_pages.description END,
+      updated_at = EXCLUDED.updated_at
+  `;
+  // 2) Maven 설비 등록
+  let order = 400;
+  for (const p of MAVEN_PRODUCTS) {
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.itemName}, ${p.icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO UPDATE SET name=EXCLUDED.name, icon=EXCLUDED.icon`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, model, name_en, is_oem, oem_source, updated_at)
+      VALUES ('lineup', ${p.key}, ${p.title}, ${p.description}, ${p.specTable}, ${p.imageUrl}, ${p.model}, ${p.nameEn}, true, ${MAVEN_OEM_SOURCE}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, model=EXCLUDED.model, name_en=EXCLUDED.name_en, is_oem=EXCLUDED.is_oem, oem_source=EXCLUDED.oem_source, updated_at=EXCLUDED.updated_at
+    `;
+    for (const [tg, tk] of p.links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+    }
+    // 적용사례 이미지(있을 때만, 중복 방지)
+    let ci = 0;
+    for (const c of p.cases) {
+      const cnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='lineup' AND item_key=${p.key} AND url=${c.url}`) as { c: number }[];
+      if ((cnt[0]?.c ?? 0) === 0) {
+        await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${c.url}, ${c.caption}, ${ci}, ${now})`;
+      }
+      ci += 1;
+    }
+    order += 1;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('maven_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
