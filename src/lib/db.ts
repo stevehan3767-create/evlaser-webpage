@@ -507,6 +507,7 @@ function createSchema(): Promise<void> {
     await ensureChanxanLineupV1();
     await ensureChanxanMedicalV1();
     await ensureChanxanCasesV1();
+    await ensureHuiruiLineupV1();
   })();
 }
 
@@ -1840,6 +1841,176 @@ async function ensureChanxanCasesV1(): Promise<void> {
     await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'lineup', ${key}, ${`/images/lineup/chanxan/cases/${file}`}, ${"가공 샘플 (Processing samples)"}, 0, ${now})`;
   }
   await sql`INSERT INTO settings (key, value) VALUES ('chanxan_cases_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// 해외 공급·협업사(중국 Huirui 南京辉锐光电, 난징) 레이저 클래딩 제품 등록 +
+// 레이저 클래딩 기술 콘텐츠에 '고속 클래딩·브레이크 디스크' 응용 보강.
+const HUIRUI_OEM_SOURCE = "http://www.huirui-tech.com";
+const HUIRUI_CLADDING_APPENDIX = [
+  "",
+  "[고속 레이저 클래딩 · 브레이크 디스크 (응용)]",
+  "고속 레이저 클래딩(High-Speed Laser Cladding)은 분말 사용률을 높이고 증착 속도를 크게 끌어올린 공정으로, 자동차 브레이크 디스크의 내마모·내식 코팅에 적용됩니다. 유럽 Euro 7 배출 기준(2026.11.29 시행)이 제동 시 미세먼지(PM) 배출을 규제하면서, 회색 주철 디스크 표면에 클래딩층을 형성하는 방식이 주목받고 있습니다.",
+  "- 코팅 구조: 버퍼층 ~100µm + 내마모·내식층 ~250µm(연삭 후 ~200µm), 층간 야금 결합·무균열",
+  "- 특성: 경도 ~440HV, 분말 사용률 ~90%, 상층 연삭량 <0.1mm",
+  "- 생산성: 레이저 출력에 따라 디스크 1장당 6kW <7분 / 10kW <4분 / 24kW <2.5분",
+  "- 응용: 브레이크 디스크 외에도 항공 터빈 블레이드·유압 피스톤로드·밸브 스템·터보차저 로터·압연롤 보수 등",
+].join("\n");
+const HUIRUI_PRODUCTS: CkdProduct[] = [
+  {
+    key: "huiruiBrakeDisc",
+    itemName: "브레이크 디스크 클래딩",
+    title: "고속 레이저 클래딩 브레이크 디스크 시스템",
+    nameEn: "High-Speed Laser Cladding System for Brake Disc",
+    model: "6 / 10 / 24 kW",
+    icon: "clad",
+    description: [
+      "고속 레이저 클래딩 브레이크 디스크 시스템",
+      "회색 주철 브레이크 디스크 표면에 레이저로 금속 분말을 용융·적층해 내마모·내식 코팅층을 형성하는 고속 클래딩 시스템입니다. 유럽 Euro 7 제동 미세먼지(PM) 규제 대응 솔루션으로, 중국 Huirui(南京辉锐光电)의 설비이며 ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 고속 레이저 클래딩으로 높은 증착 속도·분말 사용률(~90%)",
+      "- 버퍼층+내마모·내식층의 야금 결합, 무균열·무기공 상층",
+      "- 경도 ~440HV, 상층 연삭량 <0.1mm로 후가공 최소화",
+      "- 자체 분말·공정 파라미터 데이터베이스, 폐루프 분말 공급 제어",
+      "- 온라인 검사(분말-레이저 정렬·분말 유량 등) 지원",
+      "",
+      "[코팅 구조]",
+      "모재(회색 주철) → 버퍼층 ~100µm → 내마모·내식층 ~250µm (연삭 후 ~200µm)",
+      "",
+      "[적용 분야]",
+      "자동차 브레이크 디스크(Euro 7 대응) 내마모·내식 코팅",
+      "",
+      "[코팅 소재]",
+      "In625+WC, 316+TiC, 430+TiC, S.S.+TiC 등 (분말)",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "레이저 출력 (Laser power) | 6 / 10 / 24 kW (선택)",
+      "코팅 구조 (Layer structure) | 버퍼 ~100µm + 내마모·내식 ~250µm (연삭 후 ~200µm)",
+      "경도 (Hardness) | ~440 HV",
+      "분말 사용률 (Powder usage) | ~90%",
+      "디스크 1장 클래딩 시간 (Cycle) | 6kW <7분 / 10kW <4분 / 24kW <2.5분",
+      "코팅 소재 (Coating powder) | In625+WC, 316+TiC, 430+TiC 등",
+      "적용 (Application) | 브레이크 디스크 (Euro 7 대응)",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-brakedisc-cladding.webp",
+    links: [
+      ["tech", "cladding"],
+      ["material", "metalSteel"],
+      ["industry", "automotive"],
+      ["industry", "machinery"],
+    ],
+    cases: [],
+  },
+  {
+    key: "huiruiBrakeLine",
+    itemName: "클래딩 양산 라인",
+    title: "레이저 클래딩 브레이크 디스크 양산 라인",
+    nameEn: "High-Speed Laser Cladding Brake Disc Production Line",
+    model: "24 kW × 2 Line",
+    icon: "machine",
+    description: [
+      "레이저 클래딩 브레이크 디스크 양산 라인",
+      "전처리 검사부터 레이저 클래딩, 양면 연삭, 후처리 검사까지 자동화한 브레이크 디스크 클래딩 양산 라인입니다. 중국 Huirui(南京辉锐光电)의 턴키 라인으로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 24kW 레이저 클래딩 시스템 2기 구성으로 고생산성",
+      "- 로봇 상·하차 + 슬라이드 레일 + 온라인 두께 측정 자동화",
+      "- 전처리 검사 → 클래딩 → 양면 연삭 → 후처리 검사 통합",
+      "- 코어 작업 영역 확장 모듈로 증설 대응",
+      "- 생산라인 장비 독자 IP·국산화율 90% 이상, 국내 소재·공정 공급망 구축",
+      "",
+      "[생산 능력]",
+      "듀얼 레이저 기준 연간 약 30만 디스크 (300일 × 18시간 기준)",
+      "",
+      "[적용 분야]",
+      "자동차 브레이크 디스크 대량 클래딩 양산",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 라인 구성·사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "구성 (Configuration) | 전처리 검사 → 레이저 클래딩 → 양면 연삭 → 후처리 검사 (자동화)",
+      "레이저 클래딩 시스템 (Cladding system) | 24 kW × 2",
+      "연삭 (Grinding) | 양면 연삭 (~60초)",
+      "자동화 (Automation) | 로봇 상·하차, 슬라이드 레일, 온라인 두께 측정",
+      "생산 능력 (Throughput) | 약 300,000 디스크/년 (듀얼, 300일×18h)",
+      "디스크 사이즈 예 (Disc size) | 외경 345mm, 내경 233mm",
+    ].join("\n"),
+    imageUrl: "/images/lineup/huirui/huirui-brakedisc-cladding.webp",
+    links: [
+      ["tech", "cladding"],
+      ["material", "metalSteel"],
+      ["industry", "automotive"],
+    ],
+    cases: [],
+  },
+  {
+    key: "huiruiRepair",
+    itemName: "클래딩 보수 시스템",
+    title: "레이저 클래딩 보수·표면강화 시스템",
+    nameEn: "Laser Cladding Repair & Surface Strengthening System",
+    model: "LMD / Cladding",
+    icon: "clad",
+    description: [
+      "레이저 클래딩 보수·표면강화 시스템",
+      "레이저 금속 적층(LMD)·고속 클래딩으로 고가 부품을 보수·복원하고 표면을 강화하는 시스템입니다. 중국 Huirui(南京辉锐光电)는 중국 최대 산업용 레이저 클래딩 설비 공급사로, ㈜이브이레이저가 국내 공급·기술지원을 담당합니다.",
+      "",
+      "[주요 특징]",
+      "- 레이저 금속 적층(LMD)·고속 클래딩·적층 보수·표면 코팅 대응",
+      "- 분말 공급기·클래딩 레이저 헤드·클래딩 노즐·통합 시스템 등 자체 제품군",
+      "- 내마모·내식·내열 코팅으로 부품 수명 연장",
+      "- 적용 시나리오별 맞춤 구성(로봇 연동 등)",
+      "",
+      "[적용 분야]",
+      "항공 터빈(HPT) 블레이드 보수, 증기터빈 블레이드 보수, 유압 피스톤로드 내식 클래딩, 밸브 스템 보수, 터보차저 로터 보수, 압연롤 온라인 보수, 커팅 픽 내마모 클래딩 등",
+      "",
+      "[코팅 소재]",
+      "인코넬·스텔라이트·탄화물 복합분말 등",
+      "",
+      "※ 중국 Huirui와의 공급·협업 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+    ].join("\n"),
+    specTable: [
+      "공정 (Process) | LMD · 고속 클래딩 · 적층 보수 · 표면 코팅",
+      "레이저 출력 (Laser power) | 1,000 ~ 6,000 W 급 (사양 선택)",
+      "코팅 소재 (Coating material) | 인코넬·스텔라이트·탄화물 복합분말 등",
+      "구성 (Components) | 분말 공급기 · 클래딩 레이저 헤드 · 클래딩 노즐 · 통합 시스템",
+      "적용 (Application) | 항공·에너지·기계·조선·철강 부품 보수·표면강화",
+    ].join("\n"),
+    imageUrl: "/images/tech/scenes/scene-surface.webp",
+    links: [
+      ["tech", "cladding"],
+      ["material", "metalSteel"],
+      ["industry", "aerospace"],
+      ["industry", "machinery"],
+      ["industry", "shipbuilding"],
+      ["industry", "steel"],
+      ["industry", "automotive"],
+    ],
+    cases: [],
+  },
+];
+async function ensureHuiruiLineupV1(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'huirui_lineup_v1'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  // 레이저 클래딩 기술 콘텐츠에 고속 클래딩·브레이크 디스크 응용 섹션 보강(1회 추가)
+  await sql`UPDATE content_pages SET description = description || ${HUIRUI_CLADDING_APPENDIX}, updated_at = ${now} WHERE group_key='tech' AND item_key='cladding' AND description NOT LIKE ${"%고속 레이저 클래딩 · 브레이크 디스크%"}`;
+  // Huirui 제품 등록
+  let order = 360;
+  for (const p of HUIRUI_PRODUCTS) {
+    await sql`INSERT INTO content_items (id, group_key, item_key, name, icon, sort_order, created_at) VALUES (${newId()}, 'lineup', ${p.key}, ${p.itemName}, ${p.icon}, ${order}, ${now}) ON CONFLICT (group_key, item_key) DO NOTHING`;
+    await sql`
+      INSERT INTO content_pages (group_key, item_key, title, description, spec_table, image_url, model, name_en, is_oem, oem_source, updated_at)
+      VALUES ('lineup', ${p.key}, ${p.title}, ${p.description}, ${p.specTable}, ${p.imageUrl}, ${p.model}, ${p.nameEn}, true, ${HUIRUI_OEM_SOURCE}, ${now})
+      ON CONFLICT (group_key, item_key) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description, spec_table=EXCLUDED.spec_table, image_url=EXCLUDED.image_url, model=EXCLUDED.model, name_en=EXCLUDED.name_en, is_oem=EXCLUDED.is_oem, oem_source=EXCLUDED.oem_source, updated_at=EXCLUDED.updated_at
+    `;
+    for (const [tg, tk] of p.links) {
+      await sql`INSERT INTO content_item_links (from_group, from_key, to_group, to_key) VALUES ('lineup', ${p.key}, ${tg}, ${tk}) ON CONFLICT DO NOTHING`;
+    }
+    order += 1;
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('huirui_lineup_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
