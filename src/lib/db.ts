@@ -513,6 +513,7 @@ function createSchema(): Promise<void> {
     await ensureHuiruiSpecFilesV1();
     await ensureMavenLineupV1();
     await ensureMavenCatalogV1();
+    await ensureMavenTextureV2();
   })();
 }
 
@@ -3490,6 +3491,98 @@ async function ensureMavenCatalogV1(): Promise<void> {
     }
   }
   await sql`INSERT INTO settings (key, value) VALUES ('maven_catalog_v1', ${now}) ON CONFLICT (key) DO NOTHING`;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// 레이저 몰드 텍스처 가공 시스템(MAVEN/Kaycheng KCSGL·KCSDL·KCSGR 시리즈) —
+// "레이저정밀(미세)가공"(tech/precisionMachining) 기술 페이지를 사진·사양·샘플·특징을
+// 포함한 완성형 콘텐츠로 보강한다. (maven_catalog_v1의 간이 텍스처 섹션을 대체)
+// ───────────────────────────────────────────────────────────────────────────
+const MAVEN_TEXTURE_DESC = [
+  "[레이저 몰드 텍스처 가공 시스템 — MAVEN]",
+  "레이저 몰드 텍스처(Texturing) 가공은 금형·부품 표면에 가죽결·기하무늬·헤어라인 등 미세 패턴을 레이저로 직접 새기는 정밀 표면가공 기술입니다. 기존 화학 부식(에칭) 방식을 대체해 균일성·반복성·친환경성이 우수하며, 3D 곡면에도 이음매 없이(seamless) 가공할 수 있습니다. ㈜이브이레이저는 중국 Maven Laser Automation의 KCSGL·KCSDL·KCSGR 텍스처 가공기 시리즈를 국내 공급·기술지원합니다.",
+  "",
+  "[시스템 특징]",
+  "- 초정밀 각도 세분화로 섬세한 패턴 구현",
+  "- 단차(높이차) 자동 보정(Auto compensation for high drop)",
+  "- 대면적 텍스처를 이음매 없이 연속 가공(Seamless splicing)",
+  "- 200G 이내 대용량 파일도 원활하게 처리",
+  "- STP·STL·OBJ·IGS·PLY·TIF 및 비트맵 등 다양한 포맷 지원",
+  "- 광학 측정기로 금형 위치 자동 인식(수동 조정 불필요)",
+  "- 직관적이고 이해하기 쉬운 전용 소프트웨어",
+  "",
+  "[제품 강점(6-High)]",
+  "- 고효율(High Efficiency): 패턴 텍스처 신속 임포트",
+  "- 고정밀(High Accuracy): 마블(대리석) 구조 + 연삭급 볼스크류, 마이크론급 레이저 안정 출력",
+  "- 고적합성(High Suitability): 모든 금형 금속 소재 대응",
+  "- 고가성비(High Cost Performance)",
+  "- 고품질(High Quality)",
+  "- 고유연성(High Flexibility): 초유연 알고리즘·시스템",
+  "",
+  "[가공 프로세스]",
+  "1. 모델링: 공작물의 3D 모델을 추출하고 가공 영역을 지정",
+  "2. 그래픽 처리: 곡면을 평탄화한 뒤 텍스처 이미지를 필요한 비율로 배치",
+  "3. 궤적 형성: 레이어·블록 수 등 파라미터로 모듈 파일 자동 생성",
+  "4. 장비 프리셋: 레이저 기준 캘리브레이션(최초 1회), 공작물 위치결정",
+  "5. 가공: 원클릭 가공, 가공 로그 자동 기록으로 모니터링 용이",
+  "",
+  "[주요 모델·사양]",
+  "- KCSGL8050F (5축 서보): 최대 20kW · 행정 800×500×500mm · 최대가공 Φ500 · 텍스처 단차 30mm · B축 190°(-55~+135)/C축 720° · 적재 200kg · 레이저 50/60/100W · 초점 254mm · 중량 6,200kg · 380V 3상",
+  "- KCSGL12090F (5축 서보): 최대 25kW · 행정 1200×900×1000mm · 최대가공 Φ800 · 단차 30mm · B축 190°/C축 720° · 적재 1,000kg · 레이저 50/60/100W · 초점 254mm · 중량 10,000kg · 380V 3상",
+  "- KCSGL12080 (서보): 최대 10kW · 행정 1200×900×500mm · 최대가공 1050×800×350mm · 단차 30mm · 텍스처각 45° · 적재 1,200kg · 레이저 50/60/100W · 초점 200mm · 중량 9,000kg · 380V 3상",
+  "- KCSGL6050 (리니어모터): 최대 4.8kW · 행정 700×480×280mm · 최대가공 500×400×250mm · 단차 30mm · 텍스처각 45° · 적재 150kg · 레이저 20/50/100W · 초점 200mm · 중량 6,000kg · 220V 단상",
+  "- KCSDL3030 (리니어모터): 최대 2.5kW · Z행정 450mm · 최대가공 300×300×410mm(단일)/600×450×410mm(멀티) · 단차 50mm · 텍스처각 45° · 적재 500kg · 레이저 50/60/100W · 초점 400mm · 중량 1,250kg · 220V 단상",
+  "- KCSGR900P (서보): 최대 6kW · 행정 Y750×Z600mm · 최대가공 Φ900 · 단차 30mm · 텍스처각 80° · 적재 600kg · 레이저 50/60/100W · 초점 223±15mm · 중량 4,400kg · 220V 3상",
+  "※ 전 모델 공통: 증류수 냉각 + 0.6MPa 에어",
+  "",
+  "[적용 분야]",
+  "3C 전자 · 금형(몰드) · 자동차 · 타이어 · 조명(라이팅)·디지털 기기 외장·블로우 몰드 등 표면 텍스처 가공",
+  "",
+  "※ 중국 Maven Laser Automation과의 공급·협업(해외 OEM) 제품입니다. 사양은 카탈로그 기준이며, 담당자 확인 후 반영됩니다.",
+].join("\n");
+const MAVEN_TEXTURE_SPEC = [
+  "KCSGL8050F (5축 서보) | 20kW · 행정 800×500×500 · Φ500 · 적재 200kg · 50/60/100W · 초점 254mm",
+  "KCSGL12090F (5축 서보) | 25kW · 행정 1200×900×1000 · Φ800 · 적재 1,000kg · 50/60/100W · 초점 254mm",
+  "KCSGL12080 (서보) | 10kW · 행정 1200×900×500 · 가공 1050×800×350 · 적재 1,200kg · 초점 200mm",
+  "KCSGL6050 (리니어모터) | 4.8kW · 행정 700×480×280 · 가공 500×400×250 · 적재 150kg · 초점 200mm",
+  "KCSDL3030 (리니어모터) | 2.5kW · Z행정 450 · 가공 300×300×410 / 600×450×410 · 적재 500kg · 초점 400mm",
+  "KCSGR900P (서보) | 6kW · 행정 Y750×Z600 · Φ900 · 적재 600kg · 초점 223±15mm · 텍스처각 80°",
+  "축·제어 (Axis control) | 5축 서보 / 서보 / 리니어모터",
+  "텍스처 단차 (Max drop) | 30 ~ 50 mm",
+  "지원 포맷 (Formats) | STP·STL·OBJ·IGS·PLY·TIF·비트맵",
+  "냉각 (Cooling) | 증류수 + 0.6MPa 에어 (전 모델)",
+].join("\n");
+const MAVEN_TEXTURE_IMAGES = [
+  { url: "/images/lineup/maven/texture/machine-8050f.webp", caption: "KCSGL8050F · 5축 서보 텍스처 가공기" },
+  { url: "/images/lineup/maven/texture/machine-12080.webp", caption: "KCSGL12080 · 서보 대형 텍스처 가공기" },
+  { url: "/images/lineup/maven/texture/machine-6050.webp", caption: "KCSGL6050 · 리니어모터 텍스처 가공기" },
+  { url: "/images/lineup/maven/texture/machine-3030.webp", caption: "KCSDL3030 · 회전형 텍스처 가공기" },
+  { url: "/images/lineup/maven/texture/machine-900p.webp", caption: "KCSGR900P · 대각도(80°) 텍스처 가공기" },
+  { url: "/images/lineup/maven/texture/effects.webp", caption: "레이저 텍스처 효과 예시 (Texture effects)" },
+  { url: "/images/lineup/maven/texture/app-auto.webp", caption: "자동차 헤드램프·라이팅 (Automotive lighting)" },
+  { url: "/images/lineup/maven/texture/app-digital.webp", caption: "디지털 기기 외장·키패드 (Digital shell)" },
+  { url: "/images/lineup/maven/texture/app-blowmold.webp", caption: "블로우 몰드 (Blow mold)" },
+];
+async function ensureMavenTextureV2(): Promise<void> {
+  const flag = (await sql`SELECT value FROM settings WHERE key = 'maven_texture_v2'`) as { value: string }[];
+  if (flag.length > 0) return;
+  const now = new Date().toISOString();
+  // 1) maven_catalog_v1에서 추가한 간이 텍스처 섹션 제거(있을 때만)
+  await sql`UPDATE content_pages SET description = rtrim(left(description, position('[레이저 텍스처(Texturing) 가공' in description) - 1)) WHERE group_key='tech' AND item_key='precisionMachining' AND position('[레이저 텍스처(Texturing) 가공' in description) > 0`;
+  // 2) 완성형 텍스처 가공 섹션을 본문에 1회 추가
+  await sql`UPDATE content_pages SET description = description || E'\n\n' || ${MAVEN_TEXTURE_DESC}, updated_at = ${now} WHERE group_key='tech' AND item_key='precisionMachining' AND description NOT LIKE ${"%레이저 몰드 텍스처 가공 시스템%"}`;
+  // 3) 사양표·대표이미지·사양서 파일 연결(설명 보강 — 대표이미지는 텍스처 가공기로)
+  await sql`UPDATE content_pages SET spec_table = ${MAVEN_TEXTURE_SPEC}, image_url = '/images/lineup/maven/texture/machine-8050f.webp', spec_file_url = '/docs/maven/maven-texture-spec.pdf', spec_file_name = 'MAVEN_레이저텍스처가공기_사양서.pdf', updated_at = ${now} WHERE group_key='tech' AND item_key='precisionMachining'`;
+  // 4) 기존 간이 이미지(2종) 제거 후 완성형 갤러리(9종) 등록
+  await sql`DELETE FROM content_images WHERE group_key='tech' AND item_key='precisionMachining' AND url IN ('/images/lineup/maven/cases/texture-effects.webp','/images/lineup/maven/cases/texture-machine.webp')`;
+  for (let i = 0; i < MAVEN_TEXTURE_IMAGES.length; i++) {
+    const c = MAVEN_TEXTURE_IMAGES[i];
+    const cnt = (await sql`SELECT COUNT(*)::int AS c FROM content_images WHERE group_key='tech' AND item_key='precisionMachining' AND url=${c.url}`) as { c: number }[];
+    if ((cnt[0]?.c ?? 0) === 0) {
+      await sql`INSERT INTO content_images (id, group_key, item_key, url, caption, sort_order, created_at) VALUES (${newId()}, 'tech', 'precisionMachining', ${c.url}, ${c.caption}, ${i}, ${now})`;
+    }
+  }
+  await sql`INSERT INTO settings (key, value) VALUES ('maven_texture_v2', ${now}) ON CONFLICT (key) DO NOTHING`;
 }
 
 // 기술종류별 설명을 A4 1/2~1페이지 분량의 전문 기술자료로 보강(원리·가능재료·장점·
